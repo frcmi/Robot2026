@@ -10,164 +10,246 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.RobotSuperstructure;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.TunerConstantsAlpha;
+import frc.robot.constants.Intake.PivotConstants;
+import frc.robot.constants.Intake.RollerConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.alliancecolor.AllianceChecker;
+import frc.robot.lib.controller.Joysticks;
+import frc.robot.lib.sim.CurrentDrawCalculatorSim;
+import frc.robot.lib.subsystem.angular.AngularIO;
+import frc.robot.lib.subsystem.angular.AngularIOSim;
+import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
+import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private final Drive drive;
+    // Controller
+    private final Joysticks controller = new Joysticks(0);
 
-  // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+    // Dashboard inputs
+    private final LoggedDashboardChooser<Command> autoChooser;
+    private final Field2d field = new Field2d();
 
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+    private final Drive drive;
+    private final Vision vision;
+    private final Intake intake;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
-        // a CANcoder
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+    private final RobotSuperstructure superstructure;
 
-        // The ModuleIOTalonFXS implementation provides an example implementation for
-        // TalonFXS controller connected to a CANdi with a PWM encoder. The
-        // implementations
-        // of ModuleIOTalonFX, ModuleIOTalonFXS, and ModuleIOSpark (from the Spark
-        // swerve
-        // template) can be freely intermixed to support alternative hardware
-        // arrangements.
-        // Please see the AdvantageKit template documentation for more information:
-        // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template#custom-module-implementations
-        //
-        // drive =
-        // new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFXS(TunerConstants.FrontLeft),
-        // new ModuleIOTalonFXS(TunerConstants.FrontRight),
-        // new ModuleIOTalonFXS(TunerConstants.BackLeft),
-        // new ModuleIOTalonFXS(TunerConstants.BackRight));
-        break;
+    private final DriveCommands driveCommands;
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        break;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final AllianceChecker allianceChecker = new AllianceChecker();
 
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        break;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final CurrentDrawCalculatorSim currentDrawCalculatorSim = new CurrentDrawCalculatorSim();
+
+    private final Alert autoAlert = new Alert("No auto selected!", Alert.AlertType.kWarning);
+    private final Alert controllerOneAlert = new Alert("Controller 1 is unplugged!", Alert.AlertType.kWarning);
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final SuperstructureVisualizer measuredSuperstructureState;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final SuperstructureVisualizer targetSuperstructureState;
+
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        switch (Constants.currentMode) {
+            case REAL:
+                drive = new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
+                        new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
+                        new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
+                        new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
+                vision = new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOLimelight(camera0Name, drive::getRotation)
+                // new VisionIOLimelight(camera1Name, drive::getRotation)
+                );
+                intake = new Intake(
+                        /*
+                         * new AngularSubsystem(
+                         * new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
+                         * RollerConstants.kSubsystemConfigReal)
+                         */
+                        new AngularSubsystem(new AngularIO() {
+                        }, RollerConstants.kSubsystemConfigReal),
+                        new AngularSubsystem(
+                                new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
+                                PivotConstants.kSubsystemConfigReal));
+                break;
+
+            case SIM:
+                // Sim robot, instantiate physics sim IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
+                        new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
+                        new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
+                        new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+                vision = new Vision(
+                        drive::addVisionMeasurement,
+                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose)/*
+                                                                                                 * ,
+                                                                                                 * new
+                                                                                                 * VisionIOPhotonVisionSim
+                                                                                                 * (camera1Name,
+                                                                                                 * robotToCamera1,
+                                                                                                 * drive::getPose)
+                                                                                                 */);
+
+                AngularIOSim pivotIO = new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+                pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+                        PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
+                intake = new Intake(
+                        new AngularSubsystem(
+                                new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                                RollerConstants.kSubsystemConfigSim),
+                        new AngularSubsystem(
+                                pivotIO, PivotConstants.kSubsystemConfigReal));
+                break;
+
+            default:
+                // Replayed robot, disable IO implementations
+                drive = new Drive();
+                vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
+                }/* , new VisionIO() {} */);
+                intake = new Intake();
+                break;
+        }
+
+        superstructure = new RobotSuperstructure(intake);
+        superstructure.registerAutoCommands();
+
+        measuredSuperstructureState = new SuperstructureVisualizer(
+                intake::getMeasuredState,
+                "MeasuredStateMechanism",
+                RobotConstants.kMeasuredStateColor);
+        targetSuperstructureState = new SuperstructureVisualizer(
+                intake::getTargetState,
+                "TargetStateMechanism",
+                RobotConstants.kTargetStateColor);
+
+        // Set up auto routines
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        // Set up SysId routines
+        autoChooser.addOption(
+                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        autoChooser.addOption(
+                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Forward)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Reverse)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+        logInit();
+
+        // Configure the button bindings
+        configureButtonBindings();
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    /**
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+     * it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+        // Default command, normal field-relative drive
+        drive.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        drive,
+                        () -> -controller.getLeftStickY(),
+                        () -> -controller.getLeftStickX(),
+                        () -> -controller.getRightStickX()));
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        // Lock to 0° when A button is held
+        controller.buttonA
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -controller.getLeftY(),
+                                () -> -controller.getLeftX(),
+                                () -> Rotation2d.kZero));
 
-    // Configure the button bindings
-    configureButtonBindings();
-  }
+        // Switch to X pattern when X button is pressed
+        controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+        // Intake controls
+        controller.buttonA.onTrue(superstructure.intakeDeploy());
+        controller.buttonA.onFalse(superstructure.intakeStowed());
+    }
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    private void logInit() {
+        SmartDashboard.putData("Field", field);
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        Logger.recordOutput(
+                "Poses/AprilTagField",
+                VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
+        Logger.recordOutput(
+                "Poses/WeldedAprilTagField",
+                VisionConstants.kWeldedAprilTagField.values().toArray(new Pose3d[0]));
+        Logger.recordOutput(
+                "Poses/AndyMarkAprilTagField",
+                VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
+    }
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return autoChooser.get();
+    }
 }

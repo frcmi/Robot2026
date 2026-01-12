@@ -15,25 +15,25 @@ import lombok.Singular;
 @Builder
 @Getter
 public class AngularIOTalonFXConfig {
-    private final int masterId;
-    @Singular private final List<Integer> followerIds;
-    private final CANBus bus;
-    @Builder.Default private final boolean opposeMaster = false;
-    @Builder.Default private final Angle resetAngle = Radians.of(0.0);
-    @Builder.Default private final Angle softMinAngle = Radians.of(Double.NEGATIVE_INFINITY);
-    @Builder.Default private final Angle softMaxAngle = Radians.of(Double.POSITIVE_INFINITY);
-    @Builder.Default private final double motorRotationsPerOutputRotations = 0.0;
-    @Builder.Default private final Angle outputAnglePerOutputRotation = Rotation.of(1.0);
-    private final InvertedValue inverted;
-    private final Current supplyCurrentLimit;
-    private final Current statorCurrentLimit;
-    @Builder.Default @Setter private NeutralModeValue neutralMode = NeutralModeValue.Brake;
-    @Builder.Default @Setter private double kP = 0.0;
-    @Builder.Default @Setter private double kI = 0.0;
-    @Builder.Default @Setter private double kD = 0.0;
-    @Builder.Default @Setter private double kV = 0.0;
-    @Builder.Default @Setter private AngularVelocity cruiseVelocity = RotationsPerSecond.of(0.0);
+  private final int masterId;
+  @Singular private final List<Integer> followerIds;
+  private final CANBus bus;
+  @Builder.Default private final boolean opposeMaster = false;
+  @Builder.Default private final Angle resetAngle = Radians.of(0.0);
+  @Builder.Default private final Angle softMinAngle = Radians.of(Double.NEGATIVE_INFINITY);
+  @Builder.Default private final Angle softMaxAngle = Radians.of(Double.POSITIVE_INFINITY);
+  @Builder.Default private final double motorRotationsPerOutputRotations = 0.0;
+  @Builder.Default private final Angle outputAnglePerOutputRotation = Rotation.of(1.0);
+  private final InvertedValue inverted;
+  private final Current supplyCurrentLimit;
+  private final Current statorCurrentLimit;
+  @Builder.Default @Setter private NeutralModeValue neutralMode = NeutralModeValue.Brake;
+  @Builder.Default @Setter private double kP = 0.0;
+  @Builder.Default @Setter private double kI = 0.0;
+  @Builder.Default @Setter private double kD = 0.0;
+  @Builder.Default @Setter private double kV = 0.0;
+  @Builder.Default @Setter private AngularVelocity cruiseVelocity = RotationsPerSecond.of(0.0);
 
-    @Builder.Default @Setter
-    private AngularAcceleration acceleration = RotationsPerSecondPerSecond.of(0.0);
+  @Builder.Default @Setter
+  private AngularAcceleration acceleration = RotationsPerSecondPerSecond.of(0.0);
 }

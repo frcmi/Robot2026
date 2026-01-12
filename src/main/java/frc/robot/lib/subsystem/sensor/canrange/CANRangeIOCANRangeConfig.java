@@ -12,9 +12,9 @@ import lombok.Getter;
 @Builder
 @Getter
 public class CANRangeIOCANRangeConfig {
-    private int id;
-    private CANBus bus;
-    @Builder.Default private Angle fovRange = Degrees.of(6.75);
-    @Builder.Default private UpdateModeValue updateMode = ShortRange100Hz;
-    @Builder.Default private Frequency updateFrequency = Hertz.of(100.0);
+  private int id;
+  private CANBus bus;
+  @Builder.Default private Angle fovRange = Degrees.of(6.75);
+  @Builder.Default private UpdateModeValue updateMode = ShortRange100Hz;
+  @Builder.Default private Frequency updateFrequency = Hertz.of(100.0);
 }

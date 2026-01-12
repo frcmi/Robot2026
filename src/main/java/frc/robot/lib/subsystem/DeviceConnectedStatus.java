@@ -9,56 +9,56 @@ import lombok.Setter;
 @Setter
 @Getter
 public class DeviceConnectedStatus implements StructSerializable {
-    private boolean connected;
-    private int id;
+  private boolean connected;
+  private int id;
 
-    public DeviceConnectedStatus(boolean connected, int id) {
-        this.connected = connected;
-        this.id = id;
-    }
+  public DeviceConnectedStatus(boolean connected, int id) {
+    this.connected = connected;
+    this.id = id;
+  }
 
-    @SuppressWarnings("unused")
-    public static final Struct<DeviceConnectedStatus> struct =
-            new Struct<>() {
-                @Override
-                public Class<DeviceConnectedStatus> getTypeClass() {
-                    return DeviceConnectedStatus.class;
-                }
+  @SuppressWarnings("unused")
+  public static final Struct<DeviceConnectedStatus> struct =
+      new Struct<>() {
+        @Override
+        public Class<DeviceConnectedStatus> getTypeClass() {
+          return DeviceConnectedStatus.class;
+        }
 
-                @Override
-                public String getTypeName() {
-                    return "DeviceConnectedStatus";
-                }
+        @Override
+        public String getTypeName() {
+          return "DeviceConnectedStatus";
+        }
 
-                @Override
-                public int getSize() {
-                    return kSizeBool + kSizeInt32;
-                }
+        @Override
+        public int getSize() {
+          return kSizeBool + kSizeInt32;
+        }
 
-                @Override
-                public String getSchema() {
-                    // spotless:off
+        @Override
+        public String getSchema() {
+          // spotless:off
                     return "bool Connected;int32 Id";
                     // spotless:on
-                }
+        }
 
-                @Override
-                public DeviceConnectedStatus unpack(ByteBuffer bb) {
-                    boolean connected = bb.get() != 0;
-                    int id = bb.getInt();
+        @Override
+        public DeviceConnectedStatus unpack(ByteBuffer bb) {
+          boolean connected = bb.get() != 0;
+          int id = bb.getInt();
 
-                    return new DeviceConnectedStatus(connected, id);
-                }
+          return new DeviceConnectedStatus(connected, id);
+        }
 
-                @Override
-                public void pack(ByteBuffer bb, DeviceConnectedStatus value) {
-                    bb.put((byte) (value.connected ? 1 : 0));
-                    bb.putInt(value.getId());
-                }
+        @Override
+        public void pack(ByteBuffer bb, DeviceConnectedStatus value) {
+          bb.put((byte) (value.connected ? 1 : 0));
+          bb.putInt(value.getId());
+        }
 
-                @Override
-                public boolean isImmutable() {
-                    return true;
-                }
-            };
+        @Override
+        public boolean isImmutable() {
+          return true;
+        }
+      };
 }

@@ -5,7 +5,7 @@ package frc.robot.lib.subsystem.linear;
  * Output Mode}. *
  */
 public enum LinearIOOutputMode {
-    kNeutral,
-    kClosedLoop,
-    kOpenLoop
+  kNeutral,
+  kClosedLoop,
+  kOpenLoop
 }

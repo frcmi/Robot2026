@@ -5,9 +5,9 @@ package frc.robot.lib.subsystem.angular;
  * Mode}. *
  */
 public enum AngularSubsystemOutputMode {
-    kClosedLoop,
-    kOpenLoop,
-    kHoldAtCall,
-    kHoldAtGoal,
-    kVelocity
+  kClosedLoop,
+  kOpenLoop,
+  kHoldAtCall,
+  kHoldAtGoal,
+  kVelocity
 }

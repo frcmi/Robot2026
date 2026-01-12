@@ -7,24 +7,28 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
+
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
-import frc.robot.constants.RobotConstants;
-import frc.robot.constants.TunerConstantsAlpha;
 import frc.robot.constants.Intake.PivotConstants;
 import frc.robot.constants.Intake.RollerConstants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.TunerConstantsAlpha;
+import frc.robot.constants.VisionConstants;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
 import frc.robot.lib.sim.CurrentDrawCalculatorSim;
@@ -45,8 +49,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -71,8 +74,6 @@ public class RobotContainer {
     private final Intake intake;
 
     private final RobotSuperstructure superstructure;
-
-    private final DriveCommands driveCommands;
 
     @SuppressWarnings("FieldCanBeLocal")
     private final AllianceChecker allianceChecker = new AllianceChecker();
@@ -124,37 +125,47 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIO() {
                         },
-                        new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
-                        new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
+                        new ModuleIOSim(TunerConstantsAlpha.FrontLeft,
+                                currentDrawCalculatorSim),
+                        new ModuleIOSim(TunerConstantsAlpha.FrontRight,
+                                currentDrawCalculatorSim),
                         new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
-                        new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+                        new ModuleIOSim(TunerConstantsAlpha.BackRight,
+                                currentDrawCalculatorSim));
                 vision = new Vision(
                         drive::addVisionMeasurement,
-                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose)/*
-                                                                                                 * ,
-                                                                                                 * new
-                                                                                                 * VisionIOPhotonVisionSim
-                                                                                                 * (camera1Name,
-                                                                                                 * robotToCamera1,
-                                                                                                 * drive::getPose)
-                                                                                                 */);
+                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
+                                drive::getPose) /*
+                                                 * ,
+                                                 * new
+                                                 * VisionIOPhotonVisionSim
+                                                 * (camera1Name,
+                                                 * robotToCamera1,
+                                                 * drive::getPose)
+                                                 */);
 
-                AngularIOSim pivotIO = new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+                AngularIOSim pivotIO = new AngularIOSim(PivotConstants.kSimConfig,
+                        currentDrawCalculatorSim);
                 pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
                         PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
                 intake = new Intake(
                         new AngularSubsystem(
-                                new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                                new AngularIOSim(RollerConstants.kSimConfig,
+                                        currentDrawCalculatorSim),
                                 RollerConstants.kSubsystemConfigSim),
-                        new AngularSubsystem(
-                                pivotIO, PivotConstants.kSubsystemConfigReal));
+                        new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
-                drive = new Drive();
+                drive = new Drive(new GyroIO() {
+                }, new ModuleIO() {
+                }, new ModuleIO() {
+                }, new ModuleIO() {
+                }, new ModuleIO() {
+                });
                 vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }/* , new VisionIO() {} */);
+                } /* , new VisionIO() {} */);
                 intake = new Intake();
                 break;
         }
@@ -163,20 +174,17 @@ public class RobotContainer {
         superstructure.registerAutoCommands();
 
         measuredSuperstructureState = new SuperstructureVisualizer(
-                intake::getMeasuredState,
-                "MeasuredStateMechanism",
-                RobotConstants.kMeasuredStateColor);
+                intake::getMeasuredState, "MeasuredStateMechanism", RobotConstants.kMeasuredStateColor);
         targetSuperstructureState = new SuperstructureVisualizer(
-                intake::getTargetState,
-                "TargetStateMechanism",
-                RobotConstants.kTargetStateColor);
+                intake::getTargetState, "TargetStateMechanism", RobotConstants.kTargetStateColor);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+                "Drive Wheel Radius Characterization",
+                DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption(
                 "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
         autoChooser.addOption(
@@ -213,15 +221,6 @@ public class RobotContainer {
                         () -> -controller.getLeftStickX(),
                         () -> -controller.getRightStickX()));
 
-        // Lock to 0° when A button is held
-        controller.buttonA
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -controller.getLeftY(),
-                                () -> -controller.getLeftX(),
-                                () -> Rotation2d.kZero));
-
         // Switch to X pattern when X button is pressed
         controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -234,8 +233,7 @@ public class RobotContainer {
         SmartDashboard.putData("Field", field);
 
         Logger.recordOutput(
-                "Poses/AprilTagField",
-                VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
+                "Poses/AprilTagField", VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
         Logger.recordOutput(
                 "Poses/WeldedAprilTagField",
                 VisionConstants.kWeldedAprilTagField.values().toArray(new Pose3d[0]));

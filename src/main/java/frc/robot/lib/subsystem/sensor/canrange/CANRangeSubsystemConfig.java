@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 @Getter
 public class CANRangeSubsystemConfig {
-    private final String logKey;
-    @Builder.Default @Setter private Distance threshold = Inches.of(-1.0);
-    @Builder.Default @Setter private Time debounce = Seconds.of(0.0);
+  private final String logKey;
+  @Builder.Default @Setter private Distance threshold = Inches.of(-1.0);
+  @Builder.Default @Setter private Time debounce = Seconds.of(0.0);
 }

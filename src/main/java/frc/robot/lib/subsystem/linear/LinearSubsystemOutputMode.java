@@ -5,8 +5,8 @@ package frc.robot.lib.subsystem.linear;
  * Mode}. *
  */
 public enum LinearSubsystemOutputMode {
-    kClosedLoop,
-    kOpenLoop,
-    kHoldAtCall,
-    kHoldAtGoal
+  kClosedLoop,
+  kOpenLoop,
+  kHoldAtCall,
+  kHoldAtGoal
 }

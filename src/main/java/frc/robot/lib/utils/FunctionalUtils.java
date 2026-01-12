@@ -6,13 +6,13 @@ import java.util.function.Supplier;
 
 public final class FunctionalUtils {
 
-    private FunctionalUtils() {}
+  private FunctionalUtils() {}
 
-    public static <T> Supplier<T> map(Function<T, T> mapFunc, Supplier<T> supplier) {
-        return () -> mapFunc.apply(supplier.get());
-    }
+  public static <T> Supplier<T> map(Function<T, T> mapFunc, Supplier<T> supplier) {
+    return () -> mapFunc.apply(supplier.get());
+  }
 
-    public static DoubleSupplier map(Function<Double, Double> mapFunc, DoubleSupplier supplier) {
-        return () -> mapFunc.apply(supplier.getAsDouble());
-    }
+  public static DoubleSupplier map(Function<Double, Double> mapFunc, DoubleSupplier supplier) {
+    return () -> mapFunc.apply(supplier.getAsDouble());
+  }
 }

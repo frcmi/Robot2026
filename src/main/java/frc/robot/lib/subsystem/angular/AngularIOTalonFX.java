@@ -11,11 +11,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreTalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,14 +39,14 @@ public class AngularIOTalonFX implements AngularIO {
     private final StatusSignal<AngularAcceleration> acceleration;
     private final List<StatusSignal<Temperature>> motorTemperatures;
 
-    private final MotionMagicVoltage motionMagicPos; 
-    private final MotionMagicVelocityVoltage motionMagicVel; 
+    private final MotionMagicVoltage motionMagicPos;
+    private final MotionMagicVelocityVoltage motionMagicVel;
     private final VoltageOut voltageOut;
 
     private final AngularIOTalonFXConfig deviceConfig;
 
-    private final Alert configurationsNotAppliedAlert =
-            new Alert("Configurations for AngularSubsystem not applied!", Alert.AlertType.kError);
+    private final Alert configurationsNotAppliedAlert = new Alert("Configurations for AngularSubsystem not applied!",
+            Alert.AlertType.kError);
 
     private AngularIOOutputMode outputMode = kNeutral;
     private Optional<Angle> goalPos = Optional.empty();
@@ -56,10 +56,7 @@ public class AngularIOTalonFX implements AngularIO {
         this.deviceConfig = config;
 
         master = new TalonFX(config.getMasterId(), config.getBus());
-        followers =
-                config.getFollowerIds().stream()
-                        .map(id -> new TalonFX(id, config.getBus()))
-                        .toList();
+        followers = config.getFollowerIds().stream().map(id -> new TalonFX(id, config.getBus())).toList();
 
         // Clear sticky faults.
         master.clearStickyFaults(kMaxTimeoutMS);
@@ -67,36 +64,27 @@ public class AngularIOTalonFX implements AngularIO {
 
         // Set follower control.
         followers.forEach(
-                talonFX ->
-                        talonFX.setControl(
-                                new Follower(config.getMasterId(), config.isOpposeMaster())));
+                talonFX -> talonFX.setControl(new Follower(config.getMasterId(),
+                        config.isOpposeMaster() ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned)));
 
         // Apply motor configs.
         masterConfig = getMasterConfig();
         followerConfig = getMasterConfig();
         followerConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         followerConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-        AtomicBoolean applySuccess =
-                new AtomicBoolean(
-                        tryUntilOk(
-                                () -> master.getConfigurator().apply(masterConfig, kMaxTimeoutMS)));
+        AtomicBoolean applySuccess = new AtomicBoolean(
+                tryUntilOk(() -> master.getConfigurator().apply(masterConfig, kMaxTimeoutMS)));
         followers.forEach(
-                talonFX ->
-                        applySuccess.set(
-                                applySuccess.get()
-                                        & tryUntilOk(
-                                                () ->
-                                                        talonFX.getConfigurator()
-                                                                .apply(
-                                                                        followerConfig,
-                                                                        kMaxTimeoutMS))));
+                talonFX -> applySuccess.set(
+                        applySuccess.get()
+                                & tryUntilOk(
+                                        () -> talonFX.getConfigurator().apply(followerConfig, kMaxTimeoutMS))));
         configurationsNotAppliedAlert.set(!applySuccess.get());
 
-        motionMagicPos =
-                new MotionMagicVoltage(
-                        Rotations.of(
-                                config.getResetAngle().in(Radians)
-                                        / config.getOutputAnglePerOutputRotation().in(Radians)));
+        motionMagicPos = new MotionMagicVoltage(
+                Rotations.of(
+                        config.getResetAngle().in(Radians)
+                                / config.getOutputAnglePerOutputRotation().in(Radians)));
         motionMagicVel = new MotionMagicVelocityVoltage(RotationsPerSecond.of(0.0));
         voltageOut = new VoltageOut(0.0);
 
@@ -115,42 +103,31 @@ public class AngularIOTalonFX implements AngularIO {
     private TalonFXConfiguration getMasterConfig() {
         final TalonFXConfiguration configuration = new TalonFXConfiguration();
 
-        configuration.Slot0.kP =
-                deviceConfig.getKP() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.Slot0.kI =
-                deviceConfig.getKI() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.Slot0.kD =
-                deviceConfig.getKD() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.Slot0.kV =
-                deviceConfig.getKV() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.Slot0.kP = deviceConfig.getKP() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.Slot0.kI = deviceConfig.getKI() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.Slot0.kD = deviceConfig.getKD() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.Slot0.kV = deviceConfig.getKV() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
 
-        configuration.MotionMagic.MotionMagicCruiseVelocity =
-                deviceConfig.getCruiseVelocity().in(RadiansPerSecond)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.MotionMagic.MotionMagicAcceleration =
-                deviceConfig.getAcceleration().in(RadiansPerSecondPerSecond)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.MotionMagic.MotionMagicCruiseVelocity = deviceConfig.getCruiseVelocity().in(RadiansPerSecond)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.MotionMagic.MotionMagicAcceleration = deviceConfig.getAcceleration().in(RadiansPerSecondPerSecond)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
 
-        configuration.CurrentLimits.SupplyCurrentLimit =
-                deviceConfig.getSupplyCurrentLimit().in(Amps);
+        configuration.CurrentLimits.SupplyCurrentLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
         configuration.CurrentLimits.SupplyCurrentLimitEnable = true;
-        configuration.CurrentLimits.StatorCurrentLimit =
-                deviceConfig.getStatorCurrentLimit().in(Amps);
+        configuration.CurrentLimits.StatorCurrentLimit = deviceConfig.getStatorCurrentLimit().in(Amps);
         configuration.CurrentLimits.StatorCurrentLimitEnable = true;
 
-        configuration.Feedback.SensorToMechanismRatio =
-                deviceConfig.getMotorRotationsPerOutputRotations();
+        configuration.Feedback.SensorToMechanismRatio = deviceConfig.getMotorRotationsPerOutputRotations();
 
-        configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-                deviceConfig.getSoftMaxAngle().in(Radians)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable =
-                deviceConfig.getSoftMaxAngle().gte(Radians.of(Double.POSITIVE_INFINITY));
-        configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-                deviceConfig.getSoftMinAngle().in(Radians)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable =
-                deviceConfig.getSoftMinAngle().lte(Radians.of(Double.NEGATIVE_INFINITY));
+        configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = deviceConfig.getSoftMaxAngle().in(Radians)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = deviceConfig.getSoftMaxAngle()
+                .gte(Radians.of(Double.POSITIVE_INFINITY));
+        configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = deviceConfig.getSoftMinAngle().in(Radians)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable = deviceConfig.getSoftMinAngle()
+                .lte(Radians.of(Double.NEGATIVE_INFINITY));
 
         configuration.MotorOutput.NeutralMode = deviceConfig.getNeutralMode();
         configuration.MotorOutput.Inverted = deviceConfig.getInverted();
@@ -163,41 +140,35 @@ public class AngularIOTalonFX implements AngularIO {
                 position, velocity, acceleration, statorCurrent, appliedVolts, supplyCurrent);
         motorTemperatures.forEach(StatusSignal::refresh);
 
-        inputs.angle =
-                Radians.of(
-                        position.getValueAsDouble()
-                                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+        inputs.angle = Radians.of(
+                position.getValueAsDouble()
+                        * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
         inputs.appliedVolts = appliedVolts.getValue();
         inputs.supplyCurrent = supplyCurrent.getValue();
         inputs.statorCurrent = statorCurrent.getValue();
-        inputs.velocity =
-                RadiansPerSecond.of(
-                        velocity.getValueAsDouble()
-                                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
-        inputs.acceleration =
-                RadiansPerSecondPerSecond.of(
-                        acceleration.getValueAsDouble()
-                                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+        inputs.velocity = RadiansPerSecond.of(
+                velocity.getValueAsDouble()
+                        * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+        inputs.acceleration = RadiansPerSecondPerSecond.of(
+                acceleration.getValueAsDouble()
+                        * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
 
-        inputs.motorTemperatures =
-                motorTemperatures.stream()
-                        .mapToDouble(signal -> signal.getValue().in(Celsius))
-                        .toArray();
+        inputs.motorTemperatures = motorTemperatures.stream().mapToDouble(signal -> signal.getValue().in(Celsius))
+                .toArray();
 
         int size = followers.size() + 1;
         if (inputs.deviceConnectedStatuses.length != size)
             inputs.deviceConnectedStatuses = new DeviceConnectedStatus[size];
         if (inputs.deviceConnectedStatuses[0] == null) {
-            inputs.deviceConnectedStatuses[0] =
-                    new DeviceConnectedStatus(
-                            BaseStatusSignal.isAllGood(
-                                    position,
-                                    appliedVolts,
-                                    supplyCurrent,
-                                    statorCurrent,
-                                    acceleration,
-                                    motorTemperatures.get(0)),
-                            deviceConfig.getMasterId());
+            inputs.deviceConnectedStatuses[0] = new DeviceConnectedStatus(
+                    BaseStatusSignal.isAllGood(
+                            position,
+                            appliedVolts,
+                            supplyCurrent,
+                            statorCurrent,
+                            acceleration,
+                            motorTemperatures.get(0)),
+                    deviceConfig.getMasterId());
         } else {
             inputs.deviceConnectedStatuses[0].setConnected(
                     BaseStatusSignal.isAllGood(
@@ -211,10 +182,9 @@ public class AngularIOTalonFX implements AngularIO {
 
         for (int i = 0; i < followers.size(); i++) {
             if (inputs.deviceConnectedStatuses[i + 1] == null) {
-                inputs.deviceConnectedStatuses[i + 1] =
-                        new DeviceConnectedStatus(
-                                BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)),
-                                deviceConfig.getFollowerIds().get(i));
+                inputs.deviceConnectedStatuses[i + 1] = new DeviceConnectedStatus(
+                        BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)),
+                        deviceConfig.getFollowerIds().get(i));
             } else {
                 inputs.deviceConnectedStatuses[i + 1].setConnected(
                         BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)));
@@ -232,8 +202,7 @@ public class AngularIOTalonFX implements AngularIO {
     public void setAngle(Angle angle) {
         master.setControl(
                 motionMagicPos.withPosition(
-                        angle.in(Radians)
-                                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
+                        angle.in(Radians) / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
         goalPos = Optional.of(angle);
         goalVel = Optional.empty();
         outputMode = kClosedLoop;
@@ -273,8 +242,7 @@ public class AngularIOTalonFX implements AngularIO {
     public void resetAngle(Angle angle) {
         master.setPosition(
                 Rotations.of(
-                        angle.in(Radians)
-                                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
+                        angle.in(Radians) / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
     }
 
     @Override
@@ -296,12 +264,10 @@ public class AngularIOTalonFX implements AngularIO {
         deviceConfig.setCruiseVelocity(cruiseVelocity);
         deviceConfig.setAcceleration(acceleration);
 
-        masterConfig.MotionMagic.MotionMagicCruiseVelocity =
-                cruiseVelocity.in(RadiansPerSecond)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-        masterConfig.MotionMagic.MotionMagicAcceleration =
-                acceleration.in(RadiansPerSecondPerSecond)
-                        / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        masterConfig.MotionMagic.MotionMagicCruiseVelocity = cruiseVelocity.in(RadiansPerSecond)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+        masterConfig.MotionMagic.MotionMagicAcceleration = acceleration.in(RadiansPerSecondPerSecond)
+                / deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
         master.getConfigurator().apply(masterConfig, 0.0);
     }
 

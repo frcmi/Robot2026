@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import java.util.HashMap;
 
 public class VisionConstants {
-    // spotless:off
+  // spotless:off
     public static final HashMap<Integer, Pose3d> kWeldedAprilTagField = new HashMap<>();
     public static final HashMap<Integer, Pose3d> kAndyMarkAprilTagField = new HashMap<>();
     public static final HashMap<Integer, Pose3d> kAprilTagField = kWeldedAprilTagField;

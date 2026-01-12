@@ -22,77 +22,77 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * <p>This class is provided by the NewCommands VendorDep
  */
 public class RepeatCommandWithEnd extends Command {
-    private final Command m_command;
-    private final int times;
-    private int timesRan = 0;
-    private boolean m_ended;
+  private final Command m_command;
+  private final int times;
+  private int timesRan = 0;
+  private boolean m_ended;
 
-    /**
-     * Creates a new RepeatCommand. Will run another command repeatedly, restarting it whenever it
-     * ends, until this command is interrupted.
-     *
-     * @param command the command to run repeatedly
-     */
-    @SuppressWarnings("this-escape")
-    public RepeatCommandWithEnd(Command command, int times) {
-        m_command = requireNonNullParam(command, "command", "RepeatCommand");
-        this.times = times;
-        CommandScheduler.getInstance().registerComposedCommands(command);
-        addRequirements(command.getRequirements());
-        setName("Repeat(" + command.getName() + ")");
-    }
+  /**
+   * Creates a new RepeatCommand. Will run another command repeatedly, restarting it whenever it
+   * ends, until this command is interrupted.
+   *
+   * @param command the command to run repeatedly
+   */
+  @SuppressWarnings("this-escape")
+  public RepeatCommandWithEnd(Command command, int times) {
+    m_command = requireNonNullParam(command, "command", "RepeatCommand");
+    this.times = times;
+    CommandScheduler.getInstance().registerComposedCommands(command);
+    addRequirements(command.getRequirements());
+    setName("Repeat(" + command.getName() + ")");
+  }
 
-    @Override
-    public void initialize() {
-        m_ended = false;
-        m_command.initialize();
-        timesRan = 0;
-    }
+  @Override
+  public void initialize() {
+    m_ended = false;
+    m_command.initialize();
+    timesRan = 0;
+  }
 
-    @Override
-    public void execute() {
-        if (m_ended) {
-            m_ended = false;
-            m_command.initialize();
-        }
-        m_command.execute();
-        if (m_command.isFinished()) {
-            // restart command
-            m_command.end(false);
-            m_ended = true;
-            timesRan += 1;
-        }
+  @Override
+  public void execute() {
+    if (m_ended) {
+      m_ended = false;
+      m_command.initialize();
     }
+    m_command.execute();
+    if (m_command.isFinished()) {
+      // restart command
+      m_command.end(false);
+      m_ended = true;
+      timesRan += 1;
+    }
+  }
 
-    @Override
-    public boolean isFinished() {
-        return timesRan >= times;
-    }
+  @Override
+  public boolean isFinished() {
+    return timesRan >= times;
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-        // Make sure we didn't already call end() (which would happen if the command
-        // finished in the
-        // last call to our execute())
-        if (!m_ended) {
-            m_command.end(interrupted);
-            m_ended = true;
-        }
+  @Override
+  public void end(boolean interrupted) {
+    // Make sure we didn't already call end() (which would happen if the command
+    // finished in the
+    // last call to our execute())
+    if (!m_ended) {
+      m_command.end(interrupted);
+      m_ended = true;
     }
+  }
 
-    @Override
-    public boolean runsWhenDisabled() {
-        return m_command.runsWhenDisabled();
-    }
+  @Override
+  public boolean runsWhenDisabled() {
+    return m_command.runsWhenDisabled();
+  }
 
-    @Override
-    public InterruptionBehavior getInterruptionBehavior() {
-        return m_command.getInterruptionBehavior();
-    }
+  @Override
+  public InterruptionBehavior getInterruptionBehavior() {
+    return m_command.getInterruptionBehavior();
+  }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        builder.addStringProperty("command", m_command::getName, null);
-    }
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addStringProperty("command", m_command::getName, null);
+  }
 }

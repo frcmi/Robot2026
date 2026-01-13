@@ -45,8 +45,8 @@ public class LinearIOTalonFX implements LinearIO {
 
   private final LinearIOTalonFXConfig deviceConfig;
 
-  private final Alert configurationsNotAppliedAlert = new Alert("Configurations for LinearSubsystem not applied!",
-      Alert.AlertType.kError);
+  private final Alert configurationsNotAppliedAlert =
+      new Alert("Configurations for LinearSubsystem not applied!", Alert.AlertType.kError);
 
   private LinearIOOutputMode outputMode = kNeutral;
   private Optional<Distance> goal = Optional.empty();
@@ -55,7 +55,8 @@ public class LinearIOTalonFX implements LinearIO {
     this.deviceConfig = config;
 
     master = new TalonFX(config.getMasterId(), config.getBus());
-    followers = config.getFollowerIds().stream().map(id -> new TalonFX(id, config.getBus())).toList();
+    followers =
+        config.getFollowerIds().stream().map(id -> new TalonFX(id, config.getBus())).toList();
 
     // Clear sticky faults.
     master.clearStickyFaults(kMaxTimeoutMS);
@@ -63,27 +64,35 @@ public class LinearIOTalonFX implements LinearIO {
 
     // Set follower control.
     followers.forEach(
-        talonFX -> talonFX.setControl(new Follower(config.getMasterId(),
-            config.isOpposeMaster() ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned)));
+        talonFX ->
+            talonFX.setControl(
+                new Follower(
+                    config.getMasterId(),
+                    config.isOpposeMaster()
+                        ? MotorAlignmentValue.Opposed
+                        : MotorAlignmentValue.Aligned)));
 
     // Apply motor configs.
     masterConfig = getMasterConfig();
     followerConfig = getMasterConfig();
     followerConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
     followerConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-    AtomicBoolean applySuccess = new AtomicBoolean(
-        tryUntilOk(() -> master.getConfigurator().apply(masterConfig, kMaxTimeoutMS)));
+    AtomicBoolean applySuccess =
+        new AtomicBoolean(
+            tryUntilOk(() -> master.getConfigurator().apply(masterConfig, kMaxTimeoutMS)));
     followers.forEach(
-        talonFX -> applySuccess.set(
-            applySuccess.get()
-                & tryUntilOk(
-                    () -> talonFX.getConfigurator().apply(followerConfig, kMaxTimeoutMS))));
+        talonFX ->
+            applySuccess.set(
+                applySuccess.get()
+                    & tryUntilOk(
+                        () -> talonFX.getConfigurator().apply(followerConfig, kMaxTimeoutMS))));
     configurationsNotAppliedAlert.set(!applySuccess.get());
 
-    motionMagic = new MotionMagicVoltage(
-        Rotations.of(
-            config.getResetLength().in(Meters)
-                / config.getOutputDistancePerOutputRotation().in(Meters)));
+    motionMagic =
+        new MotionMagicVoltage(
+            Rotations.of(
+                config.getResetLength().in(Meters)
+                    / config.getOutputDistancePerOutputRotation().in(Meters)));
     voltageOut = new VoltageOut(0.0);
 
     // Set signals.
@@ -107,26 +116,31 @@ public class LinearIOTalonFX implements LinearIO {
     masterConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     masterConfig.Slot0.kG = deviceConfig.getKG();
 
-    configuration.MotionMagic.MotionMagicCruiseVelocity = deviceConfig.getCruiseVelocity().in(MetersPerSecond)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
-    configuration.MotionMagic.MotionMagicAcceleration = deviceConfig.getAcceleration().in(MetersPerSecondPerSecond)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    configuration.MotionMagic.MotionMagicCruiseVelocity =
+        deviceConfig.getCruiseVelocity().in(MetersPerSecond)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    configuration.MotionMagic.MotionMagicAcceleration =
+        deviceConfig.getAcceleration().in(MetersPerSecondPerSecond)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
 
     configuration.CurrentLimits.SupplyCurrentLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
     configuration.CurrentLimits.SupplyCurrentLimitEnable = true;
     configuration.CurrentLimits.StatorCurrentLimit = deviceConfig.getStatorCurrentLimit().in(Amps);
     configuration.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    configuration.Feedback.SensorToMechanismRatio = deviceConfig.getMotorRotationsPerOutputRotations();
+    configuration.Feedback.SensorToMechanismRatio =
+        deviceConfig.getMotorRotationsPerOutputRotations();
 
-    configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = deviceConfig.getSoftMaxLength().in(Meters)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
-    configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable = deviceConfig.getSoftMaxLength()
-        .gte(Meters.of(Double.POSITIVE_INFINITY));
-    configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = deviceConfig.getSoftMinLength().in(Meters)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
-    configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable = deviceConfig.getSoftMinLength()
-        .lte(Meters.of(Double.NEGATIVE_INFINITY));
+    configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+        deviceConfig.getSoftMaxLength().in(Meters)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    configuration.SoftwareLimitSwitch.ForwardSoftLimitEnable =
+        deviceConfig.getSoftMaxLength().gte(Meters.of(Double.POSITIVE_INFINITY));
+    configuration.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        deviceConfig.getSoftMinLength().in(Meters)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    configuration.SoftwareLimitSwitch.ReverseSoftLimitEnable =
+        deviceConfig.getSoftMinLength().lte(Meters.of(Double.NEGATIVE_INFINITY));
 
     configuration.MotorOutput.NeutralMode = deviceConfig.getNeutralMode();
     configuration.MotorOutput.Inverted = deviceConfig.getInverted();
@@ -139,35 +153,39 @@ public class LinearIOTalonFX implements LinearIO {
         position, velocity, acceleration, statorCurrent, appliedVolts, supplyCurrent);
     motorTemperatures.forEach(StatusSignal::refresh);
 
-    inputs.length = Meters.of(
-        position.getValueAsDouble()
-            * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
+    inputs.length =
+        Meters.of(
+            position.getValueAsDouble()
+                * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
     inputs.appliedVolts = appliedVolts.getValue();
     inputs.supplyCurrent = supplyCurrent.getValue();
     inputs.statorCurrent = statorCurrent.getValue();
-    inputs.velocity = MetersPerSecond.of(
-        velocity.getValueAsDouble()
-            * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
-    inputs.acceleration = MetersPerSecondPerSecond.of(
-        acceleration.getValueAsDouble()
-            * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
+    inputs.velocity =
+        MetersPerSecond.of(
+            velocity.getValueAsDouble()
+                * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
+    inputs.acceleration =
+        MetersPerSecondPerSecond.of(
+            acceleration.getValueAsDouble()
+                * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
 
-    inputs.motorTemperatures = motorTemperatures.stream().mapToDouble(signal -> signal.getValue().in(Celsius))
-        .toArray();
+    inputs.motorTemperatures =
+        motorTemperatures.stream().mapToDouble(signal -> signal.getValue().in(Celsius)).toArray();
 
     int size = followers.size() + 1;
     if (inputs.deviceConnectedStatuses.length != size)
       inputs.deviceConnectedStatuses = new DeviceConnectedStatus[size];
     if (inputs.deviceConnectedStatuses[0] == null) {
-      inputs.deviceConnectedStatuses[0] = new DeviceConnectedStatus(
-          BaseStatusSignal.isAllGood(
-              position,
-              appliedVolts,
-              supplyCurrent,
-              statorCurrent,
-              acceleration,
-              motorTemperatures.get(0)),
-          deviceConfig.getMasterId());
+      inputs.deviceConnectedStatuses[0] =
+          new DeviceConnectedStatus(
+              BaseStatusSignal.isAllGood(
+                  position,
+                  appliedVolts,
+                  supplyCurrent,
+                  statorCurrent,
+                  acceleration,
+                  motorTemperatures.get(0)),
+              deviceConfig.getMasterId());
     } else {
       inputs.deviceConnectedStatuses[0].setConnected(
           BaseStatusSignal.isAllGood(
@@ -181,9 +199,10 @@ public class LinearIOTalonFX implements LinearIO {
 
     for (int i = 0; i < followers.size(); i++) {
       if (inputs.deviceConnectedStatuses[i + 1] == null) {
-        inputs.deviceConnectedStatuses[i + 1] = new DeviceConnectedStatus(
-            BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)),
-            deviceConfig.getFollowerIds().get(i));
+        inputs.deviceConnectedStatuses[i + 1] =
+            new DeviceConnectedStatus(
+                BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)),
+                deviceConfig.getFollowerIds().get(i));
       } else {
         inputs.deviceConnectedStatuses[i + 1].setConnected(
             BaseStatusSignal.isAllGood(motorTemperatures.get(i + 1)));
@@ -250,10 +269,12 @@ public class LinearIOTalonFX implements LinearIO {
     deviceConfig.setCruiseVelocity(cruiseVelocity);
     deviceConfig.setAcceleration(acceleration);
 
-    masterConfig.MotionMagic.MotionMagicCruiseVelocity = cruiseVelocity.in(MetersPerSecond)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
-    masterConfig.MotionMagic.MotionMagicAcceleration = acceleration.in(MetersPerSecondPerSecond)
-        / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    masterConfig.MotionMagic.MotionMagicCruiseVelocity =
+        cruiseVelocity.in(MetersPerSecond)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
+    masterConfig.MotionMagic.MotionMagicAcceleration =
+        acceleration.in(MetersPerSecondPerSecond)
+            / deviceConfig.getOutputDistancePerOutputRotation().in(Meters);
     master.getConfigurator().apply(masterConfig, 0.0);
   }
 

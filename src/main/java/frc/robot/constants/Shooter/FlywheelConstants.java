@@ -27,7 +27,7 @@ public class FlywheelConstants {
           .kP(5.0)
           .kI(0.0)
           .kD(0.0)
-          .kV(12.0/(6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm
+          .kV(12.0 / (6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm
           .bus(kRioBus)
           .build();
 

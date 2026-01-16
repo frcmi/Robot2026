@@ -12,6 +12,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.RobotConstants;
@@ -23,6 +24,7 @@ import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import frc.robot.lib.utils.AngleUtils;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -34,6 +36,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   @Getter private ShooterState targetState = ShooterState.kStowed;
   @Getter private ShooterState measuredState;
+
+  private Alliance alliance = Alliance.Red;
 
   private Supplier<Pose2d> robotPose;
 
@@ -62,8 +66,6 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
   }
 
-  Alliance alliance = Alliance.Red;
-
   public void onAllianceFound(Alliance alliance) {
     this.alliance = alliance;
   }
@@ -79,35 +81,57 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
 
     // Aim at hub
-    Pose2d currPose = this.robotPose.get();
     Translation2d hubPosition =
         alliance == Alliance.Blue
             ? AimingConstants.kHubPositionBlue
             : AimingConstants.kHubPositionRed;
-    double dx = hubPosition.getX() - currPose.getX() + TurretConstants.TurretOffset.getX();
-    double dy = hubPosition.getY() - currPose.getY() + TurretConstants.TurretOffset.getY();
-    double angleToHub = Math.atan2(dy, dx);
-    Logger.recordOutput("Shooter/TestRad", currPose.getRotation().getRadians());
-    double targTurret = angleToHub - currPose.getRotation().getRadians() + Math.toRadians(180.0);
-    // Wrap around to [-360, 360]
-    while (targTurret > Math.PI) {
-      targTurret -= 2.0 * Math.PI;
-    }
-    while (targTurret < -Math.PI) {
-      targTurret += 2.0 * Math.PI;
-    }
 
-    // Wrap to [-180, 180]
-    targTurret =
-        MathUtil.clamp(
-            targTurret,
-            TurretConstants.kTurretMinAngle.in(Radians),
-            TurretConstants.kTurretMaxAngle.in(Radians));
-    this.targetState.setTurret(Radians.of(targTurret));
+    this.targetState.setTurret(getTurretAngleToTarget(hubPosition));
 
     // TODO: Implement InterpLUTs
     this.targetState.setHood(Degrees.of(10.0f));
     this.targetState.setFlywheel(RotationsPerSecond.of(60)); // 3600RPM
+  }
+
+  /**
+   * @return Necessary turret position to aim at the target position.
+   */
+  public Angle getTurretAngleToTarget(Translation2d target) {
+    Pose2d currentPose = this.robotPose.get();
+
+    // rotate turret offsets by bot heading to convert to field-centric offsets
+    Translation2d turretOffset =
+        new Translation2d(TurretConstants.TurretOffset.getX(), TurretConstants.TurretOffset.getY())
+            .rotateBy(currentPose.getRotation());
+
+    double dx = target.getX() - currentPose.getX() + turretOffset.getX();
+    double dy = target.getY() - currentPose.getY() + turretOffset.getY();
+    double angleToTarget = Math.atan2(dy, dx);
+
+    Logger.recordOutput(
+        "Shooter/TestRad", currentPose.getRotation().getRadians()); // temporary logging
+
+    Angle turretTarget =
+        Radians.of(angleToTarget - currentPose.getRotation().getRadians() + Math.toRadians(180.0));
+
+    // Wrap around to [-180, 180]
+    turretTarget = AngleUtils.normalize(turretTarget);
+
+    Angle unconstrainedTurretTarget = turretTarget;
+    // Constrain to turret limits
+    turretTarget =
+        Radians.of(
+            MathUtil.clamp(
+                turretTarget.in(Radians),
+                TurretConstants.kTurretMinAngle.in(Radians),
+                TurretConstants.kTurretMaxAngle.in(Radians)));
+
+    Logger.recordOutput(
+        "Shooter/Debug/UnconstrainedTargetDegrees", unconstrainedTurretTarget.in(Degrees));
+    Logger.recordOutput(
+        "Shooter/Debug/IsTargetConstrained",
+        unconstrainedTurretTarget.in(Degrees) == turretTarget.in(Degrees));
+    return turretTarget;
   }
 
   public Command waitUntilAtGoal() {

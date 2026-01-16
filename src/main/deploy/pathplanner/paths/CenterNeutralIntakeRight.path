@@ -69,11 +69,11 @@
       },
       "prevControl": {
         "x": 7.632159586014437,
-        "y": 2.9129093269005297
+        "y": 2.9129093269005293
       },
       "nextControl": {
         "x": 7.708217439448527,
-        "y": 3.4070906730994706
+        "y": 3.407090673099471
       },
       "isLocked": false,
       "linkedName": null
@@ -171,7 +171,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Center Auto",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

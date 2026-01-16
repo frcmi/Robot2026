@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.6478930926316143,
-        "y": 1.0435513125075475
+        "x": 0.6532035631023925,
+        "y": 1.0510877371986602
       },
       "isLocked": false,
       "linkedName": "Outpost"
@@ -20,12 +20,12 @@
         "y": 2.3690445135946323
       },
       "prevControl": {
-        "x": 1.557552187161599,
-        "y": 2.126066350943727
+        "x": 1.5593238996004912,
+        "y": 2.1256441692508505
       },
       "nextControl": {
-        "x": 1.6752231262211699,
-        "y": 2.6120226762455374
+        "x": 1.6734514137822776,
+        "y": 2.612444857938414
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 3.40002080022952
       },
       "prevControl": {
-        "x": 1.5954761097764814,
-        "y": 3.1508969209934543
+        "x": 1.5969982131590286,
+        "y": 3.150773835394428
       },
       "nextControl": null,
       "isLocked": false,
@@ -58,10 +58,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -179.0945475064099
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right Auto",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -179.6056129209989

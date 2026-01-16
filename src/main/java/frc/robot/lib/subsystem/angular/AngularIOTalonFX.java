@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreTalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.*;
@@ -135,6 +136,13 @@ public class AngularIOTalonFX implements AngularIO {
 
     configuration.Feedback.SensorToMechanismRatio =
         deviceConfig.getMotorRotationsPerOutputRotations();
+
+    // For remote CANCoder
+    if (deviceConfig.getSensorId().isPresent()) {
+      configuration.Feedback.FeedbackRemoteSensorID = deviceConfig.getSensorId().get();
+      configuration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      configuration.Feedback.RotorToSensorRatio = deviceConfig.getRotorRotationsPerSensorRotation();
+    }
 
     configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
         deviceConfig.getSoftMaxAngle().in(Radians)

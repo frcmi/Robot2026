@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.*;
 import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,8 @@ public class AngularIOTalonFXConfig {
   @Builder.Default private final Angle softMaxAngle = Radians.of(Double.POSITIVE_INFINITY);
   @Builder.Default private final double motorRotationsPerOutputRotations = 0.0;
   @Builder.Default private final Angle outputAnglePerOutputRotation = Rotation.of(1.0);
+  @Builder.Default private final double rotorRotationsPerSensorRotation = 1.0;
+  @Builder.Default private final Optional<Integer> sensorId = Optional.empty();
   private final InvertedValue inverted;
   private final Current supplyCurrentLimit;
   private final Current statorCurrentLimit;

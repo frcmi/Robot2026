@@ -125,29 +125,33 @@ public class AngularSubsystem extends RegisteredSubsystem {
         () -> config.setVelocityTolerance(RadiansPerSecond.of(velocityToleranceTunable.get())),
         velocityToleranceTunable);
 
-    isAtAngle =
-        outputMode != kOpenLoop
-            && MathUtil.isNear(
-                inputs.goalPos.in(Radians),
-                inputs.angle.in(Radians),
-                config.getPositionTolerance().in(Radians))
-            && MathUtil.isNear(
-                0.0,
-                inputs.velocity.in(RadiansPerSecond),
-                config.getVelocityTolerance().in(RadiansPerSecond));
+    if (outputMode == kOpenLoop) {
+      isAtAngle = false;
+    } else if (outputMode == kVelocity) {
+      isAtAngle =
+          MathUtil.isNear(
+              inputs.goalVel.in(RadiansPerSecond),
+              inputs.velocity.in(RadiansPerSecond),
+              config.getVelocityTolerance().in(RadiansPerSecond));
+    } else {
+      isAtAngle =
+          MathUtil.isNear(
+                  inputs.goalPos.in(Radians),
+                  inputs.angle.in(Radians),
+                  config.getPositionTolerance().in(Radians))
+              && MathUtil.isNear(
+                  0.0,
+                  inputs.velocity.in(RadiansPerSecond),
+                  config.getVelocityTolerance().in(RadiansPerSecond));
+    }
 
     Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), atAngle);
     Logger.recordOutput(
         String.format("AngularSubsystems/%s/SubsystemOutputMode", logKey), outputMode);
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/AngleDegrees", logKey), getAngle().in(Degrees));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/GoalAngleDegrees", logKey), getGoalPos().in(Degrees));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/VelDeg_s", logKey), getVelocity().in(DegreesPerSecond));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/GoalVelDeg_s", logKey),
-        getGoalVelocity().in(DegreesPerSecond));
+    Logger.recordOutput(String.format("AngularSubsystems/%s/Angle", logKey), getAngle());
+    Logger.recordOutput(String.format("AngularSubsystems/%s/GoalAngle", logKey), getGoalPos());
+    Logger.recordOutput(String.format("AngularSubsystems/%s/Vel", logKey), getVelocity());
+    Logger.recordOutput(String.format("AngularSubsystems/%s/GoalVel", logKey), getGoalVelocity());
 
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {

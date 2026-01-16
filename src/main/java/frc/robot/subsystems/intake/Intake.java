@@ -23,7 +23,7 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends VirtualSubsystem {
-  // private final AngularSubsystem rollers;
+  private final AngularSubsystem rollers;
   private final AngularSubsystem pivot;
 
   @Getter private IntakeState targetState = IntakeState.kStowed;
@@ -37,7 +37,7 @@ public class Intake extends VirtualSubsystem {
   }
 
   public Intake(AngularSubsystem rollers, AngularSubsystem pivot) {
-    // this.rollers = rollers;
+    this.rollers = rollers;
     this.pivot = pivot;
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> getTargetState().getPivot()));
@@ -67,8 +67,7 @@ public class Intake extends VirtualSubsystem {
   public Command set(Supplier<IntakeState> state) {
     return parallel(
         Commands.runOnce(() -> this.targetState = state.get()),
-        pivot.angle(() -> state.get().getPivot()) // ,
-        // rollers.openLoop(() -> state.get().getRollers())
-        );
+        pivot.angle(() -> state.get().getPivot()),
+        rollers.openLoop(() -> state.get().getRollers()));
   }
 }

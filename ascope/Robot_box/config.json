@@ -1,0 +1,13 @@
+{
+    "name": "box",
+    "isFTC": false,
+    "disableSimplification": false,
+    "rotations": [],
+    "position": [
+        0,
+        0,
+        0
+    ],
+    "cameras": [],
+    "components": []
+}

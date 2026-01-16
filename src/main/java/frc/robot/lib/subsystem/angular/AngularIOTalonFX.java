@@ -271,6 +271,10 @@ public class AngularIOTalonFX implements AngularIO {
 
   @Override
   public void resetAngle(Angle angle) {
+    if (masterConfig.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RemoteCANcoder) {
+      // Don't reset if using remote sensor
+      return;
+    }
     master.setPosition(
         Rotations.of(
             angle.in(Radians) / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));

@@ -11,12 +11,15 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.Shooter.AimingConstants;
 import frc.robot.constants.Shooter.FlywheelConstants;
 import frc.robot.constants.Shooter.HoodConstants;
 import frc.robot.constants.Shooter.TurretConstants;
+import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -24,7 +27,7 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class Shooter extends VirtualSubsystem {
+public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver {
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
@@ -59,6 +62,12 @@ public class Shooter extends VirtualSubsystem {
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
   }
 
+  Alliance alliance = Alliance.Red;
+
+  public void onAllianceFound(Alliance alliance) {
+    this.alliance = alliance;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -71,15 +80,18 @@ public class Shooter extends VirtualSubsystem {
 
     // Aim at hub
     Pose2d currPose = this.robotPose.get();
-    double dx = AimingConstants.kHubPosition.getX() - currPose.getX();
-    double dy = AimingConstants.kHubPosition.getY() - currPose.getY();
+    Translation2d hubPosition = alliance == Alliance.Blue
+        ? AimingConstants.kHubPositionBlue
+        : AimingConstants.kHubPositionRed;
+    double dx = hubPosition.getX() - currPose.getX() + TurretConstants.TurretOffset.getX();
+    double dy = hubPosition.getY() - currPose.getY() + TurretConstants.TurretOffset.getY();
     double angleToHub = Math.atan2(dy, dx);
     Logger.recordOutput("Shooter/TestRad", currPose.getRotation().getRadians());
     double targTurret = angleToHub - currPose.getRotation().getRadians() + Math.toRadians(180.0);
     // Wrap around to [-360, 360]
     while (targTurret > Math.PI) {
       targTurret -= 2.0 * Math.PI;
-    } 
+    }
     while (targTurret < -Math.PI) {
       targTurret += 2.0 * Math.PI;
     }

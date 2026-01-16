@@ -155,8 +155,12 @@ public class AngularSubsystem extends RegisteredSubsystem {
     Logger.recordOutput(
         String.format("AngularSubsystems/%s/GoalVelDegS", logKey),
         getGoalVelocity().in(DegreesPerSecond));
-    Logger.recordOutput(String.format("AngularSubsystems/%s/SupplyCurrentAmps", logKey), getSupplyCurrent().in(Amps));
-    Logger.recordOutput(String.format("AngularSubsystems/%s/StatorCurrentAmps", logKey), getStatorCurrent().in(Amps));
+    Logger.recordOutput(
+        String.format("AngularSubsystems/%s/SupplyCurrentAmps", logKey),
+        getSupplyCurrent().in(Amps));
+    Logger.recordOutput(
+        String.format("AngularSubsystems/%s/StatorCurrentAmps", logKey),
+        getStatorCurrent().in(Amps));
 
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {

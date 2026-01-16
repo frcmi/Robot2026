@@ -203,6 +203,8 @@ public class RobotContainer {
             "Target",
             RobotConstants.kTargetStateColor);
 
+    allianceChecker.registerObservers(shooter);
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

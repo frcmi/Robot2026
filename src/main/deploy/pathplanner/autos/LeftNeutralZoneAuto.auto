@@ -5,13 +5,19 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftDepotIntakeClimb"
+                  "pathName": "LeftNeutralZoneIntake"
                 }
               },
               {
@@ -34,6 +40,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftDepotIntakeClimb"
           }
         },
         {

@@ -32,6 +32,7 @@ import frc.robot.constants.Shooter.HoodConstants;
 import frc.robot.constants.Shooter.TurretConstants;
 import frc.robot.constants.TunerConstantsAlpha;
 import frc.robot.constants.VisionConstants;
+import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
 import frc.robot.lib.sim.CurrentDrawCalculatorSim;
@@ -77,6 +78,10 @@ public class RobotContainer {
 
   @SuppressWarnings("FieldCanBeLocal")
   private final AllianceChecker allianceChecker = new AllianceChecker();
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private final LoggedInterpolatingTableManager tableManager =
+      new LoggedInterpolatingTableManager();
 
   @SuppressWarnings("FieldCanBeLocal")
   private final CurrentDrawCalculatorSim currentDrawCalculatorSim = new CurrentDrawCalculatorSim();

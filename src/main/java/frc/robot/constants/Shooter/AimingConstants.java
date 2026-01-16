@@ -13,6 +13,7 @@ public class AimingConstants {
           "Shooter/HoodAngleM_Deg",
           new double[][] {
             {0.0, 0.0},
+            {0.2, 5.0},
             {0.37, 15.0},
             {0.81, 60.0},
             {1.4, 45.0}

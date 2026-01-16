@@ -21,7 +21,6 @@ import frc.robot.constants.Shooter.AimingConstants;
 import frc.robot.constants.Shooter.FlywheelConstants;
 import frc.robot.constants.Shooter.HoodConstants;
 import frc.robot.constants.Shooter.TurretConstants;
-import frc.robot.lib.LoggedInterpolatingTable;
 import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
@@ -44,14 +43,6 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> robotVel;
 
-  public LoggedInterpolatingTable hoodAngleTable =
-      new LoggedInterpolatingTable(
-          "Shooter/FlywheelSpeedM_RPS",
-          new double[][] {
-            {1.0, 1.0},
-            {2.0, 4.0},
-            {3.0, 9.0}
-          });
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -146,7 +137,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);
-    double hoodAngle = hoodAngleTable.get(distanceToTarget);
+    double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
     this.targetState.setHood(Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
     this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));

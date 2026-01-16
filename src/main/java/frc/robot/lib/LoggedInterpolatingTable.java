@@ -1,8 +1,9 @@
 package frc.robot.lib;
 
 import frc.robot.constants.ModeConstants;
-import frc.robot.lib.subsystem.VirtualSubsystem;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -10,10 +11,11 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 /**
  * Class for an interpolated lookup table. Gets values from dashboard in tuning mode, returns
  * default if not or value not in dashboard. Supports linear interpolation between data points.
- * Automatically registers as a virtual subsystem to handle periodic updates.
+ * Automatically updates via a static registry - no need to call periodic manually.
  */
 @SuppressWarnings("unused")
-public class LoggedInterpolatingTable extends VirtualSubsystem {
+public class LoggedInterpolatingTable {
+  private static final List<LoggedInterpolatingTable> instances = new ArrayList<>();
   private static final String tableKey = "/Tuning";
 
   private final String key;
@@ -32,6 +34,7 @@ public class LoggedInterpolatingTable extends VirtualSubsystem {
    */
   public LoggedInterpolatingTable(String dashboardKey) {
     this.key = tableKey + "/" + dashboardKey;
+    instances.add(this);
   }
 
   /**
@@ -130,13 +133,22 @@ public class LoggedInterpolatingTable extends VirtualSubsystem {
 
   /**
    * Periodic callback that ensures values are continuously read and logged to AdvantageScope.
-   * Called automatically by the subsystem scheduler - no need to call manually.
+   * Called automatically via the static updater - no need to call manually.
    */
-  @Override
-  public void periodic() {
+  private void periodic() {
     if (ModeConstants.kTuningMode && hasDefault) {
       // Trigger a read to ensure all values are logged
       getTableFromDashboard();
+    }
+  }
+
+  /**
+   * Updates all registered LoggedInterpolatingTable instances. Call this once per robot periodic
+   * (e.g., from Robot.java or a dedicated virtual subsystem).
+   */
+  public static void periodicAll() {
+    for (LoggedInterpolatingTable table : instances) {
+      table.periodic();
     }
   }
 

@@ -75,7 +75,9 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     // Hood
     hoodRoot =
         mechanismShooter.getRoot(
-            "HoodRoot", Inches.of(PADDING).in(Meters), Inches.of(2.0).in(Meters));
+            "HoodRoot",
+            Inches.of(PADDING + 6.0).in(Meters),
+            Inches.of(2.0).in(Meters)); // Turret 6" from edge of hood
     hood =
         hoodRoot.append(
             new LoggedMechanismLigament2d(

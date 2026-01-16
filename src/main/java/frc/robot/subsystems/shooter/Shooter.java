@@ -74,7 +74,15 @@ public class Shooter extends VirtualSubsystem {
     double dx = AimingConstants.kHubPosition.getX() - currPose.getX();
     double dy = AimingConstants.kHubPosition.getY() - currPose.getY();
     double angleToHub = Math.atan2(dy, dx);
-    double targTurret = angleToHub - currPose.getRotation().getRadians();
+    Logger.recordOutput("Shooter/TestRad", currPose.getRotation().getRadians());
+    double targTurret = angleToHub - currPose.getRotation().getRadians() + Math.toRadians(180.0);
+    // Wrap around to [-360, 360]
+    while (targTurret > Math.PI) {
+      targTurret -= 2.0 * Math.PI;
+    } 
+    while (targTurret < -Math.PI) {
+      targTurret += 2.0 * Math.PI;
+    }
 
     // Wrap to [-180, 180]
     targTurret =

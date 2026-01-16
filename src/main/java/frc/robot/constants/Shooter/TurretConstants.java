@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public class TurretConstants {
   public static final Translation3d TurretOffset =
       new Translation3d(
-          Inches.of(10.0f).in(Meters), Inches.of(12.0f).in(Meters), Inches.of(5.0f).in(Meters));
+          Inches.of(-10.0f).in(Meters), Inches.of(-10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
   public static final Angle kTurretMinAngle = Degrees.of(-90.0f);
   public static final Angle kTurretMaxAngle = Degrees.of(90.0f);
@@ -41,7 +41,7 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(5.0)
+          .kP(1.0)
           .kI(0.0)
           .kD(0.0)
           .cruiseVelocity(RotationsPerSecond.of(7.0)) // 420rpm
@@ -76,7 +76,7 @@ public class TurretConstants {
           .bus(kSubsystemConfigReal.getBus())
           .positionTolerance(kSubsystemConfigReal.getPositionTolerance())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(5.0)
+          .kP(1.0)
           .kI(0.0)
           .kD(0.0)
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())

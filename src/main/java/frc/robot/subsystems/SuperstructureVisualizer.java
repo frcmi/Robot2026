@@ -58,7 +58,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
         mechanismIntake.getRoot(
             "PivotRoot",
             Inches.of(PADDING + 23 - 1.536513).in(Meters), // Relative to sideplate
-            Inches.of(0.75 + 12.504)
+            Inches.of(0.75 + 6.0)
                 .in(Meters)); // 0.75 is ground clearance, 12.504 is above origin (which has ground
     // clearance)
 
@@ -69,20 +69,20 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 "Pivot",
                 PivotConstants.PivotLength.in(Meters),
                 intakeState.get().getPivot().in(Degrees),
-                8.0,
+                4.0,
                 mechColor));
 
     // Hood
     hoodRoot =
         mechanismShooter.getRoot(
-            "HoodRoot", Inches.of(PADDING).in(Meters), Inches.of(0.0).in(Meters));
+            "HoodRoot", Inches.of(PADDING).in(Meters), Inches.of(2.0).in(Meters));
     hood =
         hoodRoot.append(
             new LoggedMechanismLigament2d(
                 "Hood",
                 HoodConstants.HoodLength.in(Meters),
                 shooterState.get().getHood().in(Degrees),
-                6.0,
+                3.0,
                 mechColor));
   }
 

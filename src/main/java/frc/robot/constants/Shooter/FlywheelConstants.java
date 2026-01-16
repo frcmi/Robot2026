@@ -27,6 +27,7 @@ public class FlywheelConstants {
           .kP(5.0)
           .kI(0.0)
           .kD(0.0)
+          .kV(12.0/(6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm
           .bus(kRioBus)
           .build();
 
@@ -42,6 +43,7 @@ public class FlywheelConstants {
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
+          .kV(kSubsystemConfigReal.getKV())
           .build();
 
   public static final AngularSubsystemConfig kSubsystemConfigSim =
@@ -49,9 +51,10 @@ public class FlywheelConstants {
           .logKey(kSubsystemConfigReal.getLogKey())
           .bus(kSubsystemConfigReal.getBus())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(5.0)
+          .kP(0.05)
           .kI(0.0)
           .kD(0.0)
+          .kV(kSubsystemConfigReal.getKV())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
   public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.002);
@@ -63,6 +66,7 @@ public class FlywheelConstants {
           .kP(kSubsystemConfigSim.getKP())
           .kI(kSubsystemConfigSim.getKI())
           .kD(kSubsystemConfigSim.getKD())
+          .kV(kSubsystemConfigSim.getKV())
           .acceleration(kSubsystemConfigSim.getAcceleration())
           .build();
 }

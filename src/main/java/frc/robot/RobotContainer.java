@@ -126,7 +126,8 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                     FlywheelConstants.kSubsystemConfigReal),
-                drive::getPose);
+                drive::getPose,
+                drive::getPoseVelocity);
         break;
 
       case SIM:
@@ -166,7 +167,8 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(FlywheelConstants.kSimConfig, currentDrawCalculatorSim),
                     FlywheelConstants.kSubsystemConfigSim),
-                drive::getPose);
+                drive::getPose,
+                drive::getPoseVelocity);
         break;
 
       default:
@@ -181,7 +183,7 @@ public class RobotContainer {
         vision =
             new Vision(drive::addVisionMeasurement, new VisionIO() {} /* , new VisionIO() {} */);
         intake = new Intake();
-        shooter = new Shooter(drive::getPose);
+        shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         break;
     }
 

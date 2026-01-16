@@ -12,6 +12,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +21,7 @@ import frc.robot.constants.Shooter.AimingConstants;
 import frc.robot.constants.Shooter.FlywheelConstants;
 import frc.robot.constants.Shooter.HoodConstants;
 import frc.robot.constants.Shooter.TurretConstants;
+import frc.robot.lib.LoggedInterpolatingTable;
 import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
@@ -40,26 +42,38 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Alliance alliance = Alliance.Red;
 
   private Supplier<Pose2d> robotPose;
+  private Supplier<ChassisSpeeds> robotVel;
+
+  public LoggedInterpolatingTable hoodAngleTable =
+      new LoggedInterpolatingTable(
+          "Shooter/FlywheelSpeedM_RPS",
+          new double[][] {
+            {1.0, 1.0},
+            {2.0, 4.0},
+            {3.0, 9.0}
+          });
 
   /** Creates a new Shooter. */
-  public Shooter(Supplier<Pose2d> robotPose) {
+  public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
     this(
         new AngularSubsystem(new AngularIO() {}, TurretConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, HoodConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, FlywheelConstants.kSubsystemConfigReal),
-        robotPose);
+        robotPose,
+        robotVel);
   }
 
   public Shooter(
       AngularSubsystem turret,
       AngularSubsystem hood,
       AngularSubsystem flywheel,
-      Supplier<Pose2d> robotPoseSupplier) {
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<ChassisSpeeds> robotVelSupplier) {
     this.turret = turret;
     this.hood = hood;
     this.flywheel = flywheel;
     this.robotPose = robotPoseSupplier;
-
+    this.robotVel = robotVelSupplier;
     hood.setDefaultCommand(hood.holdAtGoal(() -> getTargetState().getHood()));
     turret.setDefaultCommand(turret.holdAtGoal(() -> getTargetState().getTurret()));
     flywheel.setDefaultCommand(flywheel.velocity(() -> getTargetState().getFlywheel()));
@@ -86,17 +100,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             ? AimingConstants.kHubPositionBlue
             : AimingConstants.kHubPositionRed;
 
-    this.targetState.setTurret(getTurretAngleToTarget(hubPosition));
-
-    // TODO: Implement InterpLUTs
-    this.targetState.setHood(Degrees.of(10.0f));
-    this.targetState.setFlywheel(RotationsPerSecond.of(60)); // 3600RPM
-  }
-
-  /**
-   * @return Necessary turret position to aim at the target position.
-   */
-  public Angle getTurretAngleToTarget(Translation2d target) {
+    // Calculate turret angle to target
     Pose2d currentPose = this.robotPose.get();
 
     // rotate turret offsets by bot heading to convert to field-centric offsets
@@ -104,20 +108,34 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         new Translation2d(TurretConstants.TurretOffset.getX(), TurretConstants.TurretOffset.getY())
             .rotateBy(currentPose.getRotation());
 
-    double dx = target.getX() - currentPose.getX() + turretOffset.getX();
-    double dy = target.getY() - currentPose.getY() + turretOffset.getY();
+    // Calculate aiming position iteratively
+    double dx = hubPosition.getX() - currentPose.getX() + turretOffset.getX();
+    double dy = hubPosition.getY() - currentPose.getY() + turretOffset.getY();
+    double distanceToTarget = Math.hypot(dx, dy);
+    ChassisSpeeds robotVelocity = robotVel.get();
+    for (int i = 0; i < 10; i++) {
+      // TODO: Verify this actually converges (it should though)
+      double airtime = AimingConstants.kAirtimeTable.get(distanceToTarget);
+      dx =
+          hubPosition.getX()
+              - currentPose.getX()
+              + turretOffset.getX()
+              - robotVelocity.vxMetersPerSecond * airtime;
+      dy =
+          hubPosition.getY()
+              - currentPose.getY()
+              + turretOffset.getY()
+              - robotVelocity.vyMetersPerSecond * airtime;
+      distanceToTarget = Math.hypot(dx, dy);
+    }
+
     double angleToTarget = Math.atan2(dy, dx);
-
-    Logger.recordOutput(
-        "Shooter/TestRad", currentPose.getRotation().getRadians()); // temporary logging
-
     Angle turretTarget =
         Radians.of(angleToTarget - currentPose.getRotation().getRadians() + Math.toRadians(180.0));
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);
 
-    Angle unconstrainedTurretTarget = turretTarget;
     // Constrain to turret limits
     turretTarget =
         Radians.of(
@@ -126,12 +144,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 TurretConstants.kTurretMinAngle.in(Radians),
                 TurretConstants.kTurretMaxAngle.in(Radians)));
 
-    Logger.recordOutput(
-        "Shooter/Debug/UnconstrainedTargetDegrees", unconstrainedTurretTarget.in(Degrees));
-    Logger.recordOutput(
-        "Shooter/Debug/IsTargetConstrained",
-        unconstrainedTurretTarget.in(Degrees) == turretTarget.in(Degrees));
-    return turretTarget;
+    // Actually apply to hardware
+    this.targetState.setTurret(turretTarget);
+    double hoodAngle = hoodAngleTable.get(distanceToTarget);
+    this.targetState.setHood(Degrees.of(hoodAngle));
+    double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
+    this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
   }
 
   public Command waitUntilAtGoal() {

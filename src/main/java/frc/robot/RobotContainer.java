@@ -27,12 +27,14 @@ import frc.robot.commands.RobotSuperstructure;
 import frc.robot.constants.Intake.PivotConstants;
 import frc.robot.constants.Intake.RollerConstants;
 import frc.robot.constants.RobotConstants;
+import frc.robot.constants.Shooter.FlywheelConstants;
+import frc.robot.constants.Shooter.HoodConstants;
+import frc.robot.constants.Shooter.TurretConstants;
 import frc.robot.constants.TunerConstantsAlpha;
 import frc.robot.constants.VisionConstants;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
 import frc.robot.lib.sim.CurrentDrawCalculatorSim;
-import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -44,6 +46,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -52,12 +55,9 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -70,6 +70,7 @@ public class RobotContainer {
 
   private final Drive drive;
   private final Vision vision;
+  private final Shooter shooter;
   private final Intake intake;
 
   private final RobotSuperstructure superstructure;
@@ -81,7 +82,8 @@ public class RobotContainer {
   private final CurrentDrawCalculatorSim currentDrawCalculatorSim = new CurrentDrawCalculatorSim();
 
   private final Alert autoAlert = new Alert("No auto selected!", Alert.AlertType.kWarning);
-  private final Alert controllerOneAlert = new Alert("Controller 1 is unplugged!", Alert.AlertType.kWarning);
+  private final Alert controllerOneAlert =
+      new Alert("Controller 1 is unplugged!", Alert.AlertType.kWarning);
 
   @SuppressWarnings("FieldCanBeLocal")
   private final SuperstructureVisualizer measuredSuperstructureState;
@@ -89,98 +91,124 @@ public class RobotContainer {
   @SuppressWarnings("FieldCanBeLocal")
   private final SuperstructureVisualizer targetSuperstructureState;
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        drive = new Drive(
-            new GyroIOPigeon2(),
-            new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
-            new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
-            new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
-            new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
-        vision = new Vision(
-            drive::addVisionMeasurement,
-            new VisionIOLimelight(camera0Name, drive::getRotation),
-            new VisionIOLimelight(camera1Name, drive::getRotation));
-        intake = new Intake(
-            new AngularSubsystem(
-                new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
-                RollerConstants.kSubsystemConfigReal),
-            new AngularSubsystem(
-                new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
-                PivotConstants.kSubsystemConfigReal));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
+                new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
+                new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
+                new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOLimelight(camera0Name, drive::getRotation),
+                new VisionIOLimelight(camera1Name, drive::getRotation));
+        intake =
+            new Intake(
+                new AngularSubsystem(
+                    new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
+                    RollerConstants.kSubsystemConfigReal),
+                new AngularSubsystem(
+                    new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
+                    PivotConstants.kSubsystemConfigReal));
+        shooter =
+            new Shooter(
+                new AngularSubsystem(
+                    new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
+                    TurretConstants.kSubsystemConfigReal),
+                new AngularSubsystem(
+                    new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
+                    HoodConstants.kSubsystemConfigReal),
+                new AngularSubsystem(
+                    new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
+                    FlywheelConstants.kSubsystemConfigReal),
+                drive::getPose);
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive = new Drive(
-            new GyroIO() {
-            },
-            new ModuleIOSim(TunerConstantsAlpha.FrontLeft,
-                currentDrawCalculatorSim),
-            new ModuleIOSim(TunerConstantsAlpha.FrontRight,
-                currentDrawCalculatorSim),
-            new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
-            new ModuleIOSim(TunerConstantsAlpha.BackRight,
-                currentDrawCalculatorSim));
-        vision = new Vision(
-            drive::addVisionMeasurement,
-            new VisionIOPhotonVisionSim(camera0Name, robotToCamera0,
-                drive::getPose),
-            new VisionIOPhotonVisionSim(camera1Name,
-                robotToCamera1,
-                drive::getPose));
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        AngularIOSim pivotIO = new AngularIOSim(PivotConstants.kSimConfig,
-            currentDrawCalculatorSim);
+        AngularIOSim pivotIO =
+            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
         pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
             PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
-        intake = new Intake(
-            new AngularSubsystem(
-                new AngularIOSim(RollerConstants.kSimConfig,
-                    currentDrawCalculatorSim),
-                RollerConstants.kSubsystemConfigSim),
-            new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+        intake =
+            new Intake(
+                new AngularSubsystem(
+                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                    RollerConstants.kSubsystemConfigSim),
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+
+        shooter =
+            new Shooter(
+                new AngularSubsystem(
+                    new AngularIOSim(TurretConstants.kSimConfig, currentDrawCalculatorSim),
+                    TurretConstants.kSubsystemConfigSim),
+                new AngularSubsystem(
+                    new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
+                    HoodConstants.kSubsystemConfigSim),
+                new AngularSubsystem(
+                    new AngularIOSim(FlywheelConstants.kSimConfig, currentDrawCalculatorSim),
+                    FlywheelConstants.kSubsystemConfigSim),
+                drive::getPose);
         break;
 
       default:
         // Replayed robot, disable IO implementations
-        drive = new Drive(
-            new GyroIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            });
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-        } /* , new VisionIO() {} */);
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIO() {} /* , new VisionIO() {} */);
         intake = new Intake();
+        shooter = new Shooter(drive::getPose);
         break;
     }
 
     superstructure = new RobotSuperstructure(intake);
     superstructure.registerAutoCommands();
 
-    measuredSuperstructureState = new SuperstructureVisualizer(
-        intake::getMeasuredState, drive::getPose, "Measured",
-        RobotConstants.kMeasuredStateColor);
-    targetSuperstructureState = new SuperstructureVisualizer(
-        intake::getTargetState, drive::getPose, "Target", RobotConstants.kTargetStateColor);
+    measuredSuperstructureState =
+        new SuperstructureVisualizer(
+            intake::getMeasuredState,
+            shooter::getMeasuredState,
+            drive::getPose,
+            "Measured",
+            RobotConstants.kMeasuredStateColor);
+    targetSuperstructureState =
+        new SuperstructureVisualizer(
+            intake::getTargetState,
+            shooter::getTargetState,
+            drive::getPose,
+            "Target",
+            RobotConstants.kTargetStateColor);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
     autoChooser.addOption(
-        "Drive Wheel Radius Characterization",
-        DriveCommands.wheelRadiusCharacterization(drive));
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
     autoChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
@@ -201,11 +229,9 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {

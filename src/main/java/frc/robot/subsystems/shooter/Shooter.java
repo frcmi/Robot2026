@@ -80,9 +80,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // Aim at hub
     Pose2d currPose = this.robotPose.get();
-    Translation2d hubPosition = alliance == Alliance.Blue
-        ? AimingConstants.kHubPositionBlue
-        : AimingConstants.kHubPositionRed;
+    Translation2d hubPosition =
+        alliance == Alliance.Blue
+            ? AimingConstants.kHubPositionBlue
+            : AimingConstants.kHubPositionRed;
     double dx = hubPosition.getX() - currPose.getX() + TurretConstants.TurretOffset.getX();
     double dy = hubPosition.getY() - currPose.getY() + TurretConstants.TurretOffset.getY();
     double angleToHub = Math.atan2(dy, dx);

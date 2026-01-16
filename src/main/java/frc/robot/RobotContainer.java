@@ -50,84 +50,83 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // Controller
-    private final Joysticks controller = new Joysticks(0);
+  // Controller
+  private final Joysticks controller = new Joysticks(0);
 
-    // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
-    private final Field2d field = new Field2d();
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
+  private final Field2d field = new Field2d();
 
-    private final Drive drive;
-    private final Vision vision;
-    private final Intake intake;
+  private final Drive drive;
+  private final Vision vision;
+  private final Intake intake;
 
-    private final RobotSuperstructure superstructure;
+  private final RobotSuperstructure superstructure;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final AllianceChecker allianceChecker = new AllianceChecker();
+  @SuppressWarnings("FieldCanBeLocal")
+  private final AllianceChecker allianceChecker = new AllianceChecker();
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final CurrentDrawCalculatorSim currentDrawCalculatorSim = new CurrentDrawCalculatorSim();
+  @SuppressWarnings("FieldCanBeLocal")
+  private final CurrentDrawCalculatorSim currentDrawCalculatorSim = new CurrentDrawCalculatorSim();
 
-    private final Alert autoAlert = new Alert("No auto selected!", Alert.AlertType.kWarning);
-    private final Alert controllerOneAlert = new Alert("Controller 1 is unplugged!", Alert.AlertType.kWarning);
+  private final Alert autoAlert = new Alert("No auto selected!", Alert.AlertType.kWarning);
+  private final Alert controllerOneAlert =
+      new Alert("Controller 1 is unplugged!", Alert.AlertType.kWarning);
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final SuperstructureVisualizer measuredSuperstructureState;
+  @SuppressWarnings("FieldCanBeLocal")
+  private final SuperstructureVisualizer measuredSuperstructureState;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final SuperstructureVisualizer targetSuperstructureState;
+  @SuppressWarnings("FieldCanBeLocal")
+  private final SuperstructureVisualizer targetSuperstructureState;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        switch (Constants.currentMode) {
-            case REAL:
-                drive = new Drive(
-                        new GyroIOPigeon2(),
-                        new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
-                        new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
-                        new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
-                        new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
-                vision = new Vision(
-                        drive::addVisionMeasurement, new VisionIOLimelight(camera0Name, drive::getRotation)
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
+                new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
+                new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
+                new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement, new VisionIOLimelight(camera0Name, drive::getRotation)
                 // new VisionIOLimelight(camera1Name, drive::getRotation)
                 );
-                intake = new Intake(
-                        /*
-                         * new AngularSubsystem(
-                         * new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
-                         * RollerConstants.kSubsystemConfigReal)
-                         */
-                        new AngularSubsystem(new AngularIO() {
-                        }, RollerConstants.kSubsystemConfigReal),
-                        new AngularSubsystem(
-                                new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
-                                PivotConstants.kSubsystemConfigReal));
-                break;
+        intake =
+            new Intake(
+                /*
+                 * new AngularSubsystem(
+                 * new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
+                 * RollerConstants.kSubsystemConfigReal)
+                 */
+                new AngularSubsystem(new AngularIO() {}, RollerConstants.kSubsystemConfigReal),
+                new AngularSubsystem(
+                    new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
+                    PivotConstants.kSubsystemConfigReal));
+        break;
 
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
-                        new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
-                        new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
-                        new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
-                vision = new Vision(
-                        drive::addVisionMeasurement,
-                        new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose) /*
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose) /*
                                                                                                   * ,
                                                                                                   * new
                                                                                                   * VisionIOPhotonVisionSim
@@ -136,112 +135,110 @@ public class RobotContainer {
                                                                                                   * drive::getPose)
                                                                                                   */);
 
-                AngularIOSim pivotIO = new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-                pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-                        PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
-                intake = new Intake(
-                        new AngularSubsystem(
-                                new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
-                                RollerConstants.kSubsystemConfigSim),
-                        new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
-                break;
+        AngularIOSim pivotIO =
+            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
+        intake =
+            new Intake(
+                new AngularSubsystem(
+                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                    RollerConstants.kSubsystemConfigSim),
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+        break;
 
-            default:
-                // Replayed robot, disable IO implementations
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        });
-                vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                } /* , new VisionIO() {} */);
-                intake = new Intake();
-                break;
-        }
-
-        superstructure = new RobotSuperstructure(intake);
-        superstructure.registerAutoCommands();
-
-        measuredSuperstructureState = new SuperstructureVisualizer(
-                intake::getMeasuredState, "MeasuredStateMechanism", RobotConstants.kMeasuredStateColor);
-        targetSuperstructureState = new SuperstructureVisualizer(
-                intake::getTargetState, "TargetStateMechanism", RobotConstants.kTargetStateColor);
-
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Set up SysId routines
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-        logInit();
-
-        // Configure the button bindings
-        configureButtonBindings();
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIO() {} /* , new VisionIO() {} */);
+        intake = new Intake();
+        break;
     }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-     * it to a {@link
-     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
-    private void configureButtonBindings() {
-        // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> controller.getLeftStickY(),
-                        () -> -controller.getLeftStickX(),
-                        () -> -controller.getRightStickX()));
+    superstructure = new RobotSuperstructure(intake);
+    superstructure.registerAutoCommands();
 
-        // Switch to X pattern when X button is pressed
-        controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+    measuredSuperstructureState =
+        new SuperstructureVisualizer(
+            intake::getMeasuredState, "MeasuredStateMechanism", RobotConstants.kMeasuredStateColor);
+    targetSuperstructureState =
+        new SuperstructureVisualizer(
+            intake::getTargetState, "TargetStateMechanism", RobotConstants.kTargetStateColor);
 
-        // Intake controls
-        controller.buttonA.onTrue(superstructure.intakeDeploy());
-        controller.buttonA.onFalse(superstructure.intakeStowed());
-    }
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    private void logInit() {
-        SmartDashboard.putData("Field", field);
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-        Logger.recordOutput(
-                "Poses/AprilTagField", VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
-        Logger.recordOutput(
-                "Poses/WeldedAprilTagField",
-                VisionConstants.kWeldedAprilTagField.values().toArray(new Pose3d[0]));
-        Logger.recordOutput(
-                "Poses/AndyMarkAprilTagField",
-                VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
-    }
+    logInit();
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
+    // Configure the button bindings
+    configureButtonBindings();
+  }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> controller.getLeftStickY(),
+            () -> -controller.getLeftStickX(),
+            () -> -controller.getRightStickX()));
+
+    // Switch to X pattern when X button is pressed
+    controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    // Intake controls
+    controller.buttonA.onTrue(superstructure.intakeDeploy());
+    controller.buttonA.onFalse(superstructure.intakeStowed());
+  }
+
+  private void logInit() {
+    SmartDashboard.putData("Field", field);
+
+    Logger.recordOutput(
+        "Poses/AprilTagField", VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Poses/WeldedAprilTagField",
+        VisionConstants.kWeldedAprilTagField.values().toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Poses/AndyMarkAprilTagField",
+        VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
 }

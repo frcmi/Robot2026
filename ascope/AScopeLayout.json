@@ -14,7 +14,9 @@
             "/Tuning/Shooter/HoodAngleM_Deg/Entry0",
             "/Tuning/Shooter/HoodAngleM_Deg/Entry2",
             "/AdvantageKit/AngularSubsystems/Turret",
-            "/AdvantageKit/RealOutputs"
+            "/AdvantageKit/RealOutputs",
+            "/AdvantageKit/RealOutputs/Shooter",
+            "/AdvantageKit/RealOutputs/Shooter/TurretOffset"
           ]
         },
         "tabs": {
@@ -127,6 +129,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Shooter/Target",
+                    "logType": "Translation2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "robot",
                     "logKey": "NT:/AdvantageKit/RealOutputs/Superstructure/MeasuredTurretPose",
                     "logType": "Pose3d",
@@ -168,17 +180,17 @@
               },
               "controllerUUID": "w50jx3bbda9a450nyf6lhabhbigrh93v",
               "renderer": {
-                "cameraIndex": -1,
+                "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  5.622774038636559,
-                  2.169524128235997,
-                  -1.3419895296654114
+                  -0.7567503699061726,
+                  1.5203569619259332,
+                  0.21235928294573014
                 ],
                 "cameraTarget": [
-                  3.736812149461118,
-                  -1.985220723248051,
-                  1.0321841723338796
+                  0.182642000521671,
+                  0.5384059831899289,
+                  0.18917736037288413
                 ]
               },
               "controlsHeight": 200

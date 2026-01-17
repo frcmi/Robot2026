@@ -11,7 +11,10 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -85,10 +88,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
 
     // Aim at hub
+    // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for feeding)
     Translation2d hubPosition =
         alliance == Alliance.Blue
             ? AimingConstants.kHubPositionBlue
             : AimingConstants.kHubPositionRed;
+    Logger.recordOutput("Shooter/Target", hubPosition);
 
     // Calculate turret angle to target
     Pose2d currentPose = this.robotPose.get();
@@ -99,8 +104,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             .rotateBy(currentPose.getRotation());
 
     // Calculate aiming position iteratively
-    double dx = hubPosition.getX() - currentPose.getX() + turretOffset.getX();
-    double dy = hubPosition.getY() - currentPose.getY() + turretOffset.getY();
+    double dx = hubPosition.getX() - (currentPose.getX() + turretOffset.getX());
+    double dy = hubPosition.getY() - (currentPose.getY() + turretOffset.getY());
     double distanceToTarget = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     for (int i = 0; i < 10; i++) {
@@ -108,13 +113,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       double airtime = AimingConstants.kAirtimeTable.get(distanceToTarget);
       dx =
           hubPosition.getX()
-              - currentPose.getX()
-              + turretOffset.getX()
+              - (currentPose.getX() + turretOffset.getX())
               - robotVelocity.vxMetersPerSecond * airtime;
       dy =
           hubPosition.getY()
-              - currentPose.getY()
-              + turretOffset.getY()
+              - (currentPose.getY() + turretOffset.getY())
               - robotVelocity.vyMetersPerSecond * airtime;
       distanceToTarget = Math.hypot(dx, dy);
     }

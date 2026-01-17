@@ -11,10 +11,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -88,7 +85,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
 
     // Aim at hub
-    // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for feeding)
+    // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for
+    // feeding)
     Translation2d hubPosition =
         alliance == Alliance.Blue
             ? AimingConstants.kHubPositionBlue

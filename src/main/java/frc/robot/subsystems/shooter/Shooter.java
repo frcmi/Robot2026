@@ -43,7 +43,6 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> robotVel;
 
-
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
     this(

@@ -40,6 +40,7 @@ import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -73,6 +74,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
+  private final Climber climber;
 
   private final RobotSuperstructure superstructure;
 
@@ -133,6 +135,7 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigReal),
                 drive::getPose,
                 drive::getPoseVelocity);
+        climber = new Climber();
         break;
 
       case SIM:
@@ -174,6 +177,7 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
                 drive::getPoseVelocity);
+        climber = new Climber();
         break;
 
       default:
@@ -189,6 +193,7 @@ public class RobotContainer {
             new Vision(drive::addVisionMeasurement, new VisionIO() {} /* , new VisionIO() {} */);
         intake = new Intake();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        climber = new Climber();
         break;
     }
 
@@ -258,6 +263,10 @@ public class RobotContainer {
     // Intake controls
     controller.buttonA.onTrue(superstructure.intakeDeploy());
     controller.buttonA.onFalse(superstructure.intakeStowed());
+
+    controller.buttonY.onTrue(climber.down());
+    controller.leftBumper.onTrue(climber.rightUp());
+    controller.rightBumper.onTrue(climber.rightUp());
   }
 
   private void logInit() {

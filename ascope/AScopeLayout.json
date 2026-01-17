@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": 206,
-      "y": 102,
+      "x": 167,
+      "y": 59,
       "width": 1100,
       "height": 650,
       "state": {
@@ -15,8 +15,10 @@
             "/Tuning/Shooter/HoodAngleM_Deg/Entry2",
             "/AdvantageKit/AngularSubsystems/Turret",
             "/AdvantageKit/RealOutputs",
-            "/AdvantageKit/RealOutputs/Shooter",
-            "/AdvantageKit/RealOutputs/Shooter/TurretOffset"
+            "/AdvantageKit/RealOutputs/Shooter/TurretOffset",
+            "/AdvantageKit/RealOutputs/Shooter/robotVel",
+            "/AdvantageKit/RealOutputs/Shooter/distLog",
+            "/AdvantageKit/RealOutputs/AngularSubsystems"
           ]
         },
         "tabs": {
@@ -59,7 +61,7 @@
                 "rightSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/AngularSubsystems/Turret/GoalAngleDeg",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/AngularSubsystems/Turret/AngleDeg",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -69,7 +71,7 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/AngularSubsystems/Turret/AngleDeg",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/AngularSubsystems/Turret/GoalAngleDeg",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -129,16 +131,6 @@
                     }
                   },
                   {
-                    "type": "vision",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Shooter/Target",
-                    "logType": "Translation2d",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "size": "normal"
-                    }
-                  },
-                  {
                     "type": "robot",
                     "logKey": "NT:/AdvantageKit/RealOutputs/Superstructure/MeasuredTurretPose",
                     "logType": "Pose3d",
@@ -174,6 +166,16 @@
                     "options": {
                       "plane": "xz"
                     }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Shooter/Target",
+                    "logType": "Translation2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
                   }
                 ],
                 "game": "FRC:2026 Field"
@@ -183,14 +185,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.7567503699061726,
-                  1.5203569619259332,
-                  0.21235928294573014
+                  -1.7275355084020494,
+                  1.9265565798517987,
+                  0.19231157759973394
                 ],
                 "cameraTarget": [
-                  0.182642000521671,
-                  0.5384059831899289,
-                  0.18917736037288413
+                  0.3094962186198141,
+                  0.49977442464838556,
+                  0.1668247262505893
                 ]
               },
               "controlsHeight": 200

@@ -17,8 +17,7 @@ public class Climber extends SubsystemBase {
   private MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
   private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
-  private boolean left = false;
-  private boolean right = false;
+  private boolean up = false;
 
   private double upAngle = 10;
 
@@ -29,6 +28,7 @@ public class Climber extends SubsystemBase {
     slot0Configs.kP = 5;
     slot0Configs.kI = 0;
     slot0Configs.kD = 0;
+    slot0Configs.kG = 0;
 
     motionMagicConfigs.MotionMagicCruiseVelocity = 80;
     motionMagicConfigs.MotionMagicAcceleration = 160;
@@ -37,38 +37,31 @@ public class Climber extends SubsystemBase {
     climber1.getConfigurator().apply(talonFXConfigs);
     climber2.getConfigurator().apply(talonFXConfigs);
 
+    climber1.setPosition(0);
+    climber2.setPosition(0);
+
     setDefaultCommand(setAngle());
   }
 
   private Command setAngle() {
     return run(
         () -> {
-          climber1.setControl(m_request.withPosition(left ? upAngle : 0));
-          climber2.setControl(m_request.withPosition(right ? upAngle : 0));
+          climber1.setControl(m_request.withPosition(up ? upAngle : 0));
+          climber2.setControl(m_request.withPosition(up ? upAngle : 0));
         });
   }
 
-  public Command leftUp() {
+  public Command up() {
     return runOnce(
         () -> {
-          left = true;
-          right = false;
-        });
-  }
-
-  public Command rightUp() {
-    return runOnce(
-        () -> {
-          left = false;
-          right = true;
+          up = true;
         });
   }
 
   public Command down() {
     return runOnce(
         () -> {
-          left = false;
-          right = false;
+          up = false;
         });
   }
 }

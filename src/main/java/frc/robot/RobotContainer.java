@@ -264,9 +264,8 @@ public class RobotContainer {
     controller.buttonA.onTrue(superstructure.intakeDeploy());
     controller.buttonA.onFalse(superstructure.intakeStowed());
 
-    controller.buttonY.onTrue(climber.down());
-    controller.leftBumper.onTrue(climber.rightUp());
-    controller.rightBumper.onTrue(climber.rightUp());
+    controller.leftBumper.onTrue(climber.down());
+    controller.rightBumper.onTrue(climber.up());
   }
 
   private void logInit() {

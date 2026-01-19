@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -14,6 +15,11 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -21,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
@@ -36,6 +43,7 @@ import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
 import frc.robot.lib.sim.CurrentDrawCalculatorSim;
+import frc.robot.lib.sim.FuelSim;
 import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -132,7 +140,7 @@ public class RobotContainer {
                     new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                     FlywheelConstants.kSubsystemConfigReal),
                 drive::getPose,
-                drive::getPoseVelocity);
+                drive::getChassisSpeeds);
         break;
 
       case SIM:
@@ -258,6 +266,37 @@ public class RobotContainer {
     // Intake controls
     controller.buttonA.onTrue(superstructure.intakeDeploy());
     controller.buttonA.onFalse(superstructure.intakeStowed());
+    controller.buttonY.onTrue(
+        new InstantCommand(
+            () -> {
+                ChassisSpeeds robotVel = drive.getChassisSpeeds();
+                Translation3d robotVelT3d = new Translation3d(robotVel.vxMetersPerSecond, robotVel.vyMetersPerSecond, 0.0);
+
+                double rps = shooter.getMeasuredState().getFlywheel().in(Revolutions.per(Second));
+                double mps = rps * Units.inchesToMeters(4) * Math.PI * 0.5; // linear velocity = 0.5 * rps * circ
+
+                // convert to translational and vertical
+                double angle = shooter.getMeasuredState().getHood().in(Radians);
+
+                double tvel = mps * Math.sin(angle);
+                double zvel = mps * Math.cos(angle);
+
+                Robot.fuel.add(
+                    new FuelSim(
+                        new Pose3d(
+                            drive.getPose().getX(),
+                            drive.getPose().getY(),
+                            Units.inchesToMeters(8),
+                            new Rotation3d()),
+                        new Pose3d(
+                            new Translation3d(tvel, 0.0, zvel)
+                                .rotateBy(
+                                    new Rotation3d(
+                                        new Rotation2d(shooter.getMeasuredState().getTurret()).plus(Rotation2d.fromDegrees(180))))
+                                        .plus(robotVelT3d),
+                            new Rotation3d())));
+                        }));
+    controller.buttonX.onTrue(new InstantCommand(Robot.fuel::clear));
   }
 
   private void logInit() {

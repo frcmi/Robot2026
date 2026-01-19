@@ -8,8 +8,12 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.sim.FuelSim;
+import java.util.ArrayList;
+import java.util.List;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -146,7 +150,20 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationInit() {}
 
+  public static List<FuelSim> fuel = new ArrayList<>();
+
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    for (FuelSim f : fuel) {
+      f.update();
+    }
+
+    // cursed code lmao
+    Logger.recordOutput(
+        "Simulated/Fuel", fuel.stream().map((f) -> f.getPose()).toList().toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Simulated/FuelVelocity",
+        fuel.stream().map((f) -> f.velocity).toList().toArray(new Pose3d[0]));
+  }
 }

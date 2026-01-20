@@ -1,4 +1,4 @@
-package frc.robot.constants.Shooter;
+package frc.robot.constants.shooter;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.lib.LoggedInterpolatingTable;

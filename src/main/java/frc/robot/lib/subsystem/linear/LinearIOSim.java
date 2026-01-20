@@ -69,17 +69,17 @@ public class LinearIOSim implements LinearIO {
     Distance goal = Meters.of(0.0);
     switch (outputMode) {
       case kClosedLoop -> {
-          inputs.appliedVolts =
-          Volts.of(
-              MathUtil.clamp(
-                  controller.calculate(
-                              linearExtension.getPositionMeters(),
-                              this.goal.orElse(Meters.of(0.0)).in(Meters))
-                          * RobotController.getBatteryVoltage()
-                      + deviceConfig.getKG(),
-                  -12.0,
-                  12.0));
-            goal = Meters.of(controller.getSetpoint().position);
+        inputs.appliedVolts =
+            Volts.of(
+                MathUtil.clamp(
+                    controller.calculate(
+                                linearExtension.getPositionMeters(),
+                                this.goal.orElse(Meters.of(0.0)).in(Meters))
+                            * RobotController.getBatteryVoltage()
+                        + deviceConfig.getKG(),
+                    -12.0,
+                    12.0));
+        goal = Meters.of(controller.getSetpoint().position);
       }
       case kOpenLoop -> inputs.appliedVolts =
           Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));

@@ -43,8 +43,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   // Climb mechanism on YZ plane
   private final LoggedMechanism2d mechanismClimb =
       new LoggedMechanism2d(
-          Inches.of(PADDING + 27 + PADDING).in(Meters),
-          Inches.of(95.0).in(Meters));
+          Inches.of(PADDING + 27 + PADDING).in(Meters), Inches.of(95.0).in(Meters));
   private final LoggedMechanismRoot2d climberRoot;
   private final LoggedMechanismLigament2d climberBase;
   private final LoggedMechanismLigament2d climberExtension;
@@ -126,7 +125,9 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 "ClimberExtension",
                 climbState.get().getClimber().in(Meters),
                 90.0, // Vertical extension
-                mechColor.equals(RobotConstants.kMeasuredStateColor) ? 4.0 : 3.0, // So that you can see measured under target
+                mechColor.equals(RobotConstants.kMeasuredStateColor)
+                    ? 4.0
+                    : 3.0, // So that you can see measured under target
                 mechColor));
   }
 

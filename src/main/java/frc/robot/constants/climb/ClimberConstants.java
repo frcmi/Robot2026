@@ -38,8 +38,8 @@ public class ClimberConstants {
           .kI(0.0)
           .kD(0.5)
           .kG(0.05) // Small gravity compensation for hanging climber
-          .cruiseVelocity(InchesPerSecond.of(48.0))
-          .acceleration(InchesPerSecondPerSecond.of(400.0))
+          .cruiseVelocity(InchesPerSecond.of(200.0))
+          .acceleration(InchesPerSecondPerSecond.of(1000.0))
           .build();
 
   public static final LinearIOTalonFXConfig kTalonFXConfig =

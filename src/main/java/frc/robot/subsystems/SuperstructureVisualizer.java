@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.shooter.HoodConstants;
@@ -125,7 +126,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 "ClimberExtension",
                 climbState.get().getClimber().in(Meters),
                 90.0, // Vertical extension
-                4.0,
+                mechColor.equals(RobotConstants.kMeasuredStateColor) ? 4.0 : 3.0, // So that you can see measured under target
                 mechColor));
   }
 

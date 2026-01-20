@@ -22,7 +22,7 @@ public class RobotSuperstructure {
 
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
-    NamedCommands.registerCommand("ClimbClimbed", climbClimbed());
+    NamedCommands.registerCommand("Climb", climbClimbed());
   }
 
   public Command climbRaise() {

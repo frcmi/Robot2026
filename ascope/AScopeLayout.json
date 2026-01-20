@@ -131,6 +131,24 @@
                     }
                   },
                   {
+                    "type": "mechanism",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Superstructure/MeasuredClimb",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {
+                      "plane": "yz"
+                    }
+                  },
+                  {
+                    "type": "mechanism",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Superstructure/TargetClimb",
+                    "logType": "Mechanism2d",
+                    "visible": true,
+                    "options": {
+                      "plane": "yz"
+                    }
+                  },
+                  {
                     "type": "robot",
                     "logKey": "NT:/AdvantageKit/RealOutputs/Superstructure/MeasuredTurretPose",
                     "logType": "Pose3d",

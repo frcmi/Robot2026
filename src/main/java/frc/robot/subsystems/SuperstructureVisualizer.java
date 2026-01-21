@@ -38,8 +38,10 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
       new LoggedMechanism2d(
           Inches.of(PADDING + 27 + PADDING).in(Meters), // Width: 27in
           Inches.of(95.0).in(Meters));
-  private final LoggedMechanismRoot2d climberRoot;
-  private final LoggedMechanismLigament2d climber;
+  private final LoggedMechanismRoot2d climberRoot1;
+  private final LoggedMechanismRoot2d climberRoot2;
+  private final LoggedMechanismLigament2d climber1;
+  private final LoggedMechanismLigament2d climber2;
 
   private final LoggedMechanism2d mechanismShooter =
       new LoggedMechanism2d(Inches.of(PADDING + 7 + PADDING).in(Meters), Inches.of(22).in(Meters));
@@ -48,7 +50,8 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
 
   private final Supplier<IntakeState> intakeState;
   private final Supplier<ShooterState> shooterState;
-  private final Supplier<Distance> climberState;
+  private final Supplier<Distance> climberState1;
+  private final Supplier<Distance> climberState2;
   private final Supplier<Pose2d> robotPose;
 
   private final String logKey;
@@ -56,13 +59,15 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   public SuperstructureVisualizer(
       Supplier<IntakeState> intakeState,
       Supplier<ShooterState> shooterState,
-      Supplier<Distance> climberState,
+      Supplier<Distance> climberState1,
+      Supplier<Distance> climberState2,
       Supplier<Pose2d> robotPose,
       String logKey,
       Color8Bit mechColor) {
     this.intakeState = intakeState;
     this.shooterState = shooterState;
-    this.climberState = climberState;
+    this.climberState1 = climberState1;
+    this.climberState2 = climberState2;
     this.robotPose = robotPose;
     this.logKey = logKey;
 
@@ -100,21 +105,31 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 mechColor));
 
     // Climber visualization
-    climberRoot =
+    climberRoot1 =
         mechanismClimber.getRoot(
-            "ClimberRoot", Inches.of(PADDING + 6.0).in(Meters), Inches.of(90.0).in(Meters));
+            "ClimberRoot1", Inches.of(PADDING + 3.0).in(Meters), Inches.of(5.0).in(Meters));
 
-    climber =
-        climberRoot.append(
+    climber1 =
+        climberRoot1.append(
             new LoggedMechanismLigament2d(
-                "Climber", ClimberConstants.kStowedDistance, ClimberConstants.kClimberAngle));
+                "Climber1", ClimberConstants.kStowedDistance, ClimberConstants.kClimberAngle));
+
+    climberRoot2 =
+        mechanismClimber.getRoot(
+            "ClimberRoot2", Inches.of(PADDING + 9.0).in(Meters), Inches.of(5.0).in(Meters));
+
+    climber2 =
+        climberRoot2.append(
+            new LoggedMechanismLigament2d(
+                "Climber2", ClimberConstants.kStowedDistance, ClimberConstants.kClimberAngle));
   }
 
   @Override
   public void periodic() {
     intakePivot.setAngle(intakeState.get().getPivot().in(Degrees));
     hood.setAngle(90 + shooterState.get().getHood().in(Degrees));
-    climber.setLength(climberState.get());
+    climber1.setLength(climberState1.get());
+    climber2.setLength(climberState2.get());
 
     Logger.recordOutput(String.format("Superstructure/%sIntake", logKey), mechanismIntake);
     Logger.recordOutput(

@@ -222,7 +222,8 @@ public class RobotContainer {
         new SuperstructureVisualizer(
             intake::getMeasuredState,
             shooter::getMeasuredState,
-            climber::getMeasuredState,
+            climber::getMeasuredState1,
+            climber::getMeasuredState2,
             drive::getPose,
             "Measured",
             RobotConstants.kMeasuredStateColor);
@@ -231,12 +232,13 @@ public class RobotContainer {
             intake::getTargetState,
             shooter::getTargetState,
             climber::getTargetState,
+            climber::getTargetState,
             drive::getPose,
             "Target",
             RobotConstants.kTargetStateColor);
 
     allianceChecker.registerObservers(shooter);
-
+    
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

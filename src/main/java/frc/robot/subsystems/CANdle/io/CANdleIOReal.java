@@ -9,34 +9,35 @@ import com.ctre.phoenix6.signals.StripTypeValue;
 
 public class CANdleIOReal implements CANdleIO {
 
-    private final CANdle m_candle = new CANdle(1, "rio");
-    private ControlRequest request;
+  private final CANdle m_candle = new CANdle(1, "rio");
+  private ControlRequest request;
 
-    public CANdleIOReal() {
-        var candleconfig = new CANdleConfiguration();
+  public CANdleIOReal() {
+    var candleconfig = new CANdleConfiguration();
 
-        candleconfig.LED.StripType = StripTypeValue.GRB;
-        candleconfig.LED.BrightnessScalar = 0.5;
+    candleconfig.LED.StripType = StripTypeValue.GRB;
+    candleconfig.LED.BrightnessScalar = 0.5;
 
-        candleconfig.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Disabled;
+    candleconfig.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Disabled;
 
-        m_candle.getConfigurator().apply(candleconfig);
+    m_candle.getConfigurator().apply(candleconfig);
 
-        for (int i = 0; i < 24; ++i) {
-            m_candle.setControl(new EmptyAnimation(i));
-        }
-        request = new EmptyAnimation(0);
+    for (int i = 0; i < 24; ++i) {
+      m_candle.setControl(new EmptyAnimation(i));
     }
+    request = new EmptyAnimation(0);
+  }
 
-    @Override
-    public void setControl(ControlRequest request) {
-        m_candle.setControl(request);
-        this.request = request;
-    };
+  @Override
+  public void setControl(ControlRequest request) {
+    m_candle.setControl(request);
+    this.request = request;
+  }
+  ;
 
-    @Override
-    public void updateInputs(CANdleIOInputs inputs) {
-        inputs.animation = request;
-    };
-    
+  @Override
+  public void updateInputs(CANdleIOInputs inputs) {
+    inputs.animationName = request.getName();
+  }
+  ;
 }

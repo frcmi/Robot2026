@@ -1,15 +1,11 @@
 package frc.robot.subsystems.CANdle;
 
-import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.*;
-import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.RGBWColor;
-import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
-import com.ctre.phoenix6.signals.StripTypeValue;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.CANdle.io.CANdleIO;
+import frc.robot.subsystems.CANdle.io.CANdleIOInputsAutoLogged;
 
 public class CANdleSystem extends SubsystemBase {
 
@@ -17,6 +13,7 @@ public class CANdleSystem extends SubsystemBase {
   private static final int SlotEndIdx = 37;
 
   private final CANdleIO io;
+  private final CANdleIOInputsAutoLogged inputs;
 
   public CANdleSystem() {
     this(new CANdleIO() {});
@@ -24,10 +21,17 @@ public class CANdleSystem extends SubsystemBase {
 
   public CANdleSystem(CANdleIO io) {
     this.io = io;
+    this.inputs = new CANdleIOInputsAutoLogged();
+  }
+
+  @Override
+  public void periodic() {
+    this.io.updateInputs(inputs);
   }
 
   private Command setAnimFlow() {
-    return run(() -> {
+    return run(
+        () -> {
           io.setControl(
               new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)

@@ -1,19 +1,18 @@
 package frc.robot.subsystems.CANdle.io;
 
-import org.littletonrobotics.junction.AutoLog;
-
-import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix6.controls.ControlRequest;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface CANdleIO {
 
-    @AutoLog
-    static class CANdleIOInputs {
-        public ControlRequest animation;
-    }
+  @AutoLog
+  static class CANdleIOInputs {
+    public String animationName;
+  }
 
-    default void setControl(ControlRequest request) {};
+  default void setControl(ControlRequest request) {}
+  ;
 
-    default void updateInputs(CANdleIOInputs inputs) {};
-
+  default void updateInputs(CANdleIOInputs inputs) {}
+  ;
 }

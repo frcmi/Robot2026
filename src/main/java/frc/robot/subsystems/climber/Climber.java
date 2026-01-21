@@ -1,67 +1,57 @@
 package frc.robot.subsystems.climber;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ClimberConstants;
+import frc.robot.lib.subsystem.VirtualSubsystem;
+import frc.robot.lib.subsystem.linear.LinearIO;
+import frc.robot.lib.subsystem.linear.LinearSubsystem;
+import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
-public class Climber extends SubsystemBase {
-  public final TalonFX climber1 = new TalonFX(0);
-  public final TalonFX climber2 = new TalonFX(0);
+public class Climber extends VirtualSubsystem {
+  public final LinearSubsystem climber1;
+  public final LinearSubsystem climber2;
 
-  private final TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
-  private Slot0Configs slot0Configs = talonFXConfigs.Slot0;
-  private MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-  private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-
-  private boolean up = false;
-
-  private double upAngle = 10;
+  @Getter private Distance targetState = ClimberConstants.kStowedDistance;
+  @Getter private Distance measuredState;
 
   public Climber() {
-    slot0Configs.kS = 0;
-    slot0Configs.kV = 0;
-    slot0Configs.kA = 0;
-    slot0Configs.kP = 5;
-    slot0Configs.kI = 0;
-    slot0Configs.kD = 0;
-    slot0Configs.kG = 0;
-
-    motionMagicConfigs.MotionMagicCruiseVelocity = 80;
-    motionMagicConfigs.MotionMagicAcceleration = 160;
-    motionMagicConfigs.MotionMagicJerk = 1600;
-
-    climber1.getConfigurator().apply(talonFXConfigs);
-    climber2.getConfigurator().apply(talonFXConfigs);
-
-    climber1.setPosition(0);
-    climber2.setPosition(0);
-
-    setDefaultCommand(setAngle());
+    this(
+        new LinearSubsystem(new LinearIO() {}, ClimberConstants.kSubsystemConfigReal),
+        new LinearSubsystem(new LinearIO() {}, ClimberConstants.kSubsystemConfigReal));
   }
 
-  private Command setAngle() {
-    return run(
-        () -> {
-          climber1.setControl(m_request.withPosition(up ? upAngle : 0));
-          climber2.setControl(m_request.withPosition(up ? upAngle : 0));
-        });
+  public Climber(LinearSubsystem climber1, LinearSubsystem climber2) {
+    this.climber1 = climber1;
+    this.climber2 = climber2;
+
+    climber1.setDefaultCommand(climber1.holdAtGoal(() -> targetState));
+    climber2.setDefaultCommand(climber2.holdAtGoal(() -> targetState));
+
+    measuredState = climber1.getLength();
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    measuredState = climber1.getLength();
+
+    Logger.recordOutput("Climber/TargetState", targetState);
+    Logger.recordOutput("Climber/MeasuredState", measuredState);
   }
 
   public Command up() {
     return runOnce(
         () -> {
-          up = true;
+          targetState = ClimberConstants.kExtendedDistance;
         });
   }
 
   public Command down() {
     return runOnce(
         () -> {
-          up = false;
+          targetState = ClimberConstants.kStowedDistance;
         });
   }
 }

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
+import frc.robot.constants.ClimberConstants;
 import frc.robot.constants.Intake.PivotConstants;
 import frc.robot.constants.Intake.RollerConstants;
 import frc.robot.constants.RobotConstants;
@@ -39,6 +40,9 @@ import frc.robot.lib.sim.CurrentDrawCalculatorSim;
 import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import frc.robot.lib.subsystem.linear.LinearIOSim;
+import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
+import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
@@ -135,7 +139,14 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigReal),
                 drive::getPose,
                 drive::getPoseVelocity);
-        climber = new Climber();
+        climber =
+            new Climber(
+                new LinearSubsystem(
+                    new LinearIOTalonFX(ClimberConstants.kTalonFXConfig1),
+                    ClimberConstants.kSubsystemConfigReal),
+                new LinearSubsystem(
+                    new LinearIOTalonFX(ClimberConstants.kTalonFXConfig2),
+                    ClimberConstants.kSubsystemConfigReal));
         break;
 
       case SIM:
@@ -177,7 +188,14 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
                 drive::getPoseVelocity);
-        climber = new Climber();
+        climber =
+            new Climber(
+                new LinearSubsystem(
+                    new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
+                    ClimberConstants.kSubsystemConfigSim),
+                new LinearSubsystem(
+                    new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
+                    ClimberConstants.kSubsystemConfigSim));
         break;
 
       default:
@@ -204,6 +222,7 @@ public class RobotContainer {
         new SuperstructureVisualizer(
             intake::getMeasuredState,
             shooter::getMeasuredState,
+            climber::getMeasuredState,
             drive::getPose,
             "Measured",
             RobotConstants.kMeasuredStateColor);
@@ -211,6 +230,7 @@ public class RobotContainer {
         new SuperstructureVisualizer(
             intake::getTargetState,
             shooter::getTargetState,
+            climber::getTargetState,
             drive::getPose,
             "Target",
             RobotConstants.kTargetStateColor);
@@ -261,11 +281,11 @@ public class RobotContainer {
     controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Intake controls
-    controller.buttonA.onTrue(superstructure.intakeDeploy());
-    controller.buttonA.onFalse(superstructure.intakeStowed());
+    // controller.buttonA.onTrue(superstructure.intakeDeploy());
+    // controller.buttonA.onFalse(superstructure.intakeStowed());
 
-    controller.leftBumper.onTrue(climber.down());
-    controller.rightBumper.onTrue(climber.up());
+    controller.buttonA.onTrue(climber.down());
+    controller.buttonB.onTrue(climber.up());
   }
 
   private void logInit() {

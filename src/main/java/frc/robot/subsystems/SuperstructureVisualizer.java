@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.constants.ClimberConstants;
 import frc.robot.constants.Intake.PivotConstants;
 import frc.robot.constants.Shooter.HoodConstants;
 import frc.robot.constants.Shooter.TurretConstants;
@@ -32,6 +34,13 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   private final LoggedMechanismRoot2d intakePivotRoot;
   private final LoggedMechanismLigament2d intakePivot;
 
+  private final LoggedMechanism2d mechanismClimber =
+      new LoggedMechanism2d(
+          Inches.of(PADDING + 27 + PADDING).in(Meters), // Width: 27in
+          Inches.of(95.0).in(Meters));
+  private final LoggedMechanismRoot2d climberRoot;
+  private final LoggedMechanismLigament2d climber;
+
   private final LoggedMechanism2d mechanismShooter =
       new LoggedMechanism2d(Inches.of(PADDING + 7 + PADDING).in(Meters), Inches.of(22).in(Meters));
   private final LoggedMechanismRoot2d hoodRoot;
@@ -39,6 +48,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
 
   private final Supplier<IntakeState> intakeState;
   private final Supplier<ShooterState> shooterState;
+  private final Supplier<Distance> climberState;
   private final Supplier<Pose2d> robotPose;
 
   private final String logKey;
@@ -46,11 +56,13 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   public SuperstructureVisualizer(
       Supplier<IntakeState> intakeState,
       Supplier<ShooterState> shooterState,
+      Supplier<Distance> climberState,
       Supplier<Pose2d> robotPose,
       String logKey,
       Color8Bit mechColor) {
     this.intakeState = intakeState;
     this.shooterState = shooterState;
+    this.climberState = climberState;
     this.robotPose = robotPose;
     this.logKey = logKey;
 
@@ -86,12 +98,23 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 shooterState.get().getHood().in(Degrees),
                 3.0,
                 mechColor));
+
+    // Climber visualization
+    climberRoot =
+        mechanismClimber.getRoot(
+            "ClimberRoot", Inches.of(PADDING + 6.0).in(Meters), Inches.of(90.0).in(Meters));
+
+    climber =
+        climberRoot.append(
+            new LoggedMechanismLigament2d(
+                "Climber", ClimberConstants.kStowedDistance, ClimberConstants.kClimberAngle));
   }
 
   @Override
   public void periodic() {
     intakePivot.setAngle(intakeState.get().getPivot().in(Degrees));
     hood.setAngle(90 + shooterState.get().getHood().in(Degrees));
+    climber.setLength(climberState.get());
 
     Logger.recordOutput(String.format("Superstructure/%sIntake", logKey), mechanismIntake);
     Logger.recordOutput(
@@ -102,5 +125,6 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                     TurretConstants.TurretOffset,
                     new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians)))));
     Logger.recordOutput(String.format("Superstructure/%sShooter", logKey), mechanismShooter);
+    Logger.recordOutput(String.format("Superstructure/%sClimber", logKey), mechanismClimber);
   }
 }

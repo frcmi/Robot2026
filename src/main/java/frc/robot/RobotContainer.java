@@ -14,12 +14,10 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -152,6 +150,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+                
+        drive.setPose(new Pose2d(12.0, 4.012, new Rotation2d()));
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -268,34 +268,13 @@ public class RobotContainer {
     controller.buttonA.onFalse(superstructure.intakeStowed());
     controller.buttonY.onTrue(
         new InstantCommand(
-            () -> {
-                ChassisSpeeds robotVel = drive.getChassisSpeeds();
-                Translation3d robotVelT3d = new Translation3d(robotVel.vxMetersPerSecond, robotVel.vyMetersPerSecond, 0.0);
-
-                double rps = shooter.getMeasuredState().getFlywheel().in(Revolutions.per(Second));
-                double mps = rps * Units.inchesToMeters(4) * Math.PI * 0.5; // linear velocity = 0.5 * rps * circ
-
-                // convert to translational and vertical
-                double angle = shooter.getMeasuredState().getHood().in(Radians);
-
-                double tvel = mps * Math.sin(angle);
-                double zvel = mps * Math.cos(angle);
-
+            () ->
                 Robot.fuel.add(
-                    new FuelSim(
-                        new Pose3d(
-                            drive.getPose().getX(),
-                            drive.getPose().getY(),
-                            Units.inchesToMeters(8),
-                            new Rotation3d()),
-                        new Pose3d(
-                            new Translation3d(tvel, 0.0, zvel)
-                                .rotateBy(
-                                    new Rotation3d(
-                                        new Rotation2d(shooter.getMeasuredState().getTurret()).plus(Rotation2d.fromDegrees(180))))
-                                        .plus(robotVelT3d),
-                            new Rotation3d())));
-                        }));
+                    FuelSim.generateShotFuel(
+                        measuredSuperstructureState.getTurretPose(),
+                        drive.getChassisSpeeds(),
+                        shooter.getMeasuredState().getFlywheel(),
+                        shooter.getMeasuredState().getHood()))));
     controller.buttonX.onTrue(new InstantCommand(Robot.fuel::clear));
   }
 

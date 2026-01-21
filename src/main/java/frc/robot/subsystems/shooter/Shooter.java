@@ -99,9 +99,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             .rotateBy(currentPose.getRotation());
 
     // Calculate aiming position iteratively
-    double dx = hubPosition.getX() - currentPose.getX() + turretOffset.getX();
-    double dy = hubPosition.getY() - currentPose.getY() + turretOffset.getY();
+    double dx = hubPosition.getX() - currentPose.getX() - turretOffset.getX();
+    double dy = hubPosition.getY() - currentPose.getY() - turretOffset.getY();
     double distanceToTarget = Math.hypot(dx, dy);
+    Logger.recordOutput("Shooter/DistanceInitial", distanceToTarget);
     ChassisSpeeds robotVelocity = robotVel.get();
     for (int i = 0; i < 10; i++) {
       // TODO: Verify this actually converges (it should though)
@@ -109,12 +110,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       dx =
           hubPosition.getX()
               - currentPose.getX()
-              + turretOffset.getX()
+              - turretOffset.getX()
               - robotVelocity.vxMetersPerSecond * airtime;
       dy =
           hubPosition.getY()
               - currentPose.getY()
-              + turretOffset.getY()
+              - turretOffset.getY()
               - robotVelocity.vyMetersPerSecond * airtime;
       distanceToTarget = Math.hypot(dx, dy);
     }

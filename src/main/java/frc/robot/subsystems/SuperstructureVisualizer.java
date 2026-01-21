@@ -94,13 +94,15 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     hood.setAngle(90 + shooterState.get().getHood().in(Degrees));
 
     Logger.recordOutput(String.format("Superstructure/%sIntake", logKey), mechanismIntake);
-    Logger.recordOutput(
-        String.format("Superstructure/%sTurretPose", logKey),
-        new Pose3d(robotPose.get())
-            .plus(
-                new Transform3d(
-                    TurretConstants.TurretOffset,
-                    new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians)))));
+    Logger.recordOutput(String.format("Superstructure/%sTurretPose", logKey), getTurretPose());
     Logger.recordOutput(String.format("Superstructure/%sShooter", logKey), mechanismShooter);
+  }
+
+  public Pose3d getTurretPose() {
+    return new Pose3d(robotPose.get())
+        .plus(
+            new Transform3d(
+                TurretConstants.TurretOffset,
+                new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians))));
   }
 }

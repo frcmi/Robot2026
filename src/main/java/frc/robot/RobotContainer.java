@@ -14,7 +14,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -150,7 +149,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
-                
+
         drive.setPose(new Pose2d(12.0, 4.012, new Rotation2d()));
         vision =
             new Vision(

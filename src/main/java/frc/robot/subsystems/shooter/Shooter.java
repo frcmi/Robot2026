@@ -90,6 +90,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             ? AimingConstants.kHubPositionBlue
             : AimingConstants.kHubPositionRed;
 
+    Logger.recordOutput("Shooter/HubPosition", hubPosition);
+
     // Calculate turret angle to target
     Pose2d currentPose = this.robotPose.get();
 

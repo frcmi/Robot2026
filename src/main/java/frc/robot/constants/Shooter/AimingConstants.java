@@ -5,9 +5,9 @@ import frc.robot.lib.LoggedInterpolatingTable;
 
 public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
-  public static final Translation2d kHubPositionRed = new Translation2d(12.51, 4.03); // Meters
+  public static final Translation2d kHubPositionRed = new Translation2d(12.1, 4.07); // Meters
 
-  // TODO: Tune, right now it's from my launch angle calculator
+  // TODO: retune for new hub position
   public static LoggedInterpolatingTable kHoodAngleTable =
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
@@ -19,7 +19,7 @@ public class AimingConstants {
             {2.2, 25.0} // tower, corner
           });
 
-  // No idea where these numbers even came from, copilot just made them up but whatever :shrug:
+  // TODO: retune for new hub position
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",

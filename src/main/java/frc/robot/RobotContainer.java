@@ -40,6 +40,9 @@ import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
+import frc.robot.subsystems.CANdle.CANdleSystem;
+import frc.robot.subsystems.CANdle.io.CANdleIOReal;
+import frc.robot.subsystems.CANdle.io.CANdleIOSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -75,6 +78,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final Intake intake;
   private final Climber climber;
+  private final CANdleSystem candle;
 
   private final RobotSuperstructure superstructure;
 
@@ -136,6 +140,7 @@ public class RobotContainer {
                 drive::getPose,
                 drive::getPoseVelocity);
         climber = new Climber();
+        candle = new CANdleSystem(new CANdleIOReal());
         break;
 
       case SIM:
@@ -178,6 +183,7 @@ public class RobotContainer {
                 drive::getPose,
                 drive::getPoseVelocity);
         climber = new Climber();
+        candle = new CANdleSystem(new CANdleIOSim());
         break;
 
       default:
@@ -194,6 +200,7 @@ public class RobotContainer {
         intake = new Intake();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         climber = new Climber();
+        candle = new CANdleSystem();
         break;
     }
 

@@ -10,10 +10,13 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.constants.Intake.PivotConstants;
-import frc.robot.constants.Shooter.HoodConstants;
-import frc.robot.constants.Shooter.TurretConstants;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.climb.ClimberConstants;
+import frc.robot.constants.intake.PivotConstants;
+import frc.robot.constants.shooter.HoodConstants;
+import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.ShooterState;
 import java.util.function.Supplier;
@@ -37,8 +40,17 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   private final LoggedMechanismRoot2d hoodRoot;
   private final LoggedMechanismLigament2d hood;
 
+  // Climb mechanism on YZ plane
+  private final LoggedMechanism2d mechanismClimb =
+      new LoggedMechanism2d(
+          Inches.of(PADDING + 27 + PADDING).in(Meters), Inches.of(95.0).in(Meters));
+  private final LoggedMechanismRoot2d climberRoot;
+  private final LoggedMechanismLigament2d climberBase;
+  private final LoggedMechanismLigament2d climberExtension;
+
   private final Supplier<IntakeState> intakeState;
   private final Supplier<ShooterState> shooterState;
+  private final Supplier<ClimbState> climbState;
   private final Supplier<Pose2d> robotPose;
 
   private final String logKey;
@@ -46,11 +58,13 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   public SuperstructureVisualizer(
       Supplier<IntakeState> intakeState,
       Supplier<ShooterState> shooterState,
+      Supplier<ClimbState> climbState,
       Supplier<Pose2d> robotPose,
       String logKey,
       Color8Bit mechColor) {
     this.intakeState = intakeState;
     this.shooterState = shooterState;
+    this.climbState = climbState;
     this.robotPose = robotPose;
     this.logKey = logKey;
 
@@ -86,12 +100,42 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 shooterState.get().getHood().in(Degrees),
                 3.0,
                 mechColor));
+
+    // Climber - YZ plane visualization (separate from intake XZ plane)
+    climberRoot =
+        mechanismClimb.getRoot(
+            "ClimberRoot",
+            Inches.of(PADDING + ClimberConstants.kClimberWidth.in(Inches) / 2.0).in(Meters),
+            ClimberConstants.kClimberBaseHeight.in(Meters));
+
+    // Fixed base of climber (vertical, not moving)
+    climberBase =
+        climberRoot.append(
+            new LoggedMechanismLigament2d(
+                "ClimberBase",
+                ClimberConstants.kClimberBaseHeight.in(Meters),
+                -90.0, // Pointing down into drivetrain
+                8.0,
+                new Color8Bit(100, 100, 100)));
+
+    // Extending part of climber
+    climberExtension =
+        climberRoot.append(
+            new LoggedMechanismLigament2d(
+                "ClimberExtension",
+                climbState.get().getClimber().in(Meters),
+                90.0, // Vertical extension
+                mechColor.equals(RobotConstants.kMeasuredStateColor)
+                    ? 4.0
+                    : 3.0, // So that you can see measured under target
+                mechColor));
   }
 
   @Override
   public void periodic() {
     intakePivot.setAngle(intakeState.get().getPivot().in(Degrees));
     hood.setAngle(90 + shooterState.get().getHood().in(Degrees));
+    climberExtension.setLength(climbState.get().getClimber().in(Meters));
 
     Logger.recordOutput(String.format("Superstructure/%sIntake", logKey), mechanismIntake);
     Logger.recordOutput(
@@ -102,5 +146,6 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                     TurretConstants.TurretOffset,
                     new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians)))));
     Logger.recordOutput(String.format("Superstructure/%sShooter", logKey), mechanismShooter);
+    Logger.recordOutput(String.format("Superstructure/%sClimb", logKey), mechanismClimb);
   }
 }

@@ -66,18 +66,21 @@ public class LinearIOSim implements LinearIO {
 
   @Override
   public void updateInputs(LinearIOInputs inputs) {
-    inputs.goal = this.goal.orElse(Meters.of(0.0));
+    Distance goal = Meters.of(0.0);
     switch (outputMode) {
-      case kClosedLoop -> inputs.appliedVolts =
-          Volts.of(
-              MathUtil.clamp(
-                  controller.calculate(
-                              linearExtension.getPositionMeters(),
-                              goal.orElse(Meters.of(0.0)).in(Meters))
-                          * RobotController.getBatteryVoltage()
-                      + deviceConfig.getKG(),
-                  -12.0,
-                  12.0));
+      case kClosedLoop -> {
+        inputs.appliedVolts =
+            Volts.of(
+                MathUtil.clamp(
+                    controller.calculate(
+                                linearExtension.getPositionMeters(),
+                                this.goal.orElse(Meters.of(0.0)).in(Meters))
+                            * RobotController.getBatteryVoltage()
+                        + deviceConfig.getKG(),
+                    -12.0,
+                    12.0));
+        goal = Meters.of(controller.getSetpoint().position);
+      }
       case kOpenLoop -> inputs.appliedVolts =
           Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));
       case kNeutral -> inputs.appliedVolts = Volts.of(0.0);
@@ -86,6 +89,7 @@ public class LinearIOSim implements LinearIO {
     linearExtension.update(kDt);
 
     inputs.length = Meters.of(linearExtension.getPositionMeters());
+    inputs.goal = goal;
 
     inputs.supplyCurrent =
         Amps.of(

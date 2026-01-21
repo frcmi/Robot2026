@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -24,14 +25,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
-import frc.robot.constants.Intake.PivotConstants;
-import frc.robot.constants.Intake.RollerConstants;
 import frc.robot.constants.RobotConstants;
-import frc.robot.constants.Shooter.FlywheelConstants;
-import frc.robot.constants.Shooter.HoodConstants;
-import frc.robot.constants.Shooter.TurretConstants;
 import frc.robot.constants.TunerConstantsAlpha;
 import frc.robot.constants.VisionConstants;
+import frc.robot.constants.climb.ClimberConstants;
+import frc.robot.constants.intake.PivotConstants;
+import frc.robot.constants.intake.RollerConstants;
+import frc.robot.constants.shooter.FlywheelConstants;
+import frc.robot.constants.shooter.HoodConstants;
+import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
@@ -39,7 +41,12 @@ import frc.robot.lib.sim.CurrentDrawCalculatorSim;
 import frc.robot.lib.subsystem.angular.AngularIOSim;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFX;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import frc.robot.lib.subsystem.linear.LinearIOSim;
+import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
+import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -47,6 +54,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -73,6 +81,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
+  private final Climb climb;
 
   private final RobotSuperstructure superstructure;
 
@@ -133,6 +142,11 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigReal),
                 drive::getPose,
                 drive::getPoseVelocity);
+        climb =
+            new Climb(
+                new LinearSubsystem(
+                    new LinearIOTalonFX(ClimberConstants.kTalonFXConfig),
+                    ClimberConstants.kSubsystemConfigReal));
         break;
 
       case SIM:
@@ -174,6 +188,11 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
                 drive::getPoseVelocity);
+        climb =
+            new Climb(
+                new LinearSubsystem(
+                    new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
+                    ClimberConstants.kSubsystemConfigSim));
         break;
 
       default:
@@ -189,16 +208,18 @@ public class RobotContainer {
             new Vision(drive::addVisionMeasurement, new VisionIO() {} /* , new VisionIO() {} */);
         intake = new Intake();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        climb = new Climb();
         break;
     }
 
-    superstructure = new RobotSuperstructure(intake);
+    superstructure = new RobotSuperstructure(intake, climb, shooter);
     superstructure.registerAutoCommands();
 
     measuredSuperstructureState =
         new SuperstructureVisualizer(
             intake::getMeasuredState,
             shooter::getMeasuredState,
+            climb::getMeasuredState,
             drive::getPose,
             "Measured",
             RobotConstants.kMeasuredStateColor);
@@ -206,6 +227,7 @@ public class RobotContainer {
         new SuperstructureVisualizer(
             intake::getTargetState,
             shooter::getTargetState,
+            climb::getTargetState,
             drive::getPose,
             "Target",
             RobotConstants.kTargetStateColor);
@@ -256,8 +278,18 @@ public class RobotContainer {
     controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Intake controls
-    controller.buttonA.onTrue(superstructure.intakeDeploy());
-    controller.buttonA.onFalse(superstructure.intakeStowed());
+    controller
+        .leftTrigger
+        .debounce(0.3)
+        .whileTrue(intake.set(IntakeState.kIntaking))
+        .whileFalse(intake.set(IntakeState.kStowed));
+
+    // Climb controls
+    controller.buttonX.onTrue(
+        either(
+            superstructure.climbClimbed(),
+            superstructure.climbRaise(),
+            () -> climb.getTargetState().equals(ClimbState.kRaised)));
   }
 
   private void logInit() {

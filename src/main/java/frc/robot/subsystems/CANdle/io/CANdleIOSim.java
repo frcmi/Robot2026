@@ -15,6 +15,7 @@ public class CANdleIOSim implements CANdleIO {
   @Override
   public void updateInputs(CANdleIOInputs inputs) {
     inputs.animationName = request.getName();
+    inputs.animation = request.toString();
   }
   ;
 }

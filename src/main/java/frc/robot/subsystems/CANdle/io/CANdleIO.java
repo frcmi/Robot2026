@@ -6,8 +6,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CANdleIO {
 
   @AutoLog
-  static class CANdleIOInputs {
+  class CANdleIOInputs {
     public String animationName;
+    public String animation;
   }
 
   default void setControl(ControlRequest request) {}

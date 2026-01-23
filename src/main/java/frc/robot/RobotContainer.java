@@ -109,44 +109,74 @@ public class RobotContainer {
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
-                new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
-                new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
-                new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight(camera0Name, drive::getRotation),
-                new VisionIOLimelight(camera1Name, drive::getRotation));
-        intake =
-            new Intake(
-                new AngularSubsystem(
-                    new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
-                    RollerConstants.kSubsystemConfigReal),
-                new AngularSubsystem(
-                    new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
-                    PivotConstants.kSubsystemConfigReal));
-        shooter =
-            new Shooter(
-                new AngularSubsystem(
-                    new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
-                    TurretConstants.kSubsystemConfigReal),
-                new AngularSubsystem(
-                    new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
-                    HoodConstants.kSubsystemConfigReal),
-                new AngularSubsystem(
-                    new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
-                    FlywheelConstants.kSubsystemConfigReal),
-                drive::getPose,
-                drive::getPoseVelocity);
-        climb =
-            new Climb(
-                new LinearSubsystem(
-                    new LinearIOTalonFX(ClimberConstants.kTalonFXConfig),
-                    ClimberConstants.kSubsystemConfigReal));
+        if (Constants.driveHardwareExists) {
+          drive =
+              new Drive(
+                  new GyroIOPigeon2(),
+                  new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
+                  new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
+                  new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
+                  new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
+        } else {
+          drive =
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
+        }
+
+        if (Constants.visionHardwareExists) {
+          vision =
+              new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOLimelight(camera0Name, drive::getRotation),
+                  new VisionIOLimelight(camera1Name, drive::getRotation));
+        } else {
+          vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        }
+
+        if (Constants.intakeHardwareExists) {
+          intake =
+              new Intake(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
+                      RollerConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
+                      PivotConstants.kSubsystemConfigReal));
+        } else {
+          intake = new Intake();
+        }
+
+        if (Constants.shooterHardwareExists) {
+          shooter =
+              new Shooter(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
+                      TurretConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
+                      HoodConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
+                      FlywheelConstants.kSubsystemConfigReal),
+                  drive::getPose,
+                  drive::getPoseVelocity);
+        } else {
+          shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        }
+
+        if (Constants.climbHardwareExists) {
+          climb =
+              new Climb(
+                  new LinearSubsystem(
+                      new LinearIOTalonFX(ClimberConstants.kTalonFXConfig),
+                      ClimberConstants.kSubsystemConfigReal));
+        } else {
+          climb = new Climb();
+        }
         break;
 
       case SIM:

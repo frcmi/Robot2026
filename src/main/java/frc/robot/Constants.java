@@ -28,4 +28,13 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  // These variables affect only the REAL runmode (on an actual robot).
+  // They allow you to prevent subsystems that don't exist from being initialized,
+  // skipping over looking for hardware that doesn't exist.
+  public static boolean driveHardwareExists = true;
+  public static boolean climbHardwareExists = false;
+  public static boolean intakeHardwareExists = false;
+  public static boolean shooterHardwareExists = false;
+  public static boolean visionHardwareExists = false;
 }

@@ -56,7 +56,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
     setTunable();
 
     io.setLogKey(logKey);
-    resetAngle();
+    io.resetAngle();
     setDefaultCommand(holdAtCall());
   }
 

@@ -113,8 +113,8 @@ public class LinearIOTalonFX implements LinearIO {
     configuration.Slot0.kP = deviceConfig.getKP();
     configuration.Slot0.kI = deviceConfig.getKI();
     configuration.Slot0.kD = deviceConfig.getKD();
-    masterConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    masterConfig.Slot0.kG = deviceConfig.getKG();
+    configuration.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    configuration.Slot0.kG = deviceConfig.getKG();
 
     configuration.MotionMagic.MotionMagicCruiseVelocity =
         deviceConfig.getCruiseVelocity().in(MetersPerSecond)
@@ -244,6 +244,9 @@ public class LinearIOTalonFX implements LinearIO {
 
   @Override
   public void resetLength(Distance length) {
+    System.out.println(
+        "Reset Length: "
+            + length.in(Meters) / deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
     master.setPosition(
         Rotations.of(
             length.in(Meters) / deviceConfig.getOutputDistancePerOutputRotation().in(Meters)));

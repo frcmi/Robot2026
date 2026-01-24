@@ -320,6 +320,7 @@ public class RobotContainer {
             superstructure.climbClimbed(),
             superstructure.climbRaise(),
             () -> climb.getTargetState().equals(ClimbState.kRaised)));
+    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
   }
 
   private void logInit() {

@@ -25,7 +25,7 @@ public class ClimberConstants {
 
   // Visualization constants
   public static final Distance kClimberBaseHeight =
-      Inches.of(10.0); // Height of climber base from ground
+      Inches.of(24.0); // Height of climber base from ground
   public static final Distance kClimberWidth = Inches.of(3.0); // Width of climber visualization
 
   public static final LinearSubsystemConfig kSubsystemConfigReal =
@@ -34,24 +34,24 @@ public class ClimberConstants {
           .bus(kRioBus)
           .positionTolerance(Inches.of(0.5))
           .velocityTolerance(InchesPerSecond.of(2.0))
-          .kP(10.0)
+          .kP(12.0)
           .kI(0.0)
           .kD(0.5)
-          .kG(0.05) // Small gravity compensation for hanging climber
-          .cruiseVelocity(InchesPerSecond.of(200.0))
-          .acceleration(InchesPerSecondPerSecond.of(1000.0))
+          .kG(0.0) // Small gravity compensation for hanging climber
+          .cruiseVelocity(InchesPerSecond.of(60.0))
+          .acceleration(InchesPerSecondPerSecond.of(200.0))
           .build();
 
   public static final LinearIOTalonFXConfig kTalonFXConfig =
       LinearIOTalonFXConfig.builder()
-          .masterId(20) // Example CAN ID - adjust as needed
+          .masterId(9) // Example CAN ID - adjust as needed
           .bus(kRioBus)
           .resetLength(ClimbState.kStowed.getClimber())
           .softMinLength(ClimbState.kStowed.getClimber())
           .softMaxLength(ClimbState.kRaised.getClimber())
-          .motorRotationsPerOutputRotations(4.0) // 4:1 gear ratio for climber in a box
+          .motorRotationsPerOutputRotations(12.0) // 12:1 gear ratio for climber in a box
           .outputDistancePerOutputRotation(kDistancePerRotation)
-          .inverted(InvertedValue.CounterClockwise_Positive)
+          .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
           .statorCurrentLimit(Amps.of(80.0)) // Higher current for climbing
           .neutralMode(NeutralModeValue.Brake)

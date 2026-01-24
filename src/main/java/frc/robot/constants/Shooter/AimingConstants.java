@@ -26,18 +26,16 @@ public class AimingConstants {
             {0.63, 40.0}, // at hub
             {2.0, 44.0}, // random data point
             {2.7, 47.0}, // tower
-            {5.3, 55.0} // corner
+            {5.3, 55.0} // far corner
           });
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
           new double[][] {
             {0.0, 0.0},
-            {0.37, 0.5},
-            {0.81, 0.8},
-            {1.4, 1.2},
-            {1.8, 1.5},
-            {2.2, 1.8},
-            {3.0, 2.2}
+            {0.57, 0.9}, // at hub
+            {0.91, 1.1}, // random data point
+            {2.66, 1.22}, // tower
+            {5.375, 1.36}, // far corner
           });
 }

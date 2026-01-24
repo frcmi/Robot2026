@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
 import frc.robot.constants.RobotConstants;
-import frc.robot.constants.TunerConstantsAlpha;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.constants.intake.PivotConstants;
@@ -34,6 +33,7 @@ import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
+import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
@@ -113,10 +113,10 @@ public class RobotContainer {
           drive =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(TunerConstantsAlpha.FrontLeft),
-                  new ModuleIOTalonFX(TunerConstantsAlpha.FrontRight),
-                  new ModuleIOTalonFX(TunerConstantsAlpha.BackLeft),
-                  new ModuleIOTalonFX(TunerConstantsAlpha.BackRight));
+                  new ModuleIOTalonFX(AlphaTunerConstants.FrontLeft),
+                  new ModuleIOTalonFX(AlphaTunerConstants.FrontRight),
+                  new ModuleIOTalonFX(AlphaTunerConstants.BackLeft),
+                  new ModuleIOTalonFX(AlphaTunerConstants.BackRight));
         } else {
           drive =
               new Drive(
@@ -184,10 +184,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(TunerConstantsAlpha.FrontLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(TunerConstantsAlpha.FrontRight, currentDrawCalculatorSim),
-                new ModuleIOSim(TunerConstantsAlpha.BackLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(TunerConstantsAlpha.BackRight, currentDrawCalculatorSim));
+                new ModuleIOSim(AlphaTunerConstants.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.BackRight, currentDrawCalculatorSim));
         vision =
             new Vision(
                 drive::addVisionMeasurement,

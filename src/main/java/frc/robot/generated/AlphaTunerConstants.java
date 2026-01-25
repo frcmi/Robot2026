@@ -33,13 +33,7 @@ public class AlphaTunerConstants {
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
   private static final Slot0Configs driveGains =
-      new Slot0Configs()
-          .withKP(0.1)
-          .withKI(0)
-          .withKD(0)
-          .withKS(0.14088)
-          .withKV(0.11931)
-          .withKA(0.014199);
+      new Slot0Configs().withKP(0.1).withKI(0).withKD(0).withKS(0).withKV(0.124);
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
@@ -61,7 +55,7 @@ public class AlphaTunerConstants {
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
-  private static final Current kSlipCurrent = Amps.of(20);
+  private static final Current kSlipCurrent = Amps.of(120);
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -95,8 +89,8 @@ public class AlphaTunerConstants {
   private static final double kSteerGearRatio = 21.428571428571427;
   private static final Distance kWheelRadius = Inches.of(2);
 
-  private static final boolean kInvertLeftSide = false;
-  private static final boolean kInvertRightSide = true;
+  private static final boolean kInvertLeftSide = true;
+  private static final boolean kInvertRightSide = false;
 
   private static final int kPigeonId = 0;
 
@@ -140,45 +134,45 @@ public class AlphaTunerConstants {
               .withDriveFrictionVoltage(kDriveFrictionVoltage);
 
   // Front Left
-  private static final int kFrontLeftDriveMotorId = 2;
-  private static final int kFrontLeftSteerMotorId = 6;
-  private static final int kFrontLeftEncoderId = 10;
-  private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.48779296875);
-  private static final boolean kFrontLeftSteerMotorInverted = false;
-  private static final boolean kFrontLeftEncoderInverted = true;
+  private static final int kFrontLeftDriveMotorId = 1;
+  private static final int kFrontLeftSteerMotorId = 5;
+  private static final int kFrontLeftEncoderId = 9;
+  private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.045654296875);
+  private static final boolean kFrontLeftSteerMotorInverted = true;
+  private static final boolean kFrontLeftEncoderInverted = false;
 
   private static final Distance kFrontLeftXPos = Inches.of(11);
   private static final Distance kFrontLeftYPos = Inches.of(11);
 
   // Front Right
-  private static final int kFrontRightDriveMotorId = 1;
-  private static final int kFrontRightSteerMotorId = 5;
-  private static final int kFrontRightEncoderId = 9;
-  private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.043212890625);
-  private static final boolean kFrontRightSteerMotorInverted = false;
-  private static final boolean kFrontRightEncoderInverted = true;
+  private static final int kFrontRightDriveMotorId = 2;
+  private static final int kFrontRightSteerMotorId = 6;
+  private static final int kFrontRightEncoderId = 10;
+  private static final Angle kFrontRightEncoderOffset = Rotations.of(0.469482421875);
+  private static final boolean kFrontRightSteerMotorInverted = true;
+  private static final boolean kFrontRightEncoderInverted = false;
 
   private static final Distance kFrontRightXPos = Inches.of(11);
   private static final Distance kFrontRightYPos = Inches.of(-11);
 
   // Back Left
-  private static final int kBackLeftDriveMotorId = 3;
-  private static final int kBackLeftSteerMotorId = 7;
-  private static final int kBackLeftEncoderId = 11;
-  private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.181884765625);
-  private static final boolean kBackLeftSteerMotorInverted = false;
-  private static final boolean kBackLeftEncoderInverted = true;
+  private static final int kBackLeftDriveMotorId = 4;
+  private static final int kBackLeftSteerMotorId = 8;
+  private static final int kBackLeftEncoderId = 12;
+  private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.471435546875);
+  private static final boolean kBackLeftSteerMotorInverted = true;
+  private static final boolean kBackLeftEncoderInverted = false;
 
   private static final Distance kBackLeftXPos = Inches.of(-11);
   private static final Distance kBackLeftYPos = Inches.of(11);
 
   // Back Right
-  private static final int kBackRightDriveMotorId = 4;
-  private static final int kBackRightSteerMotorId = 8;
-  private static final int kBackRightEncoderId = 12;
-  private static final Angle kBackRightEncoderOffset = Rotations.of(0.46875);
-  private static final boolean kBackRightSteerMotorInverted = false;
-  private static final boolean kBackRightEncoderInverted = true;
+  private static final int kBackRightDriveMotorId = 3;
+  private static final int kBackRightSteerMotorId = 7;
+  private static final int kBackRightEncoderId = 11;
+  private static final Angle kBackRightEncoderOffset = Rotations.of(0.193359375);
+  private static final boolean kBackRightSteerMotorInverted = true;
+  private static final boolean kBackRightEncoderInverted = false;
 
   private static final Distance kBackRightXPos = Inches.of(-11);
   private static final Distance kBackRightYPos = Inches.of(-11);
@@ -295,9 +289,9 @@ public class AlphaTunerConstants {
      * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set
      *     to 0 Hz, this is 250 Hz on CAN FD, and 100 Hz on CAN 2.0.
      * @param odometryStandardDeviation The standard deviation for odometry calculation in the form
-     *     [x, y, theta]ᵀ, with units in meters and radians
+     *     [x, y, theta]áµ€, with units in meters and radians
      * @param visionStandardDeviation The standard deviation for vision calculation in the form [x,
-     *     y, theta]ᵀ, with units in meters and radians
+     *     y, theta]áµ€, with units in meters and radians
      * @param modules Constants for each specific module
      */
     public TunerSwerveDrivetrain(

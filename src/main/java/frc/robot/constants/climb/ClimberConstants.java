@@ -38,8 +38,8 @@ public class ClimberConstants {
           .kI(0.0)
           .kD(0.5)
           .kG(0.0) // Small gravity compensation for hanging climber
-          .cruiseVelocity(InchesPerSecond.of(60.0))
-          .acceleration(InchesPerSecondPerSecond.of(200.0))
+          .cruiseVelocity(InchesPerSecond.of(50.0))
+          .acceleration(InchesPerSecondPerSecond.of(150.0))
           .build();
 
   public static final LinearIOTalonFXConfig kTalonFXConfig =
@@ -49,7 +49,7 @@ public class ClimberConstants {
           .resetLength(ClimbState.kStowed.getClimber())
           .softMinLength(ClimbState.kStowed.getClimber())
           .softMaxLength(ClimbState.kRaised.getClimber())
-          .motorRotationsPerOutputRotations(12.0) // 12:1 gear ratio for climber in a box
+          .motorRotationsPerOutputRotations(15.0) // 15:1 gear ratio for climber in a box
           .outputDistancePerOutputRotation(kDistancePerRotation)
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))

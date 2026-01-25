@@ -7,6 +7,7 @@ package frc.robot.constants.intake;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -24,10 +25,12 @@ public class RollerConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(32)
-          .followerId(31)
-          .followerId(30)
+          .masterId(20)
           .bus(kRioBus)
+          .inverted(InvertedValue.Clockwise_Positive)
+          .supplyCurrentLimit(Amps.of(40))
+          .statorCurrentLimit(Amps.of(60))
+          .outputAnglePerOutputRotation(Rotations.of(1.0))
           .build();
 
   public static final AngularSubsystemConfig kSubsystemConfigSim =

@@ -137,17 +137,17 @@ public class RobotContainer {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
 
-        if (Constants.intakeHardwareExists) {
+        {
+          AngularIOSim pivotIO =
+              new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+          pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+              PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
           intake =
               new Intake(
                   new AngularSubsystem(
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
-                      PivotConstants.kSubsystemConfigReal));
-        } else {
-          intake = new Intake();
+                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
         }
 
         if (Constants.shooterHardwareExists) {
@@ -301,8 +301,8 @@ public class RobotContainer {
         DriveCommands.joystickDrive(
             drive,
             () -> controller.getLeftStickY(),
-            () -> -controller.getLeftStickX(),
-            () -> -controller.getRightStickX()));
+            () -> controller.getLeftStickX(),
+            () -> controller.getRightStickX()));
 
     // Switch to X pattern when X button is pressed
     controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));

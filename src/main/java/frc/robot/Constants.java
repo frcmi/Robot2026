@@ -33,8 +33,8 @@ public final class Constants {
   // They allow you to prevent subsystems that don't exist from being initialized,
   // skipping over looking for hardware that doesn't exist.
   public static boolean driveHardwareExists = true;
-  public static boolean climbHardwareExists = true;
-  // public static boolean intakeHardwareExists = false; // Half sim, can't do with one bool
+  public static boolean climbHardwareExists = false;
+  public static boolean intakeHardwareExists = true; // Note: Pivot will always be sim with the current setup
   public static boolean shooterHardwareExists = false;
   public static boolean visionHardwareExists = true;
 }

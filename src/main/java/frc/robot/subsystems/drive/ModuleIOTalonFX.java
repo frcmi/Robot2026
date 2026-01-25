@@ -34,14 +34,15 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.generated.TunerConstants;
+import frc.robot.generated.AlphaTunerConstants;
 import java.util.Queue;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
  * CANcoder. Configured using a set of module constants from Phoenix.
  *
- * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
+ * <p>Device configuration and other behaviors not exposed by AlphaTunerConstants can be customized
+ * here.
  */
 public class ModuleIOTalonFX implements ModuleIO {
   private final SwerveModuleConstants<
@@ -95,9 +96,9 @@ public class ModuleIOTalonFX implements ModuleIO {
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     this.constants = constants;
-    driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.kCANBus);
-    turnTalon = new TalonFX(constants.SteerMotorId, TunerConstants.kCANBus);
-    cancoder = new CANcoder(constants.EncoderId, TunerConstants.kCANBus);
+    driveTalon = new TalonFX(constants.DriveMotorId, AlphaTunerConstants.kCANBus);
+    turnTalon = new TalonFX(constants.SteerMotorId, AlphaTunerConstants.kCANBus);
+    cancoder = new CANcoder(constants.EncoderId, AlphaTunerConstants.kCANBus);
 
     // Configure drive motor
     var driveConfig = constants.DriveMotorInitialConfigs;

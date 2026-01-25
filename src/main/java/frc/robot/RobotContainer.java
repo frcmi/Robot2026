@@ -137,7 +137,7 @@ public class RobotContainer {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
 
-        {
+        if (Constants.intakeHardwareExists) {
           AngularIOSim pivotIO =
               new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
           pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
@@ -148,6 +148,8 @@ public class RobotContainer {
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+        } else {
+          intake = new Intake();
         }
 
         if (Constants.shooterHardwareExists) {

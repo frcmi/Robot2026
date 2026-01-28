@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
@@ -33,7 +31,7 @@ import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
-import frc.robot.generated.AlphaTunerConstants;
+import frc.robot.generated.HelixTunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
@@ -46,7 +44,6 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -113,10 +110,10 @@ public class RobotContainer {
           drive =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(AlphaTunerConstants.FrontLeft),
-                  new ModuleIOTalonFX(AlphaTunerConstants.FrontRight),
-                  new ModuleIOTalonFX(AlphaTunerConstants.BackLeft),
-                  new ModuleIOTalonFX(AlphaTunerConstants.BackRight));
+                  new ModuleIOTalonFX(HelixTunerConstants.FrontLeft),
+                  new ModuleIOTalonFX(HelixTunerConstants.FrontRight),
+                  new ModuleIOTalonFX(HelixTunerConstants.BackLeft),
+                  new ModuleIOTalonFX(HelixTunerConstants.BackRight));
         } else {
           drive =
               new Drive(
@@ -186,10 +183,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(AlphaTunerConstants.FrontLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.FrontRight, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.BackLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.BackRight, currentDrawCalculatorSim));
+                new ModuleIOSim(HelixTunerConstants.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(HelixTunerConstants.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(HelixTunerConstants.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(HelixTunerConstants.BackRight, currentDrawCalculatorSim));
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -307,7 +304,11 @@ public class RobotContainer {
             () -> -controller.getRightStickX()));
 
     // Switch to X pattern when X button is pressed
-    controller.buttonX.onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Commands.runOnce(drive::stopWithX, drive));
 
     // Intake controls
     controller
@@ -317,12 +318,12 @@ public class RobotContainer {
         .whileFalse(intake.set(IntakeState.kStowed));
 
     // Climb controls
-    controller.buttonX.onTrue(
+    /*controller.buttonX.onTrue(
         either(
             superstructure.climbClimbed(),
             superstructure.climbRaise(),
             () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
+    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));*/
   }
 
   private void logInit() {

@@ -94,8 +94,9 @@ public class AngularIOSim implements AngularIO {
         posSet = Optional.of(Radians.of(posController.getSetpoint().position));
         velSet = Optional.of(RadiansPerSecond.of(posController.getSetpoint().velocity));
       }
-      case kOpenLoop -> inputs.appliedVolts =
-          Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));
+      case kOpenLoop ->
+          inputs.appliedVolts =
+              Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));
       case kVelocity -> {
         double goalVelValue = goalVel.orElse(RadiansPerSecond.of(0.0)).in(RadiansPerSecond);
         inputs.appliedVolts =

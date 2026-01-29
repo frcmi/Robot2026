@@ -81,8 +81,9 @@ public class LinearIOSim implements LinearIO {
                     12.0));
         goal = Meters.of(controller.getSetpoint().position);
       }
-      case kOpenLoop -> inputs.appliedVolts =
-          Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));
+      case kOpenLoop ->
+          inputs.appliedVolts =
+              Volts.of(MathUtil.clamp(openLoopVolts.orElse(Volts.of(0.0)).in(Volts), -12.0, 12.0));
       case kNeutral -> inputs.appliedVolts = Volts.of(0.0);
     }
     linearExtension.setInput(inputs.appliedVolts.in(Volts));

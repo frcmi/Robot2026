@@ -295,6 +295,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
+    // also cursed, should be + - -
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,

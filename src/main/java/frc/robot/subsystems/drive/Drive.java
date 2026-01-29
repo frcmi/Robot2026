@@ -15,6 +15,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -128,9 +129,13 @@ public class Drive extends SubsystemBase {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        this::runVelocity,
+        (ChassisSpeeds velocity, DriveFeedforwards ff) -> {
+          ChassisSpeeds newVelocity = velocity;
+          newVelocity.omegaRadiansPerSecond = -velocity.omegaRadiansPerSecond;
+          this.runVelocity(newVelocity);
+        }, // most cursed code of 2026
         new PPHolonomicDriveController(
-            new PIDConstants(2.0, 0.0, 0.0), new PIDConstants(2.0, 0.0, 0.0)),
+            new PIDConstants(3.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);

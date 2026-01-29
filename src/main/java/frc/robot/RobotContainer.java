@@ -31,7 +31,7 @@ import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
-import frc.robot.generated.HelixTunerConstants;
+import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
@@ -110,10 +110,10 @@ public class RobotContainer {
           drive =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(HelixTunerConstants.FrontLeft),
-                  new ModuleIOTalonFX(HelixTunerConstants.FrontRight),
-                  new ModuleIOTalonFX(HelixTunerConstants.BackLeft),
-                  new ModuleIOTalonFX(HelixTunerConstants.BackRight));
+                  new ModuleIOTalonFX(AlphaTunerConstants.FrontLeft),
+                  new ModuleIOTalonFX(AlphaTunerConstants.FrontRight),
+                  new ModuleIOTalonFX(AlphaTunerConstants.BackLeft),
+                  new ModuleIOTalonFX(AlphaTunerConstants.BackRight));
         } else {
           drive =
               new Drive(
@@ -183,10 +183,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(HelixTunerConstants.FrontLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(HelixTunerConstants.FrontRight, currentDrawCalculatorSim),
-                new ModuleIOSim(HelixTunerConstants.BackLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(HelixTunerConstants.BackRight, currentDrawCalculatorSim));
+                new ModuleIOSim(AlphaTunerConstants.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(AlphaTunerConstants.BackRight, currentDrawCalculatorSim));
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -265,7 +265,6 @@ public class RobotContainer {
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));

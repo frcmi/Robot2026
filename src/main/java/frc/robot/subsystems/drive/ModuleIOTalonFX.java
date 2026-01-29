@@ -34,7 +34,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.generated.HelixTunerConstants;
+import frc.robot.generated.AlphaTunerConstants;
 import java.util.Queue;
 
 /**
@@ -96,9 +96,9 @@ public class ModuleIOTalonFX implements ModuleIO {
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     this.constants = constants;
-    driveTalon = new TalonFX(constants.DriveMotorId, HelixTunerConstants.kCANBus);
-    turnTalon = new TalonFX(constants.SteerMotorId, HelixTunerConstants.kCANBus);
-    cancoder = new CANcoder(constants.EncoderId, HelixTunerConstants.kCANBus);
+    driveTalon = new TalonFX(constants.DriveMotorId, AlphaTunerConstants.kCANBus);
+    turnTalon = new TalonFX(constants.SteerMotorId, AlphaTunerConstants.kCANBus);
+    cancoder = new CANcoder(constants.EncoderId, AlphaTunerConstants.kCANBus);
 
     // Configure drive motor
     var driveConfig = constants.DriveMotorInitialConfigs;

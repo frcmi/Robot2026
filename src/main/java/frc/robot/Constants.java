@@ -35,7 +35,7 @@ public final class Constants {
   public static boolean driveHardwareExists = true;
   public static boolean climbHardwareExists = false;
   public static boolean intakeHardwareExists =
-      true; // Note: Pivot will always be sim with the current setup
+      false; // Note: Pivot will always be sim with the current setup
   public static boolean shooterHardwareExists = false;
-  public static boolean visionHardwareExists = true;
+  public static boolean visionHardwareExists = false;
 }

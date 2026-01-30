@@ -15,7 +15,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -42,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.constants.ModeConstants;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -129,11 +129,7 @@ public class Drive extends SubsystemBase {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (ChassisSpeeds velocity, DriveFeedforwards ff) -> {
-          ChassisSpeeds newVelocity = velocity;
-          newVelocity.omegaRadiansPerSecond = -velocity.omegaRadiansPerSecond;
-          this.runVelocity(newVelocity);
-        }, // most cursed code of 2026
+        this::runVelocity,
         new PPHolonomicDriveController(
             new PIDConstants(3.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
@@ -227,6 +223,11 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     Logger.recordOutput("SwerveStates/Speeds", speeds);
+    if (ModeConstants.kCurrentMode == frc.robot.constants.ModeConstants.Mode.kReal) {
+      speeds.omegaRadiansPerSecond *= -1.0;
+      // TODO: WHY IS THIS HAPPENING???
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);

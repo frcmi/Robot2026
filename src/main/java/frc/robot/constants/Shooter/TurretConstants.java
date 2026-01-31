@@ -41,27 +41,27 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(1.0)
+          .kP(0.2)
           .kI(0.0)
           .kD(0.0)
-          .cruiseVelocity(RotationsPerSecond.of(7.0)) // 420rpm
+          .cruiseVelocity(RotationsPerSecond.of(1.0)) // 60 rpm
           .acceleration(DegreesPerSecondPerSecond.of(4000.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(9)
-          .sensorId(Optional.of(10))
+          .masterId(23)
+          .sensorId(Optional.of(0))
           .bus(kRioBus)
           .resetAngle(ShooterState.kStowed.getTurret())
           .softMinAngle(kTurretMinAngle)
           .softMaxAngle(kTurretMaxAngle)
-          .motorRotationsPerOutputRotations(1) // Assuming 1:1 ratio for turret yaw to cancoder
-          .rotorRotationsPerSensorRotation(13) // TODO: Figure out gearing
+          .motorRotationsPerOutputRotations(0.09) // Assuming 1:1 ratio for turret yaw to cancoder
+          .rotorRotationsPerSensorRotation(0.01) // TODO: Figure out gearing
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.Clockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40.0))
-          .statorCurrentLimit(Amps.of(90.0))
+          .supplyCurrentLimit(Amps.of(20.0))
+          .statorCurrentLimit(Amps.of(20.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

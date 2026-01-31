@@ -35,7 +35,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
 
-  @Getter private ShooterState targetState = ShooterState.kStowed;
+  @Getter public ShooterState targetState = ShooterState.kStowed;
   @Getter private ShooterState measuredState;
 
   private Alliance alliance = Alliance.Red;
@@ -136,11 +136,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 TurretConstants.kTurretMaxAngle.in(Radians)));
 
     // Actually apply to hardware
-    this.targetState.setTurret(turretTarget);
+    // this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
-    this.targetState.setHood(Degrees.of(hoodAngle));
+    // this.targetState.setHood(Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
-    this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
+    // this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
   }
 
   public Command waitUntilAtGoal() {

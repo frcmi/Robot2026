@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -47,6 +48,7 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -321,12 +323,12 @@ public class RobotContainer {
         .whileFalse(intake.set(IntakeState.kStowed));
 
     // Climb controls
-    /*controller.buttonX.onTrue(
+    controller.buttonX.onTrue(
         either(
             superstructure.climbClimbed(),
             superstructure.climbRaise(),
             () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));*/
+    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
   }
 
   private void logInit() {

@@ -34,7 +34,7 @@ import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
-import frc.robot.generated.AlphaTunerConstants;
+import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
 import frc.robot.lib.controller.Joysticks;
@@ -113,10 +113,10 @@ public class RobotContainer {
           drive =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(AlphaTunerConstants.FrontLeft),
-                  new ModuleIOTalonFX(AlphaTunerConstants.FrontRight),
-                  new ModuleIOTalonFX(AlphaTunerConstants.BackLeft),
-                  new ModuleIOTalonFX(AlphaTunerConstants.BackRight));
+                  new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                  new ModuleIOTalonFX(TunerConstants.FrontRight),
+                  new ModuleIOTalonFX(TunerConstants.BackLeft),
+                  new ModuleIOTalonFX(TunerConstants.BackRight));
         } else {
           drive =
               new Drive(
@@ -186,10 +186,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
-                new ModuleIOSim(AlphaTunerConstants.FrontLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.FrontRight, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.BackLeft, currentDrawCalculatorSim),
-                new ModuleIOSim(AlphaTunerConstants.BackRight, currentDrawCalculatorSim));
+                new ModuleIOSim(TunerConstants.FrontLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstants.FrontRight, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstants.BackLeft, currentDrawCalculatorSim),
+                new ModuleIOSim(TunerConstants.BackRight, currentDrawCalculatorSim));
         vision =
             new Vision(
                 drive::addVisionMeasurement,

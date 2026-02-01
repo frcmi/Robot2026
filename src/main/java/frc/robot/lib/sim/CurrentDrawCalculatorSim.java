@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import frc.robot.constants.ModeConstants;
+import frc.robot.Constants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +25,7 @@ public class CurrentDrawCalculatorSim extends VirtualSubsystem {
   }
 
   public void periodic() {
-    if (!ModeConstants.kCurrentMode.equals(ModeConstants.Mode.kSim)) return;
+    if (!Constants.currentMode.equals(Constants.Mode.SIM)) return;
 
     double[] draws =
         subsystemCurrentDraws.stream().mapToDouble(current -> current.get().in(Amps)).toArray();

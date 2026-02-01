@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.constants.ModeConstants;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -223,7 +222,7 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     Logger.recordOutput("SwerveStates/Speeds", speeds);
-    if (ModeConstants.kCurrentMode == frc.robot.constants.ModeConstants.Mode.kReal) {
+    if (Constants.currentMode == Constants.Mode.REAL) {
       speeds.omegaRadiansPerSecond *= -1.0;
       // TODO: WHY IS THIS HAPPENING???
     }

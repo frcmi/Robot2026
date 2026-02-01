@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.constants.ModeConstants;
+import frc.robot.Constants;
 import frc.robot.lib.RumbleControl;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -74,7 +74,7 @@ public class Joysticks {
   public Joysticks(int port) {
     this.port = port;
     controller =
-        !ModeConstants.kCurrentMode.equals(ModeConstants.Mode.kSim)
+        !Constants.currentMode.equals(Constants.Mode.SIM)
             ? new CommandXboxController(port)
             : new CommandXboxControllerSim(port);
 

@@ -1,6 +1,6 @@
 package frc.robot.lib;
 
-import frc.robot.constants.ModeConstants;
+import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +64,7 @@ public class LoggedInterpolatingTable {
         }
       }
 
-      if (ModeConstants.kTuningMode) {
+      if (Constants.kTuningMode) {
         // Create network table entries
         entryCountNumber = new LoggedNetworkNumber(key + "/EntryCount", defaultTable.size());
         lastEntryCount = defaultTable.size();
@@ -92,8 +92,7 @@ public class LoggedInterpolatingTable {
       return 0.0;
     }
 
-    TreeMap<Double, Double> table =
-        ModeConstants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
 
     if (table.isEmpty()) {
       return 0.0;
@@ -136,7 +135,7 @@ public class LoggedInterpolatingTable {
    * Called automatically via the static updater - no need to call manually.
    */
   private void periodic() {
-    if (ModeConstants.kTuningMode && hasDefault) {
+    if (Constants.kTuningMode && hasDefault) {
       // Trigger a read to ensure all values are logged
       getTableFromDashboard();
     }
@@ -203,7 +202,7 @@ public class LoggedInterpolatingTable {
    *     otherwise.
    */
   public boolean hasChanged(int id) {
-    if (!ModeConstants.kTuningMode) {
+    if (!Constants.kTuningMode) {
       // In non-tuning mode, table never changes
       Boolean lastValue = lastHasChangedValues.get(id);
       if (lastValue == null) {
@@ -247,8 +246,7 @@ public class LoggedInterpolatingTable {
    * @return Nx2 array where each row is [input, output]
    */
   public double[][] getTable() {
-    TreeMap<Double, Double> table =
-        ModeConstants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
 
     double[][] result = new double[table.size()][2];
     int index = 0;
@@ -269,6 +267,6 @@ public class LoggedInterpolatingTable {
     if (!hasDefault) {
       return 0;
     }
-    return ModeConstants.kTuningMode ? (int) entryCountNumber.get() : defaultTable.size();
+    return Constants.kTuningMode ? (int) entryCountNumber.get() : defaultTable.size();
   }
 }

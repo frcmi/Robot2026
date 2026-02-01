@@ -1,6 +1,6 @@
 package frc.robot.lib;
 
-import frc.robot.constants.ModeConstants;
+import frc.robot.Constants;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
-      if (ModeConstants.kTuningMode) {
+      if (Constants.kTuningMode) {
         dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
       }
     }
@@ -66,7 +66,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return ModeConstants.kTuningMode ? dashboardNumber.get() : defaultValue;
+      return Constants.kTuningMode ? dashboardNumber.get() : defaultValue;
     }
   }
 

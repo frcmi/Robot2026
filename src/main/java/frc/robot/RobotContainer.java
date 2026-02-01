@@ -7,9 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -59,7 +56,6 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -86,7 +82,6 @@ public class RobotContainer {
   private final Shooter shooter;
   private final Intake intake;
   private final Climb climb;
-  private final ShooterState shooterState;
 
   private final RobotSuperstructure superstructure;
 
@@ -112,7 +107,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    shooterState = new ShooterState(Degrees.of(0.0), Degrees.of(0.0), DegreesPerSecond.of(0.0));
     switch (Constants.currentMode) {
       case REAL:
         if (Constants.driveHardwareExists) {
@@ -310,13 +304,7 @@ public class RobotContainer {
             () -> controller.getLeftStickY(),
             () -> -controller.getLeftStickX(),
             () -> -controller.getRightStickX()));
-    shooter.setDefaultCommand(
-        Commands.run(
-            () -> {
-              shooterState.setTurret(Radians.of(0.0));
-              shooter.targetState = shooterState;
-            },
-            shooter));
+
     // Switch to X pattern when X button is pressed
     /*controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -325,8 +313,7 @@ public class RobotContainer {
     controller.buttonA.onTrue(
         Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
     // Commands.runOnce(drive::stopWithX, drive));
-    controller.dPadRight.whileTrue(
-        Commands.run(() -> shooterState.setTurret(Radians.of(Math.PI / 2))));
+
     // Intake controls
     controller
         .leftTrigger

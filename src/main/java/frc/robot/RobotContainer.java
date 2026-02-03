@@ -7,23 +7,19 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
@@ -48,7 +44,6 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -74,6 +69,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Controller
   private final Joysticks controller = new Joysticks(0);
+  private final Joysticks sysIdcontroller = new Joysticks(4);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -307,12 +303,12 @@ public class RobotContainer {
             () -> -controller.getRightStickX()));
 
     // Switch to X pattern when X button is pressed
-    /*controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));*/
-    controller.buttonA.onTrue(
-        Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
+    controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // controller.buttonA.onTrue(
+    //     Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
     // Commands.runOnce(drive::stopWithX, drive));
 
     // Intake controls
@@ -323,12 +319,12 @@ public class RobotContainer {
         .whileFalse(intake.set(IntakeState.kStowed));
 
     // Climb controls
-    controller.buttonX.onTrue(
-        either(
-            superstructure.climbClimbed(),
-            superstructure.climbRaise(),
-            () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
+    // controller.buttonX.onTrue(
+    //     either(
+    //         superstructure.climbClimbed(),
+    //         superstructure.climbRaise(),
+    //         () -> climb.getTargetState().equals(ClimbState.kRaised)));
+    // controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
   }
 
   private void logInit() {

@@ -27,7 +27,7 @@ public class RollerConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(20)
           .bus(kRioBus)
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30))
           .statorCurrentLimit(Amps.of(50))
           .outputAnglePerOutputRotation(Rotations.of(1.0))

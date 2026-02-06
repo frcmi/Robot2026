@@ -27,7 +27,7 @@ public class KickerConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(23)
           .bus(kRioBus)
-          .inverted(InvertedValue.CounterClockwise_Positive)
+          .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
           .statorCurrentLimit(Amps.of(60))
           .outputAnglePerOutputRotation(Rotations.of(1.0))

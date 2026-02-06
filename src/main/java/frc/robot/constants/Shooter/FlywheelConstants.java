@@ -24,7 +24,7 @@ public class FlywheelConstants {
           .logKey("Flywheel")
           .velocityTolerance(RotationsPerSecond.of(0.333)) // 20rpm
           .acceleration(RotationsPerSecondPerSecond.of(200.0)) // 12000rpm/s, 0.5s spinup
-          .kP(5.0)
+          .kP(0.08)
           .kI(0.0)
           .kD(0.0)
           .kV(12.0 / (6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm
@@ -38,7 +38,7 @@ public class FlywheelConstants {
           .opposeMaster(true)
           .motorRotationsPerOutputRotations(1)
           .bus(kRioBus)
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
           .statorCurrentLimit(Amps.of(60.0))
           .kP(kSubsystemConfigReal.getKP())

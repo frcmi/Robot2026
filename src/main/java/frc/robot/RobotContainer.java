@@ -151,8 +151,12 @@ public class RobotContainer {
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-                new AngularSubsystem(new AngularIOTalonFX(TransferConstants.kTalonFXConfig), TransferConstants.kSubsystemConfigReal),
-                new AngularSubsystem(new AngularIOTalonFX(KickerConstants.kTalonFXConfig), KickerConstants.kSubsystemConfigReal));
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
+                      TransferConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
+                      KickerConstants.kSubsystemConfigReal));
         } else {
           intake = new Intake();
         }
@@ -211,12 +215,12 @@ public class RobotContainer {
                     new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
                     RollerConstants.kSubsystemConfigSim),
                 new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-              new AngularSubsystem(
+                new AngularSubsystem(
                     new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
                     TransferConstants.kSubsystemConfigSim),
-              new AngularSubsystem(
-                new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
-                KickerConstants.kSubsystemConfigSim));
+                new AngularSubsystem(
+                    new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
+                    KickerConstants.kSubsystemConfigSim));
 
         shooter =
             new Shooter(

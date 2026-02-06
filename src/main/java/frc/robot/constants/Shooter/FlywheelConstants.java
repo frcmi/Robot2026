@@ -33,14 +33,14 @@ public class FlywheelConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(32)
-          .followerId(31)
+          .masterId(14)
+          .followerId(15)
           .opposeMaster(true)
           .motorRotationsPerOutputRotations(1)
           .bus(kRioBus)
           .inverted(InvertedValue.Clockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40.0))
-          .statorCurrentLimit(Amps.of(90.0))
+          .supplyCurrentLimit(Amps.of(30.0))
+          .statorCurrentLimit(Amps.of(60.0))
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
@@ -58,7 +58,7 @@ public class FlywheelConstants {
           .kV(kSubsystemConfigReal.getKV())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.002);
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.0048975432);
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
           .motor(DCMotor.getKrakenX60(2))

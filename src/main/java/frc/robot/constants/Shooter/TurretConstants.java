@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretMinAngle = Degrees.of(-90.0f);
-  public static final Angle kTurretMaxAngle = Degrees.of(90.0f);
+  public static final Angle kTurretMinAngle = Degrees.of(-0.1f);
+  public static final Angle kTurretMaxAngle = Degrees.of(0.1f);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -87,7 +87,7 @@ public class TurretConstants {
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
-          .motor(DCMotor.getKrakenX60(1))
+          .motor(DCMotor.getKrakenX44(1))
           .moi(kMOI)
           .resetAngle(kTalonFXConfig.getResetAngle())
           .physicalMinAngle(kTurretMinAngle)

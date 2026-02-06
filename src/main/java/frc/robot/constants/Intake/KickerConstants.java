@@ -25,9 +25,9 @@ public class KickerConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(22) // TODO: Update with actual motor ID
+          .masterId(23)
           .bus(kRioBus)
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
           .statorCurrentLimit(Amps.of(60))
           .outputAnglePerOutputRotation(Rotations.of(1.0))

@@ -28,8 +28,8 @@ public class RollerConstants {
           .masterId(20)
           .bus(kRioBus)
           .inverted(InvertedValue.Clockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40))
-          .statorCurrentLimit(Amps.of(60))
+          .supplyCurrentLimit(Amps.of(30))
+          .statorCurrentLimit(Amps.of(50))
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .build();
 
@@ -44,5 +44,5 @@ public class RollerConstants {
               * 3
               * 0.000292639653); // Converted from lb in^2 to kg m^2, multiply by 3 for 3 rollers
   public static final AngularIOSimConfig kSimConfig =
-      AngularIOSimConfig.builder().motor(DCMotor.getKrakenX60(1)).moi(kMOI).build();
+      AngularIOSimConfig.builder().motor(DCMotor.getKrakenX44(1)).moi(kMOI).build();
 }

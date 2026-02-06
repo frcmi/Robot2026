@@ -101,7 +101,8 @@ public class IntakeState implements StructSerializable {
   public static final IntakeState kStowed =
       new IntakeState(Degrees.of(97.5), Volts.of(0.0f), Volts.of(0.0), Volts.of(0.0), "kStowed");
   public static final IntakeState kIntaking =
-      new IntakeState(Degrees.of(-28.7), Volts.of(4.2f), Volts.of(6.0f), Volts.of(10.8f), "kIntaking");
+      new IntakeState(
+          Degrees.of(-28.7), Volts.of(4.2f), Volts.of(6.0f), Volts.of(10.8f), "kIntaking");
 
   @SuppressWarnings("unused")
   public static final Struct<IntakeState> struct =

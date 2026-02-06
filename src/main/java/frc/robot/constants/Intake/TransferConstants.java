@@ -25,7 +25,7 @@ public class TransferConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(21) // TODO: Update with actual motor ID
+          .masterId(24)
           .bus(kRioBus)
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))

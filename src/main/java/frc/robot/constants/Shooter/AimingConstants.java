@@ -21,7 +21,7 @@ public class AimingConstants {
 
   // No idea where these numbers even came from, copilot just made them up but whatever :shrug:
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
-      new LoggedInterpolatingTable("Shooter/FlywheelSpeedM_RPS", new double[][] {{0.0, 50.0}});
+      new LoggedInterpolatingTable("Shooter/FlywheelSpeedM_RPS", new double[][] {{0.0, 0.0}});
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",

@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretMinAngle = Degrees.of(-90.0f);
-  public static final Angle kTurretMaxAngle = Degrees.of(90.0f);
+  public static final Angle kTurretMinAngle = Degrees.of(-0.1);
+  public static final Angle kTurretMaxAngle = Degrees.of(0.1);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -43,15 +43,15 @@ public class TurretConstants {
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
           .kP(1.0)
           .kI(0.0)
-          .kD(0.0)
+          .kD(0.03)
           .cruiseVelocity(RotationsPerSecond.of(7.0)) // 420rpm
           .acceleration(DegreesPerSecondPerSecond.of(4000.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(9)
-          .sensorId(Optional.of(10))
+          .masterId(22)
+          .sensorId(Optional.of(0))
           .bus(kRioBus)
           .resetAngle(ShooterState.kStowed.getTurret())
           .softMinAngle(kTurretMinAngle)
@@ -59,9 +59,9 @@ public class TurretConstants {
           .motorRotationsPerOutputRotations(1.388) // Assuming 1:1 ratio for turret yaw to cancoder
           .rotorRotationsPerSensorRotation(3.14) // TODO: Figure out gearing
           .outputAnglePerOutputRotation(Rotations.of(1.0))
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
-          .statorCurrentLimit(Amps.of(90.0))
+          .statorCurrentLimit(Amps.of(60.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

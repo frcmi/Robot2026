@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretMinAngle = Degrees.of(-0.1);
-  public static final Angle kTurretMaxAngle = Degrees.of(0.1);
+  public static final Angle kTurretMinAngle = Degrees.of(-0.01f);
+  public static final Angle kTurretMaxAngle = Degrees.of(0.01f);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -41,9 +41,9 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(1.0)
+          .kP(60.0)
           .kI(0.0)
-          .kD(0.03)
+          .kD(3.0)
           .cruiseVelocity(RotationsPerSecond.of(7.0)) // 420rpm
           .acceleration(DegreesPerSecondPerSecond.of(4000.0))
           .build();
@@ -76,14 +76,15 @@ public class TurretConstants {
           .bus(kSubsystemConfigReal.getBus())
           .positionTolerance(kSubsystemConfigReal.getPositionTolerance())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(1.0)
-          .kI(0.0)
-          .kD(0.03)
+          .kP(kSubsystemConfigReal.getKP())
+          .kI(kSubsystemConfigReal.getKI())
+          .kD(kSubsystemConfigReal.getKD())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.0296); // TODO: Figure out
+  public static final MomentOfInertia kMOI =
+      KilogramSquareMeters.of(0.0951078874); // TODO: Figure out
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

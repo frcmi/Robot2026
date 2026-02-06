@@ -38,6 +38,8 @@ public class AngularIOTalonFX implements AngularIO {
   private final StatusSignal<Current> statorCurrent;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
+  private final StatusSignal<Double> targetPosition;
+  private final StatusSignal<Double> targetVelocity;
   private final List<StatusSignal<Temperature>> motorTemperatures;
 
   private final MotionMagicVoltage motionMagicPos;
@@ -105,6 +107,8 @@ public class AngularIOTalonFX implements AngularIO {
     supplyCurrent = master.getSupplyCurrent();
     velocity = master.getVelocity();
     acceleration = master.getAcceleration();
+    targetPosition = master.getClosedLoopReference();
+    targetVelocity = master.getClosedLoopReferenceSlope();
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
@@ -225,8 +229,21 @@ public class AngularIOTalonFX implements AngularIO {
     inputs.neutralMode = deviceConfig.getNeutralMode();
 
     inputs.IOOutputMode = this.outputMode;
-    inputs.goalPos = this.goalPos.orElse(Radians.of(0.0));
-    inputs.goalVel = this.goalVel.orElse(RadiansPerSecond.of(0.0));
+    if (this.outputMode == kVelocity) {
+      inputs.goalVel =
+        RadiansPerSecond.of(
+            targetPosition.getValueAsDouble()
+                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+        inputs.goalPos = Radians.of(0.0);
+    } else {
+      inputs.goalPos =
+        Radians.of(
+            targetPosition.getValueAsDouble()
+                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+      inputs.goalVel = RadiansPerSecond.of(
+              targetVelocity.getValueAsDouble()
+                  * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+    }
   }
 
   @Override

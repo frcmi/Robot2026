@@ -38,6 +38,7 @@ public class LinearIOTalonFX implements LinearIO {
   private final StatusSignal<Current> statorCurrent;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
+  private final StatusSignal<Double> targetPosition;
   private final List<StatusSignal<Temperature>> motorTemperatures;
 
   private final MotionMagicVoltage motionMagic;
@@ -102,6 +103,7 @@ public class LinearIOTalonFX implements LinearIO {
     supplyCurrent = master.getSupplyCurrent();
     velocity = master.getVelocity();
     acceleration = master.getAcceleration();
+    targetPosition = master.getClosedLoopReference();
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
@@ -212,7 +214,7 @@ public class LinearIOTalonFX implements LinearIO {
     inputs.neutralMode = deviceConfig.getNeutralMode();
 
     inputs.IOOutputMode = this.outputMode;
-    inputs.goal = this.goal.orElse(Meters.of(0.0));
+    inputs.goal = Meters.of(targetPosition.getValueAsDouble() * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
   }
 
   @Override

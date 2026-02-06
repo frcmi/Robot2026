@@ -87,7 +87,7 @@ public class AngularIOSim implements AngularIO {
             Volts.of(
                 MathUtil.clamp(
                     posController.calculate(
-                            pivot.getAngleRads(), goalPos.orElse(Radians.of(0.0)).in(Radians)),
+                        pivot.getAngleRads(), goalPos.orElse(Radians.of(0.0)).in(Radians)),
                     -12.0,
                     12.0));
         posSet = Optional.of(Radians.of(posController.getSetpoint().position));

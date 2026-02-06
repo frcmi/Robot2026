@@ -25,7 +25,7 @@ public class IntakeState implements StructSerializable {
   private final String type;
 
   private final Optional<LoggedTunableNumber> pivotTunable;
-  private final Optional<LoggedTunableNumber> rollerVelocityTunable;
+  private final Optional<LoggedTunableNumber> rollerVoltageTunable;
   private final Optional<LoggedTunableNumber> transferVoltageTunable;
   private final Optional<LoggedTunableNumber> kickerVoltageTunable;
 
@@ -40,7 +40,7 @@ public class IntakeState implements StructSerializable {
     this.kicker = kicker;
 
     pivotTunable = Optional.empty();
-    rollerVelocityTunable = Optional.empty();
+    rollerVoltageTunable = Optional.empty();
     transferVoltageTunable = Optional.empty();
     kickerVoltageTunable = Optional.empty();
 
@@ -59,10 +59,10 @@ public class IntakeState implements StructSerializable {
         Optional.of(
             new LoggedTunableNumber(
                 String.format("IntakeStates/%s/PivotAngleDegrees", logKey), pivot.in(Degrees)));
-    rollerVelocityTunable =
+    rollerVoltageTunable =
         Optional.of(
             new LoggedTunableNumber(
-                String.format("ArmStates/%s/RollersVolts", logKey), rollers.in(Volts)));
+                String.format("IntakeStates/%s/RollersVolts", logKey), rollers.in(Volts)));
     transferVoltageTunable =
         Optional.of(
             new LoggedTunableNumber(
@@ -80,7 +80,7 @@ public class IntakeState implements StructSerializable {
   }
 
   public Voltage getRollers() {
-    return rollerVelocityTunable
+    return rollerVoltageTunable
         .map(loggedTunableNumber -> Volts.of(loggedTunableNumber.get()))
         .orElse(rollers);
   }
@@ -102,7 +102,7 @@ public class IntakeState implements StructSerializable {
       new IntakeState(Degrees.of(97.5), Volts.of(0.0f), Volts.of(0.0), Volts.of(0.0), "kStowed");
   public static final IntakeState kIntaking =
       new IntakeState(
-          Degrees.of(-28.7), Volts.of(4.2f), Volts.of(6.0f), Volts.of(10.8f), "kIntaking");
+          Degrees.of(-28.7), Volts.of(12.0f), Volts.of(6.0f), Volts.of(10.8f), "kIntaking");
 
   @SuppressWarnings("unused")
   public static final Struct<IntakeState> struct =

@@ -78,7 +78,7 @@ public class TurretConstants {
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
           .kP(1.0)
           .kI(0.0)
-          .kD(0.0)
+          .kD(0.03)
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();

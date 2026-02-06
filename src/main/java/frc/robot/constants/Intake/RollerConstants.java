@@ -25,11 +25,11 @@ public class RollerConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(10)
+          .masterId(13)
           .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
-          .supplyCurrentLimit(Amps.of(30))
-          .statorCurrentLimit(Amps.of(50))
+          .supplyCurrentLimit(Amps.of(40))
+          .statorCurrentLimit(Amps.of(70))
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .build();
 

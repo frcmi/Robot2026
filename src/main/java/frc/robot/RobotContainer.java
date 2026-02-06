@@ -29,8 +29,10 @@ import frc.robot.commands.RobotSuperstructure;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
+import frc.robot.constants.intake.KickerConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
+import frc.robot.constants.intake.TransferConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
@@ -148,7 +150,9 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                new AngularSubsystem(new AngularIOTalonFX(TransferConstants.kTalonFXConfig), TransferConstants.kSubsystemConfigReal),
+                new AngularSubsystem(new AngularIOTalonFX(KickerConstants.kTalonFXConfig), KickerConstants.kSubsystemConfigReal));
         } else {
           intake = new Intake();
         }
@@ -206,7 +210,13 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
                     RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+              new AngularSubsystem(
+                    new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
+                    TransferConstants.kSubsystemConfigSim),
+              new AngularSubsystem(
+                new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
+                KickerConstants.kSubsystemConfigSim));
 
         shooter =
             new Shooter(

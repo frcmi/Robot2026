@@ -52,9 +52,9 @@ public class FlywheelConstants {
           .logKey(kSubsystemConfigReal.getLogKey())
           .bus(kSubsystemConfigReal.getBus())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(0.05)
-          .kI(0.0)
-          .kD(0.0)
+          .kP(kSubsystemConfigReal.getKP())
+          .kI(kSubsystemConfigReal.getKI())
+          .kD(kSubsystemConfigReal.getKD())
           .kV(kSubsystemConfigReal.getKV())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();

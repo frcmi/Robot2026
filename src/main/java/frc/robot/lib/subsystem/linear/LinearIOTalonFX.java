@@ -214,7 +214,10 @@ public class LinearIOTalonFX implements LinearIO {
     inputs.neutralMode = deviceConfig.getNeutralMode();
 
     inputs.IOOutputMode = this.outputMode;
-    inputs.goal = Meters.of(targetPosition.getValueAsDouble() * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
+    inputs.goal =
+        Meters.of(
+            targetPosition.getValueAsDouble()
+                * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
   }
 
   @Override

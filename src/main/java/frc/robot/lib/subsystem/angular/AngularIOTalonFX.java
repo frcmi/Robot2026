@@ -231,16 +231,17 @@ public class AngularIOTalonFX implements AngularIO {
     inputs.IOOutputMode = this.outputMode;
     if (this.outputMode == kVelocity) {
       inputs.goalVel =
-        RadiansPerSecond.of(
-            targetPosition.getValueAsDouble()
-                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
-        inputs.goalPos = Radians.of(0.0);
+          RadiansPerSecond.of(
+              targetPosition.getValueAsDouble()
+                  * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+      inputs.goalPos = Radians.of(0.0);
     } else {
       inputs.goalPos =
-        Radians.of(
-            targetPosition.getValueAsDouble()
-                * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
-      inputs.goalVel = RadiansPerSecond.of(
+          Radians.of(
+              targetPosition.getValueAsDouble()
+                  * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
+      inputs.goalVel =
+          RadiansPerSecond.of(
               targetVelocity.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
     }

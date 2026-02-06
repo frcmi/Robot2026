@@ -165,8 +165,8 @@ public class RobotContainer {
           shooter =
               new Shooter(
                   new AngularSubsystem(
-                      new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
-                      TurretConstants.kSubsystemConfigReal),
+                    new AngularIOSim(TurretConstants.kSimConfig, currentDrawCalculatorSim),
+                    TurretConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
                       new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
                       HoodConstants.kSubsystemConfigReal),

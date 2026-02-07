@@ -167,7 +167,7 @@ public class AngularIOTalonFX implements AngularIO {
   @Override
   public void updateInputs(AngularIOInputs inputs) {
     BaseStatusSignal.refreshAll(
-        position, velocity, acceleration, statorCurrent, appliedVolts, supplyCurrent);
+        position, velocity, acceleration, statorCurrent, appliedVolts, supplyCurrent, targetPosition, targetVelocity);
     motorTemperatures.forEach(StatusSignal::refresh);
 
     inputs.angle =
@@ -201,6 +201,8 @@ public class AngularIOTalonFX implements AngularIO {
                   supplyCurrent,
                   statorCurrent,
                   acceleration,
+                  targetPosition,
+                  targetVelocity,
                   motorTemperatures.get(0)),
               deviceConfig.getMasterId());
     } else {
@@ -211,6 +213,8 @@ public class AngularIOTalonFX implements AngularIO {
               supplyCurrent,
               statorCurrent,
               acceleration,
+              targetPosition,
+              targetVelocity,
               motorTemperatures.get(0)));
     }
 

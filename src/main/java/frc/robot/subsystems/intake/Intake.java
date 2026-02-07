@@ -11,11 +11,11 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.Intake.KickerConstants;
 import frc.robot.constants.Intake.PivotConstants;
 import frc.robot.constants.Intake.RollerConstants;
 import frc.robot.constants.Intake.TransferConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;

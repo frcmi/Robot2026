@@ -41,10 +41,10 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(60.0)
+          .kP(0.3)
           .kI(0.0)
-          .kD(3.0)
-          .cruiseVelocity(RotationsPerSecond.of(7.0)) // 420rpm
+          .kD(0.0)
+          .cruiseVelocity(RotationsPerSecond.of(0.2)) // 420rpm
           .acceleration(DegreesPerSecondPerSecond.of(4000.0))
           .build();
 

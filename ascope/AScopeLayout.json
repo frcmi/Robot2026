@@ -29,7 +29,8 @@
             "/ReplayOutputs/Odometry",
             "/RealOutputs",
             "/RealOutputs/AngularSubsystems",
-            "/RealOutputs/Superstructure"
+            "/RealOutputs/Superstructure",
+            "/RealOutputs/SwerveStates"
           ]
         },
         "tabs": {
@@ -150,6 +151,16 @@
                     }
                   },
                   {
+                    "type": "swerveStates",
+                    "logKey": "/RealOutputs/SwerveStates/Measured",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
                     "type": "robot",
                     "logKey": "/RealOutputs/Superstructure/MeasuredTurretPose",
                     "logType": "Pose3d",
@@ -194,9 +205,9 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -1.527290664370258,
+                  -1.5272906643702577,
                   2.207581681543128,
-                  0.039344979168889564
+                  0.03934497916888986
                 ],
                 "cameraTarget": [
                   0,

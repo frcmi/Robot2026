@@ -30,6 +30,7 @@ public interface LinearIO {
     public DeviceConnectedStatus[] deviceConnectedStatuses = {};
 
     public Distance goal = Meters.of(0.0);
+    public Distance reference = Meters.of(0.0);
   }
 
   default void setLength(Distance length) {}

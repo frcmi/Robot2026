@@ -77,6 +77,8 @@ public class AngularIOSim implements AngularIO {
 
   @Override
   public void updateInputs(AngularIOInputs inputs) {
+    inputs.goalPos = goalPos.orElse(Radians.of(0.0));
+    inputs.goalVel = goalVel.orElse(RadiansPerSecond.of(0.0));
     armLength.ifPresent(length -> pivot.setArmLength(length.get()));
 
     Optional<Angle> posSet = Optional.empty();
@@ -112,8 +114,8 @@ public class AngularIOSim implements AngularIO {
     pivot.setInput(inputs.appliedVolts.in(Volts));
     pivot.update(kDt);
 
-    inputs.goalPos = posSet.orElse(Radians.of(0.0));
-    inputs.goalVel = velSet.orElse(RadiansPerSecond.of(0.0));
+    inputs.referencePos = posSet.orElse(Radians.of(0.0));
+    inputs.referenceVel = velSet.orElse(RadiansPerSecond.of(0.0));
 
     inputs.angle = Radians.of(pivot.getAngleRads());
 

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.littletonrobotics.junction.Logger;
-
 public class AngularIOTalonFX implements AngularIO {
   // Hardware
   private final TalonFX master;
@@ -116,7 +114,16 @@ public class AngularIOTalonFX implements AngularIO {
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
 
     // Update logging frequency
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, acceleration, appliedVolts, supplyCurrent, statorCurrent, referencePosition, referenceVelocity);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0,
+        position,
+        velocity,
+        acceleration,
+        appliedVolts,
+        supplyCurrent,
+        statorCurrent,
+        referencePosition,
+        referenceVelocity);
   }
 
   private TalonFXConfiguration getMasterConfig() {

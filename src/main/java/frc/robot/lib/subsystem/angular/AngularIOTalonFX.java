@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.littletonrobotics.junction.Logger;
+
 public class AngularIOTalonFX implements AngularIO {
   // Hardware
   private final TalonFX master;
@@ -38,8 +40,8 @@ public class AngularIOTalonFX implements AngularIO {
   private final StatusSignal<Current> statorCurrent;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
-  private final StatusSignal<Double> targetPosition;
-  private final StatusSignal<Double> targetVelocity;
+  private final StatusSignal<Double> referencePosition;
+  private final StatusSignal<Double> referenceVelocity;
   private final List<StatusSignal<Temperature>> motorTemperatures;
 
   private final MotionMagicVoltage motionMagicPos;
@@ -107,8 +109,8 @@ public class AngularIOTalonFX implements AngularIO {
     supplyCurrent = master.getSupplyCurrent();
     velocity = master.getVelocity();
     acceleration = master.getAcceleration();
-    targetPosition = master.getClosedLoopReference();
-    targetVelocity = master.getClosedLoopReferenceSlope();
+    referencePosition = master.getClosedLoopReference();
+    referenceVelocity = master.getClosedLoopReferenceSlope();
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
@@ -173,8 +175,8 @@ public class AngularIOTalonFX implements AngularIO {
         statorCurrent,
         appliedVolts,
         supplyCurrent,
-        targetPosition,
-        targetVelocity);
+        referencePosition,
+        referenceVelocity);
     motorTemperatures.forEach(StatusSignal::refresh);
 
     inputs.angle =
@@ -208,8 +210,8 @@ public class AngularIOTalonFX implements AngularIO {
                   supplyCurrent,
                   statorCurrent,
                   acceleration,
-                  targetPosition,
-                  targetVelocity,
+                  referencePosition,
+                  referenceVelocity,
                   motorTemperatures.get(0)),
               deviceConfig.getMasterId());
     } else {
@@ -220,8 +222,8 @@ public class AngularIOTalonFX implements AngularIO {
               supplyCurrent,
               statorCurrent,
               acceleration,
-              targetPosition,
-              targetVelocity,
+              referencePosition,
+              referenceVelocity,
               motorTemperatures.get(0)));
     }
 
@@ -245,17 +247,17 @@ public class AngularIOTalonFX implements AngularIO {
     if (this.outputMode == kVelocity) {
       inputs.referenceVel =
           RadiansPerSecond.of(
-              targetPosition.getValueAsDouble()
+              referencePosition.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
       inputs.referencePos = Radians.of(0.0);
     } else {
       inputs.referencePos =
           Radians.of(
-              targetPosition.getValueAsDouble()
+              referencePosition.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
       inputs.referenceVel =
           RadiansPerSecond.of(
-              targetVelocity.getValueAsDouble()
+              referenceVelocity.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
     }
   }

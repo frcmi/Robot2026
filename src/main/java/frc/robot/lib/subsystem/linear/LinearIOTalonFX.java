@@ -38,7 +38,7 @@ public class LinearIOTalonFX implements LinearIO {
   private final StatusSignal<Current> statorCurrent;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
-  private final StatusSignal<Double> targetPosition;
+  private final StatusSignal<Double> referencePosition;
   private final List<StatusSignal<Temperature>> motorTemperatures;
 
   private final MotionMagicVoltage motionMagic;
@@ -103,7 +103,7 @@ public class LinearIOTalonFX implements LinearIO {
     supplyCurrent = master.getSupplyCurrent();
     velocity = master.getVelocity();
     acceleration = master.getAcceleration();
-    targetPosition = master.getClosedLoopReference();
+    referencePosition = master.getClosedLoopReference();
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
@@ -158,7 +158,7 @@ public class LinearIOTalonFX implements LinearIO {
         statorCurrent,
         appliedVolts,
         supplyCurrent,
-        targetPosition);
+        referencePosition);
     motorTemperatures.forEach(StatusSignal::refresh);
 
     inputs.length =
@@ -192,7 +192,7 @@ public class LinearIOTalonFX implements LinearIO {
                   supplyCurrent,
                   statorCurrent,
                   acceleration,
-                  targetPosition,
+                  referencePosition,
                   motorTemperatures.get(0)),
               deviceConfig.getMasterId());
     } else {
@@ -203,7 +203,7 @@ public class LinearIOTalonFX implements LinearIO {
               supplyCurrent,
               statorCurrent,
               acceleration,
-              targetPosition,
+              referencePosition,
               motorTemperatures.get(0)));
     }
 
@@ -225,7 +225,7 @@ public class LinearIOTalonFX implements LinearIO {
     inputs.goal = this.goal.orElse(Meters.of(0.0));
     inputs.reference =
         Meters.of(
-            targetPosition.getValueAsDouble()
+            referencePosition.getValueAsDouble()
                 * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
   }
 

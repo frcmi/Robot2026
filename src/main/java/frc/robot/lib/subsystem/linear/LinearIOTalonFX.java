@@ -107,6 +107,9 @@ public class LinearIOTalonFX implements LinearIO {
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
+
+    // Set update frequency
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, acceleration, appliedVolts, supplyCurrent, statorCurrent, referencePosition);
   }
 
   private TalonFXConfiguration getMasterConfig() {

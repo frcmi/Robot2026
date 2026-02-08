@@ -114,6 +114,9 @@ public class AngularIOTalonFX implements AngularIO {
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
+
+    // Update logging frequency
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, acceleration, appliedVolts, supplyCurrent, statorCurrent, referencePosition, referenceVelocity);
   }
 
   private TalonFXConfiguration getMasterConfig() {

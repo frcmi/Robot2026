@@ -51,7 +51,7 @@ public class ClimberConstants {
           .softMaxLength(ClimbState.kRaised.getClimber())
           .motorRotationsPerOutputRotations(15.0) // 15:1 gear ratio for climber in a box
           .outputDistancePerOutputRotation(kDistancePerRotation)
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
           .statorCurrentLimit(Amps.of(80.0)) // Higher current for climbing
           .neutralMode(NeutralModeValue.Brake)

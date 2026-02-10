@@ -26,16 +26,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.VisionConstants;
+import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.constants.intake.KickerConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.intake.TransferConstants;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
-import frc.robot.constants.VisionConstants;
-import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
@@ -49,6 +49,7 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -320,10 +321,10 @@ public class RobotContainer {
             () -> -controller.getRightStickX()));
 
     // Switch to X pattern when X button is pressed
-    controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     controller.buttonA.onTrue(
         Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
     Commands.runOnce(drive::stopWithX, drive);
@@ -336,12 +337,12 @@ public class RobotContainer {
         .whileFalse(intake.set(IntakeState.kStowed));
 
     // Climb controls
-    // controller.buttonX.onTrue(
-    //     either(
-    //         superstructure.climbClimbed(),
-    //         superstructure.climbRaise(),
-    //         () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    // controller.buttonA.onTrue(climb.set(ClimbState.kStowed));
+    controller.buttonX.onTrue(
+        Commands.either(
+            superstructure.climbClimbed(),
+            superstructure.climbRaise(),
+            () -> climb.getTargetState().equals(ClimbState.kRaised)));
+    controller.buttonB.onTrue(climb.set(ClimbState.kStowed));
   }
 
   private void logInit() {

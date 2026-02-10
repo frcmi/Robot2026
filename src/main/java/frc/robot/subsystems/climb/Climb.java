@@ -33,6 +33,8 @@ public class Climb extends VirtualSubsystem {
   public Climb(LinearSubsystem climber) {
     this.climber = climber;
 
+    // climber.setDefaultCommand(climber.openLoop(Volts.of(0.0)));
+
     climber.setDefaultCommand(climber.holdAtGoal(() -> getTargetState().getClimber()));
 
     measuredState = new ClimbState(climber.getLength());

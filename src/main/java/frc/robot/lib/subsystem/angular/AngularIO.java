@@ -32,6 +32,8 @@ public interface AngularIO {
 
     public Angle goalPos = Radians.of(0.0);
     public AngularVelocity goalVel = RadiansPerSecond.of(0.0);
+    public Angle referencePos = Radians.of(0.0);
+    public AngularVelocity referenceVel = RadiansPerSecond.of(0.0);
   }
 
   default void setAngle(Angle angle) {}

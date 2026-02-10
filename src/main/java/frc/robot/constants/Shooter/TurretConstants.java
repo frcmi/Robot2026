@@ -1,4 +1,4 @@
-package frc.robot.constants.Shooter;
+package frc.robot.constants.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -41,11 +41,11 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(0.3)
+          .kP(30.0)
           .kI(0.0)
-          .kD(0.0)
-          .cruiseVelocity(RotationsPerSecond.of(0.2)) // 420rpm
-          .acceleration(DegreesPerSecondPerSecond.of(4000.0))
+          .kD(3.0)
+          .cruiseVelocity(RotationsPerSecond.of(7)) // 300rpm
+          .acceleration(DegreesPerSecondPerSecond.of(2000.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
@@ -83,8 +83,7 @@ public class TurretConstants {
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI =
-      KilogramSquareMeters.of(0.0951078874); // TODO: Figure out
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.07); // TODO: Figure out
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

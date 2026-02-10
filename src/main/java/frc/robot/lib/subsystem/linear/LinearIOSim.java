@@ -66,6 +66,7 @@ public class LinearIOSim implements LinearIO {
 
   @Override
   public void updateInputs(LinearIOInputs inputs) {
+    inputs.goal = this.goal.orElse(Meters.of(0.0));
     Distance goal = Meters.of(0.0);
     switch (outputMode) {
       case kClosedLoop -> {
@@ -90,7 +91,7 @@ public class LinearIOSim implements LinearIO {
     linearExtension.update(kDt);
 
     inputs.length = Meters.of(linearExtension.getPositionMeters());
-    inputs.goal = goal;
+    inputs.reference = goal;
 
     inputs.supplyCurrent =
         Amps.of(

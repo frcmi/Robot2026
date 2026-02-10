@@ -1,4 +1,4 @@
-package frc.robot.constants.Shooter;
+package frc.robot.constants.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;

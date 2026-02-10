@@ -38,8 +38,8 @@ public class AngularIOTalonFX implements AngularIO {
   private final StatusSignal<Current> statorCurrent;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
-  private final StatusSignal<Double> targetPosition;
-  private final StatusSignal<Double> targetVelocity;
+  private final StatusSignal<Double> referencePosition;
+  private final StatusSignal<Double> referenceVelocity;
   private final List<StatusSignal<Temperature>> motorTemperatures;
 
   private final MotionMagicVoltage motionMagicPos;
@@ -107,11 +107,23 @@ public class AngularIOTalonFX implements AngularIO {
     supplyCurrent = master.getSupplyCurrent();
     velocity = master.getVelocity();
     acceleration = master.getAcceleration();
-    targetPosition = master.getClosedLoopReference();
-    targetVelocity = master.getClosedLoopReferenceSlope();
+    referencePosition = master.getClosedLoopReference();
+    referenceVelocity = master.getClosedLoopReferenceSlope();
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
+
+    // Update logging frequency
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0,
+        position,
+        velocity,
+        acceleration,
+        appliedVolts,
+        supplyCurrent,
+        statorCurrent,
+        referencePosition,
+        referenceVelocity);
   }
 
   private TalonFXConfiguration getMasterConfig() {
@@ -167,7 +179,14 @@ public class AngularIOTalonFX implements AngularIO {
   @Override
   public void updateInputs(AngularIOInputs inputs) {
     BaseStatusSignal.refreshAll(
-        position, velocity, acceleration, statorCurrent, appliedVolts, supplyCurrent);
+        position,
+        velocity,
+        acceleration,
+        statorCurrent,
+        appliedVolts,
+        supplyCurrent,
+        referencePosition,
+        referenceVelocity);
     motorTemperatures.forEach(StatusSignal::refresh);
 
     inputs.angle =
@@ -201,6 +220,8 @@ public class AngularIOTalonFX implements AngularIO {
                   supplyCurrent,
                   statorCurrent,
                   acceleration,
+                  referencePosition,
+                  referenceVelocity,
                   motorTemperatures.get(0)),
               deviceConfig.getMasterId());
     } else {
@@ -211,6 +232,8 @@ public class AngularIOTalonFX implements AngularIO {
               supplyCurrent,
               statorCurrent,
               acceleration,
+              referencePosition,
+              referenceVelocity,
               motorTemperatures.get(0)));
     }
 
@@ -229,20 +252,22 @@ public class AngularIOTalonFX implements AngularIO {
     inputs.neutralMode = deviceConfig.getNeutralMode();
 
     inputs.IOOutputMode = this.outputMode;
+    inputs.goalPos = this.goalPos.orElse(Radians.of(0.0));
+    inputs.goalVel = this.goalVel.orElse(RadiansPerSecond.of(0.0));
     if (this.outputMode == kVelocity) {
-      inputs.goalVel =
+      inputs.referenceVel =
           RadiansPerSecond.of(
-              targetPosition.getValueAsDouble()
+              referencePosition.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
-      inputs.goalPos = Radians.of(0.0);
+      inputs.referencePos = Radians.of(0.0);
     } else {
-      inputs.goalPos =
+      inputs.referencePos =
           Radians.of(
-              targetPosition.getValueAsDouble()
+              referencePosition.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
-      inputs.goalVel =
+      inputs.referenceVel =
           RadiansPerSecond.of(
-              targetVelocity.getValueAsDouble()
+              referenceVelocity.getValueAsDouble()
                   * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
     }
   }

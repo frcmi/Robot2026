@@ -140,8 +140,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/DriveTargetAngle", turretTarget);
     return DriveCommands.joystickDriveAtAngle(
         drive,
-        () -> controller.getLeftStickX(),
         () -> controller.getLeftStickY(),
+        () -> -controller.getLeftStickX(),
         () -> turretTarget);
   }
 }

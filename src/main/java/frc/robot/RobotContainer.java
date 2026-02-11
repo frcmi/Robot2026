@@ -329,6 +329,7 @@ public class RobotContainer {
         Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
     Commands.runOnce(drive::stopWithX, drive);
 
+    controller.rightTrigger.debounce(0.3).whileTrue(shooter.setDriveTrain(drive, controller));
     // Intake controls
     controller
         .leftTrigger

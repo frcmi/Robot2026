@@ -41,11 +41,11 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(30.0)
+          .kP(0.0)
           .kI(0.0)
-          .kD(3.0)
-          .cruiseVelocity(RotationsPerSecond.of(7)) // 300rpm
-          .acceleration(DegreesPerSecondPerSecond.of(2000.0))
+          .kD(0.0)
+          .cruiseVelocity(RotationsPerSecond.of(0.1)) // 300rpm
+          .acceleration(DegreesPerSecondPerSecond.of(10.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =

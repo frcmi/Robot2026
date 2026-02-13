@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
@@ -154,11 +153,11 @@ public class RobotContainer {
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
                   new AngularSubsystem(
-                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
-                      TransferConstants.kSubsystemConfigReal),
+                      new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
+                      TransferConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
-                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
-                      KickerConstants.kSubsystemConfigReal));
+                      new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
+                      KickerConstants.kSubsystemConfigSim));
         } else {
           intake = new Intake();
         }
@@ -334,14 +333,8 @@ public class RobotContainer {
     controller
         .leftTrigger
         .debounce(0.3)
-        .whileTrue(
-            intake
-                .set(IntakeState.kIntaking)
-                .alongWith(new InstantCommand(() -> Shooter.runFlywheel = true)))
-        .whileFalse(
-            intake
-                .set(IntakeState.kStowed)
-                .alongWith(new InstantCommand(() -> Shooter.runFlywheel = false)));
+        .whileTrue(intake.set(IntakeState.kIntaking))
+        .whileFalse(intake.set(IntakeState.kStowed));
 
     // Climb controls
     controller.buttonX.onTrue(

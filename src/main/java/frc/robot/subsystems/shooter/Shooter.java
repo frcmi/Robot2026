@@ -34,7 +34,6 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver {
   public static LoggedTunableNumber turretTargetLogged =
       new LoggedTunableNumber("/Turret/Target", ShooterState.kStowed.getTurret().in(Degrees));
-  public static boolean runFlywheel = false;
 
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;

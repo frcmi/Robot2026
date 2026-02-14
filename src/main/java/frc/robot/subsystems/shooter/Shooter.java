@@ -106,16 +106,17 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double distanceToTarget = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
-    for (int i = 0; i < 5; i++) {
+    /*for (int i = 0; i < 5; i++) {
       double airtime = AimingConstants.kAirtimeTable.get(distanceToTarget);
       dx = hubPosition.getX() - currentPose.getX() - robotVelocity.vxMetersPerSecond * airtime;
       dy = hubPosition.getY() - currentPose.getY() - robotVelocity.vyMetersPerSecond * airtime;
       distanceToTarget = Math.hypot(dx, dy);
-    }
+    }*/
 
     double angleToTarget = Math.atan2(dy, dx);
-    Angle turret =
-        Radians.of(angleToTarget - currentPose.getRotation().getRadians() + Math.toRadians(180.0));
+    Angle turret = Radians.of(angleToTarget);
+    // TODO: ADD THIS PART BACK WHEN AIMING WITH TURRET
+    // - currentPose.getRotation().getRadians() + Math.toRadians(180.0));
 
     // Wrap around to [-180, 180]
     turret = AngleUtils.normalize(turret);

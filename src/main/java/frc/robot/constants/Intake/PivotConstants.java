@@ -39,18 +39,16 @@ public class PivotConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(9)
+          .masterId(32)
+          .followerId(33)
+          .opposeMaster(true)
           .bus(kRioBus)
-          .resetAngle(IntakeState.kStowed.getPivot())
+          .resetAngle(IntakeState.kIntaking.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kStowed.getPivot())
-          .motorRotationsPerOutputRotations(
-              (38.0 / 12.0)
-                  * (56.0 / 14.0)
-                  * (24.0 / 18.0)
-                  * (36.0 / 12.0)) // The reductions on the intake
+          .motorRotationsPerOutputRotations(5.0 * 5.0) // The reductions on the intake
           .outputAnglePerOutputRotation(Rotations.of(1.0))
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
           .statorCurrentLimit(Amps.of(90.0))
           .neutralMode(NeutralModeValue.Brake)

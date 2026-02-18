@@ -30,7 +30,7 @@ public class TurretConstants {
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-90.0f);
-  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(90.0f);
+  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(70.0f);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -51,7 +51,7 @@ public class TurretConstants {
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(22)
-          .sensorId(Optional.of(0))
+          .sensorId(Optional.of(42))
           .bus(kRioBus)
           .resetAngle(ShooterState.kStowed.getTurret())
           .softMinAngle(kTurretPhysicalMinAngle)

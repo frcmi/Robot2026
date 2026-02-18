@@ -168,9 +168,12 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
                       TurretConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(
+                  /*new AngularSubsystem(
                       new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
-                      HoodConstants.kSubsystemConfigReal),
+                      HoodConstants.kSubsystemConfigReal),*/
+                  new AngularSubsystem(
+                    new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
+                    HoodConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
                       new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                       FlywheelConstants.kSubsystemConfigReal),

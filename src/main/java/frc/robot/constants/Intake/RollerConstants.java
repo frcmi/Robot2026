@@ -30,7 +30,7 @@ public class RollerConstants {
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
           .statorCurrentLimit(Amps.of(70))
-          .outputAnglePerOutputRotation(Rotations.of(1.0))
+          .outputAnglePerOutputRotation(Rotations.of(3.0))
           .build();
 
   public static final AngularSubsystemConfig kSubsystemConfigSim =

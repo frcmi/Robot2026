@@ -27,7 +27,7 @@ public class TransferConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(24)
           .bus(kRioBus)
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
           .statorCurrentLimit(Amps.of(60))
           .outputAnglePerOutputRotation(Rotations.of(1.0))

@@ -21,7 +21,6 @@ import frc.robot.constants.shooter.AimingConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
-import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
@@ -32,9 +31,6 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver {
-  public static LoggedTunableNumber turretTargetLogged =
-      new LoggedTunableNumber("/Turret/Target", ShooterState.kStowed.getTurret().in(Degrees));
-
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
@@ -140,14 +136,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 TurretConstants.kTurretMaxAngle.in(Radians)));
 
     // Actually apply to hardware
-    // this.targetState.setTurret(turretTarget);
+    this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
-    // this.targetState.setHood(Degrees.of(hoodAngle));
+    this.targetState.setHood(Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
-    // this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
-    this.targetState.setTurret(Degrees.of(turretTargetLogged.getAsDouble()));
-    // this.targetState.setFlywheel(
-    // runFlywheel ? RotationsPerSecond.of(2000 / 60) : RotationsPerSecond.of(0));
+    this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
   }
 
   public Command waitUntilAtGoal() {

@@ -1,11 +1,17 @@
 package frc.robot.constants.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.lib.LoggedInterpolatingTable;
+import frc.robot.lib.LoggedTunableNumber;
 
 public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
   public static final Translation2d kHubPositionRed = new Translation2d(12.51, 4.03); // Meters
+
+  public static LoggedTunableNumber kTurretMinAngle = new LoggedTunableNumber("Shooter/Turret/MinAngleDeg", TurretConstants.kTurretPhysicalMinAngle.in(Degrees));
+  public static LoggedTunableNumber kTurretMaxAngle = new LoggedTunableNumber("Shooter/Turret/MaxAngleDeg", TurretConstants.kTurretPhysicalMaxAngle.in(Degrees));
 
   // TODO: Tune, right now it's from my launch angle calculator
   public static LoggedInterpolatingTable kHoodAngleTable =

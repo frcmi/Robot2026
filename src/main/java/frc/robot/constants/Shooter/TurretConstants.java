@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretMinAngle = Degrees.of(-90.0f);
-  public static final Angle kTurretMaxAngle = Degrees.of(90.0f);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-90.0f);
+  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(90.0f);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -54,8 +54,8 @@ public class TurretConstants {
           .sensorId(Optional.of(0))
           .bus(kRioBus)
           .resetAngle(ShooterState.kStowed.getTurret())
-          .softMinAngle(kTurretMinAngle)
-          .softMaxAngle(kTurretMaxAngle)
+          .softMinAngle(kTurretPhysicalMinAngle)
+          .softMaxAngle(kTurretPhysicalMaxAngle)
           .motorRotationsPerOutputRotations(1) // 1:1 ratio between the two
           .rotorRotationsPerSensorRotation(75.0 / 21.0 * 48.0 / 11.0)
           .outputAnglePerOutputRotation(Rotations.of(1.0))
@@ -90,8 +90,8 @@ public class TurretConstants {
           .motor(DCMotor.getKrakenX44(1))
           .moi(kMOI)
           .resetAngle(kTalonFXConfig.getResetAngle())
-          .physicalMinAngle(kTurretMinAngle)
-          .physicalMaxAngle(kTurretMaxAngle)
+          .physicalMinAngle(kTurretPhysicalMinAngle)
+          .physicalMaxAngle(kTurretPhysicalMaxAngle)
           .motorRotationsPerOutputRotations(
               kTalonFXConfig.getMotorRotationsPerOutputRotations()
                   * kTalonFXConfig.getRotorRotationsPerSensorRotation())

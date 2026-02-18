@@ -132,8 +132,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         Radians.of(
             MathUtil.clamp(
                 turretTarget.in(Radians),
-                TurretConstants.kTurretMinAngle.in(Radians),
-                TurretConstants.kTurretMaxAngle.in(Radians)));
+                Degrees.of(AimingConstants.kTurretMinAngle.getAsDouble()).in(Radians),
+                Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
 
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);

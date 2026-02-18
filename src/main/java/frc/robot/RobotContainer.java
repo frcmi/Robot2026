@@ -153,11 +153,11 @@ public class RobotContainer {
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
                   new AngularSubsystem(
-                      new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
-                      TransferConstants.kSubsystemConfigSim),
+                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
+                      TransferConstants.kSubsystemConfigReal),
                   new AngularSubsystem(
-                      new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
-                      KickerConstants.kSubsystemConfigSim));
+                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
+                      KickerConstants.kSubsystemConfigReal));
         } else {
           intake = new Intake();
         }
@@ -169,11 +169,11 @@ public class RobotContainer {
                       new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
                       TurretConstants.kSubsystemConfigReal),
                   /*new AngularSubsystem(
-                      new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
-                      HoodConstants.kSubsystemConfigReal),*/
+                  new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
+                  HoodConstants.kSubsystemConfigReal),*/
                   new AngularSubsystem(
-                    new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
-                    HoodConstants.kSubsystemConfigSim),
+                      new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
+                      HoodConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
                       new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                       FlywheelConstants.kSubsystemConfigReal),
@@ -329,13 +329,12 @@ public class RobotContainer {
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     controller.buttonA.onTrue(
-        Commands.runOnce(() -> drive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0)))));
-    Commands.runOnce(drive::stopWithX, drive);
+        Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.45, new Rotation2d(0)))));
 
     // Intake controls
     controller
         .leftTrigger
-        .debounce(0.3)
+        .debounce(0.05)
         .whileTrue(intake.set(IntakeState.kIntaking))
         .whileFalse(intake.set(IntakeState.kStowed));
 

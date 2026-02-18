@@ -10,8 +10,12 @@ public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
   public static final Translation2d kHubPositionRed = new Translation2d(12.51, 4.03); // Meters
 
-  public static LoggedTunableNumber kTurretMinAngle = new LoggedTunableNumber("Shooter/Turret/MinAngleDeg", TurretConstants.kTurretPhysicalMinAngle.in(Degrees));
-  public static LoggedTunableNumber kTurretMaxAngle = new LoggedTunableNumber("Shooter/Turret/MaxAngleDeg", TurretConstants.kTurretPhysicalMaxAngle.in(Degrees));
+  public static LoggedTunableNumber kTurretMinAngle =
+      new LoggedTunableNumber(
+          "Shooter/Turret/MinAngleDeg", TurretConstants.kTurretPhysicalMinAngle.in(Degrees));
+  public static LoggedTunableNumber kTurretMaxAngle =
+      new LoggedTunableNumber(
+          "Shooter/Turret/MaxAngleDeg", TurretConstants.kTurretPhysicalMaxAngle.in(Degrees));
 
   // TODO: Tune, right now it's from my launch angle calculator
   public static LoggedInterpolatingTable kHoodAngleTable =
@@ -32,12 +36,6 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
           new double[][] {
-            {0.0, 0.0},
-            {0.37, 0.3},
-            {0.81, 0.5},
-            {1.4, 0.8},
-            {1.8, 1.0},
-            {2.2, 1.2},
-            {3.0, 1.4}
+            {0.0, 0.2},
           });
 }

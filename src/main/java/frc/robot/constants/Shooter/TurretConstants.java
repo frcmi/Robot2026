@@ -29,7 +29,7 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-90.0f);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-70.0f);
   public static final Angle kTurretPhysicalMaxAngle = Degrees.of(70.0f);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
@@ -41,9 +41,9 @@ public class TurretConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(1.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(15.0)
+          .kP(30.0)
           .kI(0.0)
-          .kD(1.0)
+          .kD(0.8)
           .cruiseVelocity(RotationsPerSecond.of(7)) // 420rpm
           .acceleration(DegreesPerSecondPerSecond.of(10000.0))
           .build();

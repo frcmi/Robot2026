@@ -137,8 +137,8 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
-                  new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation));
+          // new VisionIOLimelight(camera1Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -263,7 +263,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
         intake = new Intake();
         transfer = new Transfer();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
@@ -341,16 +342,13 @@ public class RobotContainer {
         Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
 
     // Intake controls
-    controller
-        .leftTrigger
-        .debounce(0.05)
-        .whileTrue(intake.set(IntakeState.kIntaking))
-        .whileFalse(intake.set(IntakeState.kStowed));
+    controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
     controller
         .rightTrigger
         .debounce(0.05)
         .whileTrue(transfer.set(TransferState.kTransferring))
         .whileFalse(transfer.set(TransferState.kIdle));
+    controller.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
 
     controller.buttonB.onTrue(shooter.toggleDisabled());
   }

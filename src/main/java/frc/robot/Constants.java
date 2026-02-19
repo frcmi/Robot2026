@@ -37,7 +37,7 @@ public final class Constants {
   public static boolean intakeHardwareExists =
       true; // Note: Pivot will always be sim with the current setup
   public static boolean shooterHardwareExists = true;
-  public static boolean visionHardwareExists = false;
+  public static boolean visionHardwareExists = true;
 
   // For interplut & tunable double
   public static boolean kTuningMode = true;

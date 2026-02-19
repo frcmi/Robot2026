@@ -9,14 +9,18 @@ import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.transfer.Transfer;
+import frc.robot.subsystems.transfer.TransferState;
 
 public class RobotSuperstructure {
   private final Intake intake;
+  private final Transfer transfer;
   private final Climb climb;
   private final Shooter shooter;
 
-  public RobotSuperstructure(Intake intake, Climb climb, Shooter shooter) {
+  public RobotSuperstructure(Intake intake, Transfer transfer, Climb climb, Shooter shooter) {
     this.intake = intake;
+    this.transfer = transfer;
     this.climb = climb;
     this.shooter = shooter;
   }
@@ -24,7 +28,9 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    NamedCommands.registerCommand("DeployIntake", intake.set(IntakeState.kIntaking));
+    NamedCommands.registerCommand(
+        "DeployIntake",
+        parallel(intake.set(IntakeState.kIntaking), transfer.set(TransferState.kTransferring)));
   }
 
   public Command climbRaise() {

@@ -1,0 +1,116 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems.transfer;
+
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
+import frc.robot.lib.LoggedTunableNumber;
+import frc.robot.lib.utils.StructUtils;
+import java.nio.ByteBuffer;
+import java.util.Optional;
+import lombok.Setter;
+
+/** Add your docs here. */
+public class TransferState implements StructSerializable {
+  @Setter private Voltage transfer;
+  @Setter private Voltage kicker;
+  private final String type;
+
+  private final Optional<LoggedTunableNumber> transferVoltageTunable;
+  private final Optional<LoggedTunableNumber> kickerVoltageTunable;
+
+  public TransferState(Voltage transfer, Voltage kicker) {
+    this.transfer = transfer;
+    this.kicker = kicker;
+
+    transferVoltageTunable = Optional.empty();
+    kickerVoltageTunable = Optional.empty();
+
+    type = "kNotTunable";
+  }
+
+  public TransferState(Voltage transfer, Voltage kicker, String logKey) {
+    this.transfer = transfer;
+    this.kicker = kicker;
+    this.type = logKey;
+
+    transferVoltageTunable =
+        Optional.of(
+            new LoggedTunableNumber(
+                String.format("TransferStates/%s/TransferVolts", logKey), transfer.in(Volts)));
+    kickerVoltageTunable =
+        Optional.of(
+            new LoggedTunableNumber(
+                String.format("TransferStates/%s/KickerVolts", logKey), kicker.in(Volts)));
+  }
+
+  public Voltage getTransfer() {
+    return transferVoltageTunable
+        .map(loggedTunableNumber -> Volts.of(loggedTunableNumber.get()))
+        .orElse(transfer);
+  }
+
+  public Voltage getKicker() {
+    return kickerVoltageTunable
+        .map(loggedTunableNumber -> Volts.of(loggedTunableNumber.get()))
+        .orElse(kicker);
+  }
+
+  // States
+  public static final TransferState kIdle =
+      new TransferState(Volts.of(0.0), Volts.of(0.0), "kIdle");
+  public static final TransferState kTransferring =
+      new TransferState(Volts.of(12.0), Volts.of(12.0), "kTransferring");
+
+  @SuppressWarnings("unused")
+  public static final Struct<TransferState> struct =
+      new Struct<>() {
+        @Override
+        public Class<TransferState> getTypeClass() {
+          return TransferState.class;
+        }
+
+        @Override
+        public String getTypeName() {
+          return "TransferState";
+        }
+
+        @Override
+        public int getSize() {
+          return kSizeDouble * 2 + 256;
+        }
+
+        @Override
+        public String getSchema() {
+          // spotless:off
+                    return "double transferVoltageVolts;double kickerVoltageVolts;char Type[256]";
+                    // spotless:on
+        }
+
+        @Override
+        public TransferState unpack(ByteBuffer bb) {
+          Voltage transfer = Volts.of(bb.getDouble());
+          Voltage kicker = Volts.of(bb.getDouble());
+          String type = StructUtils.readString(bb, 256);
+
+          return new TransferState(transfer, kicker, type);
+        }
+
+        @Override
+        public void pack(ByteBuffer bb, TransferState value) {
+          bb.putDouble(value.getTransfer().in(Volts));
+          bb.putDouble(value.getKicker().in(Volts));
+          StructUtils.writeString(bb, value.type, 256);
+        }
+
+        @Override
+        public boolean isImmutable() {
+          return true;
+        }
+      };
+}

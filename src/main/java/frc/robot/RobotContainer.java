@@ -29,13 +29,13 @@ import frc.robot.commands.RobotSuperstructure;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
-import frc.robot.constants.intake.KickerConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
-import frc.robot.constants.intake.TransferConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
+import frc.robot.constants.transfer.KickerConstants;
+import frc.robot.constants.transfer.TransferConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.LoggedInterpolatingTableManager;
 import frc.robot.lib.alliancecolor.AllianceChecker;
@@ -58,6 +58,8 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.transfer.Transfer;
+import frc.robot.subsystems.transfer.TransferState;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -84,6 +86,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
+  private final Transfer transfer;
   private final Climb climb;
 
   private final RobotSuperstructure superstructure;
@@ -150,7 +153,9 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+          transfer =
+              new Transfer(
                   new AngularSubsystem(
                       new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
                       TransferConstants.kSubsystemConfigReal),
@@ -159,6 +164,7 @@ public class RobotContainer {
                       KickerConstants.kSubsystemConfigReal));
         } else {
           intake = new Intake();
+          transfer = new Transfer();
         }
 
         if (Constants.shooterHardwareExists) {
@@ -217,7 +223,10 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
                     RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+
+        transfer =
+            new Transfer(
                 new AngularSubsystem(
                     new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
                     TransferConstants.kSubsystemConfigSim),
@@ -256,12 +265,13 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         intake = new Intake();
+        transfer = new Transfer();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         climb = new Climb();
         break;
     }
 
-    superstructure = new RobotSuperstructure(intake, climb, shooter);
+    superstructure = new RobotSuperstructure(intake, transfer, climb, shooter);
     superstructure.registerAutoCommands();
 
     measuredSuperstructureState =
@@ -336,6 +346,11 @@ public class RobotContainer {
         .debounce(0.05)
         .whileTrue(intake.set(IntakeState.kIntaking))
         .whileFalse(intake.set(IntakeState.kStowed));
+    controller
+        .rightTrigger
+        .debounce(0.05)
+        .whileTrue(transfer.set(TransferState.kTransferring))
+        .whileFalse(transfer.set(TransferState.kIdle));
 
     controller.buttonB.onTrue(shooter.toggleDisabled());
   }

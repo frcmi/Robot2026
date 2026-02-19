@@ -41,6 +41,7 @@ public class Intake extends VirtualSubsystem {
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
+    this.setDefaultCommand(this.set(IntakeState.kStowed));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
   }
@@ -65,7 +66,7 @@ public class Intake extends VirtualSubsystem {
 
   public Command set(Supplier<IntakeState> state) {
     return parallel(
-        Commands.runOnce(() -> this.targetState = state.get()),
+        Commands.runOnce(() -> this.targetState = state.get(), this),
         pivot.angle(() -> state.get().getPivot()),
         rollers.openLoop(() -> state.get().getRollers()));
   }

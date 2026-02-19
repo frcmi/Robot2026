@@ -342,13 +342,13 @@ public class RobotContainer {
         Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
 
     // Intake controls
-    controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
     controller
         .rightTrigger
         .debounce(0.05)
         .whileTrue(transfer.set(TransferState.kTransferring))
         .whileFalse(transfer.set(TransferState.kIdle));
-    controller.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+    controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
+    controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
 
     controller.buttonB.onTrue(shooter.toggleDisabled());
   }

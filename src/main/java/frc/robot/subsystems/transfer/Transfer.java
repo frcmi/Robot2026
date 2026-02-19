@@ -13,6 +13,8 @@ import frc.robot.constants.transfer.TransferConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import frc.robot.subsystems.intake.IntakeState;
+
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -37,6 +39,8 @@ public class Transfer extends VirtualSubsystem {
 
     transfer.setDefaultCommand(transfer.openLoop(() -> getTargetState().getTransfer()));
     kicker.setDefaultCommand(kicker.openLoop(() -> getTargetState().getKicker()));
+
+    this.setDefaultCommand(this.set(TransferState.kIdle));
 
     measuredState = new TransferState(targetState.getTransfer(), targetState.getKicker());
   }

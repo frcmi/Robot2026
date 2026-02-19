@@ -331,7 +331,7 @@ public class RobotContainer {
             drive,
             () -> controller.getLeftStickY() * 0.75,
             () -> -controller.getLeftStickX() * 0.75,
-            () -> -controller.getRightStickX() * 0.5));
+            () -> controller.getRightStickX() * 0.75));
 
     // Switch to X pattern when X button is pressed
     // controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -345,8 +345,22 @@ public class RobotContainer {
     controller
         .rightTrigger
         .debounce(0.05)
-        .whileTrue(transfer.set(TransferState.kTransferring))
-        .whileFalse(transfer.set(TransferState.kIdle));
+        .whileTrue(
+            Commands.parallel(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> controller.getLeftStickY() * 0.5,
+                    () -> -controller.getLeftStickX() * 0.5,
+                    () -> controller.getRightStickX() * 0.75),
+                transfer.set(TransferState.kTransferring)))
+        .whileFalse(
+            Commands.parallel(
+                DriveCommands.joystickDrive(
+                    drive,
+                    () -> controller.getLeftStickY() * 0.75,
+                    () -> -controller.getLeftStickX() * 0.75,
+                    () -> controller.getRightStickX() * 0.75),
+                transfer.set(TransferState.kIdle)));
     controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
     controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
 

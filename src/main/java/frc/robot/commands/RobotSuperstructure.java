@@ -28,9 +28,9 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    NamedCommands.registerCommand(
-        "DeployIntake",
-        parallel(intake.set(IntakeState.kIntaking), transfer.set(TransferState.kTransferring)));
+    NamedCommands.registerCommand("DeployIntake", intake.set(IntakeState.kIntaking));
+    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
+    NamedCommands.registerCommand("StowIntake", intake.set(IntakeState.kStowed));
   }
 
   public Command climbRaise() {

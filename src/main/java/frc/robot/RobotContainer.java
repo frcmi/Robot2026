@@ -49,7 +49,6 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -329,7 +328,7 @@ public class RobotContainer {
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     controller.buttonA.onTrue(
-        Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.45, new Rotation2d(0)))));
+        Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
 
     // Intake controls
     controller
@@ -338,13 +337,7 @@ public class RobotContainer {
         .whileTrue(intake.set(IntakeState.kIntaking))
         .whileFalse(intake.set(IntakeState.kStowed));
 
-    // Climb controls
-    controller.buttonX.onTrue(
-        Commands.either(
-            superstructure.climbClimbed(),
-            superstructure.climbRaise(),
-            () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    controller.buttonB.onTrue(climb.set(ClimbState.kStowed));
+    controller.buttonB.onTrue(shooter.toggleDisabled());
   }
 
   private void logInit() {

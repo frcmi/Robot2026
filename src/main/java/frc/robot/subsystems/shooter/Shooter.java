@@ -5,6 +5,7 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
@@ -42,6 +43,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> robotVel;
+
+  public boolean disabled = false;
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -83,6 +86,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
+    Logger.recordOutput("Shooter/Disabled", disabled);
 
     // Aim at hub
     // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for
@@ -105,6 +109,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double dx = hubPosition.getX() - (currentPose.getX() + turretOffset.getX());
     double dy = hubPosition.getY() - (currentPose.getY() + turretOffset.getY());
     double distanceToTarget = Math.hypot(dx, dy);
+    Logger.recordOutput("Shooter/DistanceToTargetM", distanceToTarget);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
     for (int i = 0; i < 5; i++) {
@@ -140,7 +145,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
     this.targetState.setHood(Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
-    this.targetState.setFlywheel(RotationsPerSecond.of(flywheelRPS));
+    this.targetState.setFlywheel(
+        disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
   }
 
   public Command waitUntilAtGoal() {
@@ -148,5 +154,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         waitSeconds(RobotConstants.kDt),
         waitUntil(turret.atAngle()),
         waitUntil(flywheel.atAngle()));
+  }
+
+  public Command toggleDisabled() {
+    return either(
+        runOnce(
+            () -> {
+              disabled = false;
+            }),
+        runOnce(
+            () -> {
+              disabled = true;
+            }),
+        () -> disabled);
   }
 }

@@ -19,7 +19,6 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
-import frc.robot.subsystems.shooter.ShooterState;
 import java.util.function.Supplier;
 
 public class HoodConstants {
@@ -28,8 +27,8 @@ public class HoodConstants {
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
 
-  public static final Angle kMinHoodAngle = Degrees.of(0.0f);
-  public static final Angle kMaxHoodAngle = Degrees.of(90.0f);
+  public static final Angle kMinHoodAngle = Degrees.of(25.2f);
+  public static final Angle kMaxHoodAngle = Degrees.of(48.2f);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
@@ -37,9 +36,9 @@ public class HoodConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(2.0))
           .velocityTolerance(DegreesPerSecond.of(4.58))
-          .kP(1.0)
+          .kP(30.0)
           .kI(0.0)
-          .kD(0.0)
+          .kD(0.1)
           .cruiseVelocity(DegreesPerSecond.of(600.0))
           .acceleration(DegreesPerSecondPerSecond.of(4000.0))
           .build();
@@ -48,14 +47,14 @@ public class HoodConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(9)
           .bus(kRioBus)
-          .resetAngle(ShooterState.kStowed.getHood())
+          .resetAngle(kMinHoodAngle)
           .softMinAngle(kMinHoodAngle)
           .softMaxAngle(kMaxHoodAngle)
-          .motorRotationsPerOutputRotations(4) // TODO: Figure out gearing
+          .motorRotationsPerOutputRotations(187.0 / 12.0 * 36.0 / 11.0)
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
-          .statorCurrentLimit(Amps.of(90.0))
+          .statorCurrentLimit(Amps.of(60.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
@@ -70,14 +69,14 @@ public class HoodConstants {
           .bus(kSubsystemConfigReal.getBus())
           .positionTolerance(kSubsystemConfigReal.getPositionTolerance())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(0.5)
-          .kI(0.0)
-          .kD(0.0)
+          .kP(kSubsystemConfigReal.getKP())
+          .kI(kSubsystemConfigReal.getKI())
+          .kD(kSubsystemConfigReal.getKD())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.00125); // TODO: Figure out
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.0506594076);
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

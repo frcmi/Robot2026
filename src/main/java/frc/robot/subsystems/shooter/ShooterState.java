@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import frc.robot.constants.shooter.HoodConstants;
 import java.nio.ByteBuffer;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class ShooterState implements StructSerializable {
   }
 
   public static final ShooterState kStowed =
-      new ShooterState(Degrees.of(0.0), Degrees.of(0.0), DegreesPerSecond.of(0.0));
+      new ShooterState(Degrees.of(0.0), HoodConstants.kMinHoodAngle, DegreesPerSecond.of(0.0));
 
   public static final Struct<ShooterState> struct =
       new Struct<>() {

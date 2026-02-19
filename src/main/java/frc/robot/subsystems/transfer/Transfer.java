@@ -58,9 +58,6 @@ public class Transfer extends VirtualSubsystem {
   }
 
   public Command set(Supplier<TransferState> state) {
-    return parallel(
-        Commands.runOnce(() -> this.targetState = state.get(), this),
-        transfer.openLoop(() -> state.get().getTransfer()),
-        kicker.openLoop(() -> state.get().getKicker()));
+    return Commands.runOnce(() -> this.targetState = state.get(), this);
   }
 }

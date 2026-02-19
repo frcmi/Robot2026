@@ -65,9 +65,6 @@ public class Intake extends VirtualSubsystem {
   }
 
   public Command set(Supplier<IntakeState> state) {
-    return parallel(
-        Commands.runOnce(() -> this.targetState = state.get(), this),
-        pivot.angle(() -> state.get().getPivot()),
-        rollers.openLoop(() -> state.get().getRollers()));
+    return Commands.runOnce(() -> this.targetState = state.get(), this);
   }
 }

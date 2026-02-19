@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.intake;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
@@ -65,6 +64,6 @@ public class Intake extends VirtualSubsystem {
   }
 
   public Command set(Supplier<IntakeState> state) {
-    return Commands.runOnce(() -> this.targetState = state.get(), this);
+    return Commands.run(() -> this.targetState = state.get(), this);
   }
 }

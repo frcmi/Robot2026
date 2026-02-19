@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.transfer;
 
-import static edu.wpi.first.wpilibj2.command.Commands.parallel;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.transfer.KickerConstants;
@@ -58,6 +56,6 @@ public class Transfer extends VirtualSubsystem {
   }
 
   public Command set(Supplier<TransferState> state) {
-    return Commands.runOnce(() -> this.targetState = state.get(), this);
+    return Commands.run(() -> this.targetState = state.get(), this);
   }
 }

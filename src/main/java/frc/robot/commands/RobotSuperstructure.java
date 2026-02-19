@@ -3,6 +3,8 @@ package frc.robot.commands;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
@@ -28,9 +30,9 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    NamedCommands.registerCommand("DeployIntake", intake.set(IntakeState.kIntaking));
-    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
-    NamedCommands.registerCommand("StowIntake", intake.set(IntakeState.kStowed));
+
+    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
+    new EventTrigger("Shoot").whileTrue(transfer.set(TransferState.kTransferring));
   }
 
   public Command climbRaise() {

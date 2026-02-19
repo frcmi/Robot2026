@@ -152,7 +152,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "DeployIntake",
+      "name": "",
       "waypointRelativePos": 2.682576916881443,
       "endWaypointRelativePos": 4.824198614690719,
       "command": null

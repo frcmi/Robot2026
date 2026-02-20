@@ -47,6 +47,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<ChassisSpeeds> robotVel;
 
   public boolean disabled = false;
+  public boolean nearTrench = false;
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -142,10 +143,24 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 Degrees.of(AimingConstants.kTurretMinAngle.getAsDouble()).in(Radians),
                 Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
 
+    if (robotPose.get().getY()
+            < AimingConstants.kHubPositionRed.getY() - AimingConstants.trenchOffsetY
+        || robotPose.get().getY()
+            > AimingConstants.kHubPositionBlue.getY() + AimingConstants.trenchOffsetY) {
+      // If we're in the trench, just point straight ahead to make it easier to feed
+      if (robotPose.get().getX()
+              > AimingConstants.kHubPositionRed.getX() - AimingConstants.trenchOffsetX
+          && robotPose.get().getX()
+              < AimingConstants.kHubPositionBlue.getX() + AimingConstants.trenchOffsetX) {
+        nearTrench = true;
+      } else {
+        nearTrench = false;
+      }
+    }
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
-    this.targetState.setHood(Degrees.of(hoodAngle));
+    this.targetState.setHood(nearTrench ? Degrees.of(0) : Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));

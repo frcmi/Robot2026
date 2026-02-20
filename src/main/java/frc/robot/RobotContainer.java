@@ -325,6 +325,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
+    Command slowDrive =
+        DriveCommands.joystickDrive(
+            drive,
+            () -> controller.getLeftStickY() * 0.5,
+            () -> -controller.getLeftStickX() * 0.5,
+            () -> controller.getRightStickX() * 0.75);
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -332,6 +338,10 @@ public class RobotContainer {
             () -> -controller.getLeftStickX() * 0.75,
             () -> controller.getRightStickX() * 0.75));
 
+    if (shooter.nearTrench) {
+      ;
+      Commands.parallel(slowDrive).until(() -> !shooter.nearTrench);
+    }
     // Switch to X pattern when X button is pressed
     controller.buttonX.whileTrue(shooter.set(ShooterState.kStowed));
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));

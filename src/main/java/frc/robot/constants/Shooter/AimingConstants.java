@@ -9,7 +9,13 @@ import frc.robot.lib.LoggedTunableNumber;
 public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
   public static final Translation2d kHubPositionRed = new Translation2d(12.25, 4.03); // Meters
+  public static final double trenchOffsetY = 2.75; // Meters
+  public static final double trenchOffsetX = 0.5; // Meters
 
+  public static LoggedTunableNumber kTrenchOffsetY =
+      new LoggedTunableNumber("Shooter/TrenchOffset/Y", trenchOffsetY);
+  public static LoggedTunableNumber kTrenchOffsetX =
+      new LoggedTunableNumber("Shooter/TrenchOffset/X", trenchOffsetX);
   public static LoggedTunableNumber kTurretMinAngle =
       new LoggedTunableNumber(
           "Shooter/Turret/MinAngleDeg", TurretConstants.kTurretPhysicalMinAngle.in(Degrees));

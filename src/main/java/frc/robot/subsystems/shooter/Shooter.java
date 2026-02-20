@@ -47,6 +47,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<ChassisSpeeds> robotVel;
 
   public boolean disabled = false;
+  public boolean nearTrench = false;
+  public boolean nearTrenchX = false;
+  public boolean nearTrenchY = false;
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -89,6 +92,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
     Logger.recordOutput("Shooter/Disabled", disabled);
+    Logger.recordOutput("Shooter/NearTrench", nearTrench);
+    Logger.recordOutput("Shooter/NearTrenchX", nearTrenchX);
+    Logger.recordOutput("Shooter/NearTrenchY", nearTrenchY);
 
     // Aim at hub
     // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for
@@ -141,11 +147,24 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 turretTarget.in(Radians),
                 Degrees.of(AimingConstants.kTurretMinAngle.getAsDouble()).in(Radians),
                 Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
-
+    nearTrenchX =
+        robotPose.get().getX() > 10.85
+            && robotPose.get().getX()
+                < 13.125; // I got lazy and hardcoded it, this like should not matter
+    nearTrenchY =
+        robotPose.get().getY()
+                > AimingConstants.kHubPositionRed.getY() + AimingConstants.trenchOffsetY
+            || robotPose.get().getY()
+                < AimingConstants.kHubPositionBlue.getY() - AimingConstants.trenchOffsetY;
+    if (nearTrenchX && nearTrenchY) {
+      nearTrench = true;
+    } else {
+      nearTrench = false;
+    }
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
-    this.targetState.setHood(Degrees.of(hoodAngle));
+    this.targetState.setHood(nearTrench ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));

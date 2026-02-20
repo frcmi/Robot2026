@@ -9,7 +9,13 @@ import frc.robot.lib.LoggedTunableNumber;
 public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
   public static final Translation2d kHubPositionRed = new Translation2d(12.25, 4.03); // Meters
+  public static final double trenchOffsetY = 2.75; // Meters
+  public static final double trenchOffsetX = 0.5; // Meters
 
+  public static LoggedTunableNumber kTrenchOffsetY =
+      new LoggedTunableNumber("Shooter/TrenchOffset/Y", trenchOffsetY);
+  public static LoggedTunableNumber kTrenchOffsetX =
+      new LoggedTunableNumber("Shooter/TrenchOffset/X", trenchOffsetX);
   public static LoggedTunableNumber kTurretMinAngle =
       new LoggedTunableNumber(
           "Shooter/Turret/MinAngleDeg", TurretConstants.kTurretPhysicalMinAngle.in(Degrees));
@@ -22,8 +28,8 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
           new double[][] {
-            {0.0, 0.0},
-            {10, 36}
+            {0.0, 25.2},
+            {10, 48.2}
           });
 
   // No idea where these numbers even came from, copilot just made them up but whatever :shrug:

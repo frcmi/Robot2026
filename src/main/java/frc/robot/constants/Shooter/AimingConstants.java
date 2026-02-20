@@ -28,8 +28,8 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
           new double[][] {
-            {0.0, 0.0},
-            {10, 36}
+            {0.0, 25.2},
+            {10, 48.2}
           });
 
   // No idea where these numbers even came from, copilot just made them up but whatever :shrug:

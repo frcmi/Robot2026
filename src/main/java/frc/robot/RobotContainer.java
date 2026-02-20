@@ -325,23 +325,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    Command slowDrive =
-        DriveCommands.joystickDrive(
-            drive,
-            () -> controller.getLeftStickY() * 0.5,
-            () -> -controller.getLeftStickX() * 0.5,
-            () -> controller.getRightStickX() * 0.75);
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> controller.getLeftStickY() * 0.75,
             () -> -controller.getLeftStickX() * 0.75,
             () -> controller.getRightStickX() * 0.75));
-
-    if (shooter.nearTrench) {
-      ;
-      Commands.parallel(slowDrive).until(() -> !shooter.nearTrench);
-    }
     // Switch to X pattern when X button is pressed
     controller.buttonX.whileTrue(shooter.set(ShooterState.kStowed));
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
@@ -361,15 +350,7 @@ public class RobotContainer {
                     () -> controller.getLeftStickY() * 0.5,
                     () -> -controller.getLeftStickX() * 0.5,
                     () -> controller.getRightStickX() * 0.75),
-                transfer.set(TransferState.kTransferring)))
-        .whileFalse(
-            Commands.parallel(
-                DriveCommands.joystickDrive(
-                    drive,
-                    () -> controller.getLeftStickY() * 0.75,
-                    () -> -controller.getLeftStickX() * 0.75,
-                    () -> controller.getRightStickX() * 0.75),
-                transfer.set(TransferState.kIdle)));
+                transfer.set(TransferState.kTransferring)));
     controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
     controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
 

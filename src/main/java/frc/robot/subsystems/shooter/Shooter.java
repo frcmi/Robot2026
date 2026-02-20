@@ -5,6 +5,7 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.Commands.either;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.AimingConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
@@ -167,5 +169,13 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
               disabled = true;
             }),
         () -> disabled);
+  }
+
+  public Command set(ShooterState state) {
+    return set(() -> state);
+  }
+
+  public Command set(Supplier<ShooterState> state) {
+    return Commands.run(() -> this.targetState = state.get(), this);
   }
 }

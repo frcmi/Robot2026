@@ -33,7 +33,9 @@ public class FlywheelConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(14)
+          .masterId(40)
+          .followerIds(java.util.List.of(49, 50))
+          .opposeMaster(true)
           .motorRotationsPerOutputRotations(1)
           .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)

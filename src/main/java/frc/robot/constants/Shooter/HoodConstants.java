@@ -45,7 +45,7 @@ public class HoodConstants {
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
-          .masterId(9)
+          .masterId(20)
           .bus(kRioBus)
           .resetAngle(kMinHoodAngle)
           .softMinAngle(kMinHoodAngle)

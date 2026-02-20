@@ -56,6 +56,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
 import frc.robot.subsystems.vision.Vision;
@@ -171,12 +172,12 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(TurretConstants.kTalonFXConfig),
                       TurretConstants.kSubsystemConfigReal),
-                  /*new AngularSubsystem(
-                  new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
-                  HoodConstants.kSubsystemConfigReal),*/
                   new AngularSubsystem(
-                      new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
-                      HoodConstants.kSubsystemConfigSim),
+                      new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
+                      HoodConstants.kSubsystemConfigReal),
+                  /*new AngularSubsystem(
+                  new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
+                  HoodConstants.kSubsystemConfigSim),*/
                   new AngularSubsystem(
                       new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                       FlywheelConstants.kSubsystemConfigReal),
@@ -332,7 +333,7 @@ public class RobotContainer {
             () -> controller.getRightStickX() * 0.75));
 
     // Switch to X pattern when X button is pressed
-    // controller.buttonX.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    controller.buttonX.whileTrue(shooter.set(ShooterState.kStowed));
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));

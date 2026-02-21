@@ -8,7 +8,7 @@ import frc.robot.lib.LoggedTunableNumber;
 
 public class AimingConstants {
   public static final Translation2d kHubPositionBlue = new Translation2d(4.03, 4.03); // Meters
-  public static final Translation2d kHubPositionRed = new Translation2d(12.25, 4.03); // Meters
+  public static final Translation2d kHubPositionRed = new Translation2d(12, 4.03); // Meters
   public static final double trenchOffsetY = 2.75; // Meters
   public static final double trenchOffsetX = 0.5; // Meters
 
@@ -28,17 +28,21 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
           new double[][] {
-            {0.0, 25.2},
-            {10, 48.2}
+            {0.0, 10},
+            {0.9, 10.1},
+            {1, 11},
+            {2, 12},
+            {3, 10},
+            {4, 14},
+            {5, 15}
           });
 
   // No idea where these numbers even came from, copilot just made them up but whatever :shrug:
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
-          new double[][] {
-            {0.9, 0.0}, {1, 30.0}, {1.1, 40.0}, {1.4, 43.0}, {2.175, 44}, {3.184, 50}
-          });
+
+          new double[][] {{0, 0}, {0.9, 0.1}, {1, 25}, {2, 26}, {3, 30}, {4, 35}, {5, 40}});
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",

@@ -27,8 +27,8 @@ public class HoodConstants {
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
 
-  public static final Angle kMinHoodAngle = Degrees.of(25.2f);
-  public static final Angle kMaxHoodAngle = Degrees.of(48.2f);
+  public static final Angle kMinHoodAngle = Degrees.of(10);
+  public static final Angle kMaxHoodAngle = Degrees.of(28);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
@@ -52,7 +52,7 @@ public class HoodConstants {
           .softMaxAngle(kMaxHoodAngle)
           .motorRotationsPerOutputRotations(187.0 / 12.0 * 36.0 / 11.0)
           .outputAnglePerOutputRotation(Rotations.of(1.0))
-          .inverted(InvertedValue.Clockwise_Positive)
+          .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
           .statorCurrentLimit(Amps.of(60.0))
           .neutralMode(NeutralModeValue.Brake)

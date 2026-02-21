@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-110.0f);
-  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(110.0f);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-200);
+  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(0);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -44,7 +44,7 @@ public class TurretConstants {
           .kP(10.0)
           .kI(0.0)
           .kD(0.2)
-          .cruiseVelocity(RotationsPerSecond.of(7)) // 420rpm
+          .cruiseVelocity(RotationsPerSecond.of(1)) // 420rpm
           .acceleration(DegreesPerSecondPerSecond.of(10000.0))
           .build();
 

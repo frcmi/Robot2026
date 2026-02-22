@@ -56,7 +56,6 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
 import frc.robot.subsystems.vision.Vision;
@@ -182,7 +181,7 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
                       KickerConstants.kSubsystemConfigReal),
-                      shooter.aimed);
+                  shooter.aimed);
         } else {
           intake = new Intake();
           transfer = new Transfer(shooter.aimed);
@@ -239,7 +238,7 @@ public class RobotContainer {
                 drive::getPose,
                 drive::getPoseVelocity);
 
-          transfer =
+        transfer =
             new Transfer(
                 new AngularSubsystem(
                     new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
@@ -247,7 +246,7 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
                     KickerConstants.kSubsystemConfigSim),
-                    shooter.aimed);
+                shooter.aimed);
 
         climb =
             new Climb(

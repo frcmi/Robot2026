@@ -7,21 +7,15 @@ package frc.robot.subsystems.shooter;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.Commands.either;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.AimingConstants;
 import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
@@ -59,7 +53,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.05);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.1);
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -110,12 +104,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Translation2d targetPosition;
     if (inAllianceZone.getAsBoolean()) {
       targetPosition =
-        alliance == Alliance.Blue
-            ? FieldConstants.kHubPositionBlue
-            : FieldConstants.kHubPositionRed;
+          alliance == Alliance.Blue
+              ? FieldConstants.kHubPositionBlue
+              : FieldConstants.kHubPositionRed;
     } else {
-      double targetX = alliance == Alliance.Blue ? FieldConstants.allianceZoneXBlue : FieldConstants.allianceZoneXRed;
-      double targetY = robotPose.get().getY() < FieldConstants.kHubPositionBlue.getY() ? FieldConstants.allianceZoneYBottom : FieldConstants.allianceZoneYTop;
+      double targetX =
+          alliance == Alliance.Blue
+              ? FieldConstants.allianceZoneXBlue
+              : FieldConstants.allianceZoneXRed;
+      double targetY =
+          robotPose.get().getY() < FieldConstants.kHubPositionBlue.getY()
+              ? FieldConstants.allianceZoneYBottom
+              : FieldConstants.allianceZoneYTop;
       targetPosition = new Translation2d(targetX, targetY);
     }
     Logger.recordOutput("Shooter/Target", targetPosition);
@@ -169,7 +169,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(targetDist);
     rawHoodTarget = Degrees.of(hoodAngle);
-    this.targetState.setHood(nearTrench.getAsBoolean() ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
+    this.targetState.setHood(
+        nearTrench.getAsBoolean() ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
@@ -188,18 +189,20 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         () -> disabled);
   }
 
-
   // Trench code
   private boolean isNearTrench() {
     Pose2d currentPose = this.robotPose.get();
-     Translation2d hubPosition =
+    Translation2d hubPosition =
         alliance == Alliance.Blue
             ? FieldConstants.kHubPositionBlue
             : FieldConstants.kHubPositionRed;
-    
+
     // Check X
-    boolean nearX = Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
-    boolean nearY = currentPose.getY() < FieldConstants.trenchWidthY || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
+    boolean nearX =
+        Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
+    boolean nearY =
+        currentPose.getY() < FieldConstants.trenchWidthY
+            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
     return nearX && nearY;
   }
 
@@ -211,14 +214,17 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       return currentPose.getX() > FieldConstants.kHubPositionRed.getX();
     }
   }
-  
+
   private boolean isAimed() {
     double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
     double errorAtTarget = targetDist * Math.sin(turretErr);
     double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
-    double flywheelErr = measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
+    double flywheelErr =
+        measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
     if (inAllianceZone.getAsBoolean()) {
-      return errorAtTarget < (FieldConstants.hubWidth / 2.0) && hoodErr < 3.0 && flywheelErr < 1.6; // Degrees, rotations per second
+      return errorAtTarget < (FieldConstants.hubWidth / 2.0)
+          && hoodErr < 3.0
+          && flywheelErr < 1.6; // Degrees, rotations per second
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
       return errorAtTarget < (FieldConstants.bumpWidth / 2.0) && hoodErr < 5.0 && flywheelErr < 2.0;

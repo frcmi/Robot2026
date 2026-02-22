@@ -2,7 +2,6 @@ package frc.robot.constants.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.lib.LoggedInterpolatingTable;
 import frc.robot.lib.LoggedTunableNumber;
 
@@ -31,7 +30,6 @@ public class AimingConstants {
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
-
           new double[][] {{0, 0}, {0.9, 0.1}, {1, 25}, {2, 26}, {3, 30}, {4, 35}, {5, 40}});
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(

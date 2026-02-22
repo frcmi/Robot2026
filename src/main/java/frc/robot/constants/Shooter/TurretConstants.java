@@ -83,7 +83,7 @@ public class TurretConstants {
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.07); // TODO: Figure out
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.09);
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

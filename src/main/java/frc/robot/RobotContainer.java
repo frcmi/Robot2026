@@ -332,7 +332,6 @@ public class RobotContainer {
             () -> -controller.getLeftStickX() * 0.75,
             () -> controller.getRightStickX() * 0.75));
     // Switch to X pattern when X button is pressed
-    controller.buttonX.whileTrue(shooter.set(ShooterState.kStowed));
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));

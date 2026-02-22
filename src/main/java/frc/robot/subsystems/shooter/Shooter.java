@@ -15,12 +15,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.AimingConstants;
+import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
@@ -46,10 +49,17 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<Pose2d> robotPose;
   private Supplier<ChassisSpeeds> robotVel;
 
-  public boolean disabled = false;
-  public boolean nearTrench = false;
-  public boolean nearTrenchX = false;
-  public boolean nearTrenchY = false;
+  private boolean disabled = false;
+
+  // For detecting whether aimed or not
+  double targetDist = 0.0;
+  private Angle rawTurretTarget = ShooterState.kStowed.getTurret();
+  private Angle rawHoodTarget = ShooterState.kStowed.getHood();
+
+  // Triggers
+  public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
+  public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.05);
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -92,18 +102,23 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
     Logger.recordOutput("Shooter/Disabled", disabled);
-    Logger.recordOutput("Shooter/NearTrench", nearTrench);
-    Logger.recordOutput("Shooter/NearTrenchX", nearTrenchX);
-    Logger.recordOutput("Shooter/NearTrenchY", nearTrenchY);
+    Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
+    Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
+    Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
 
     // Aim at hub
-    // TODO: Make this the hub when in alliance zone, but make it alliance zone when outside (for
-    // feeding)
-    Translation2d hubPosition =
+    Translation2d targetPosition;
+    if (inAllianceZone.getAsBoolean()) {
+      targetPosition =
         alliance == Alliance.Blue
-            ? AimingConstants.kHubPositionBlue
-            : AimingConstants.kHubPositionRed;
-    Logger.recordOutput("Shooter/Target", hubPosition);
+            ? FieldConstants.kHubPositionBlue
+            : FieldConstants.kHubPositionRed;
+    } else {
+      double targetX = alliance == Alliance.Blue ? FieldConstants.allianceZoneXBlue : FieldConstants.allianceZoneXRed;
+      double targetY = robotPose.get().getY() < FieldConstants.kHubPositionBlue.getY() ? FieldConstants.allianceZoneYBottom : FieldConstants.allianceZoneYTop;
+      targetPosition = new Translation2d(targetX, targetY);
+    }
+    Logger.recordOutput("Shooter/Target", targetPosition);
 
     // Calculate turret angle to target
     Pose2d currentPose = this.robotPose.get();
@@ -114,24 +129,25 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             .rotateBy(currentPose.getRotation());
 
     // Calculate aiming position iteratively
-    double dx = hubPosition.getX() - (currentPose.getX() + turretOffset.getX());
-    double dy = hubPosition.getY() - (currentPose.getY() + turretOffset.getY());
-    double distanceToTarget = Math.hypot(dx, dy);
-    Logger.recordOutput("Shooter/DistanceToTargetM", distanceToTarget);
+    double dx = targetPosition.getX() - (currentPose.getX() + turretOffset.getX());
+    double dy = targetPosition.getY() - (currentPose.getY() + turretOffset.getY());
+    targetDist = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
     for (int i = 0; i < 5; i++) {
-      double airtime = AimingConstants.kAirtimeTable.get(distanceToTarget);
+      double airtime = AimingConstants.kAirtimeTable.get(targetDist);
       dx =
-          hubPosition.getX()
+          targetPosition.getX()
               - (currentPose.getX() + turretOffset.getX())
               - robotVelocity.vxMetersPerSecond * airtime;
       dy =
-          hubPosition.getY()
+          targetPosition.getY()
               - (currentPose.getY() + turretOffset.getY())
               - robotVelocity.vyMetersPerSecond * airtime;
-      distanceToTarget = Math.hypot(dx, dy);
+      targetDist = Math.hypot(dx, dy);
     }
+
+    Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =
@@ -139,6 +155,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);
+    rawTurretTarget = turretTarget.copy();
 
     // Constrain to turret limits
     turretTarget =
@@ -147,34 +164,15 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 turretTarget.in(Radians),
                 Degrees.of(AimingConstants.kTurretMinAngle.getAsDouble()).in(Radians),
                 Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
-    nearTrenchX =
-        robotPose.get().getX() > 10.85
-            && robotPose.get().getX()
-                < 13.125; // I got lazy and hardcoded it, this like should not matter
-    nearTrenchY =
-        robotPose.get().getY()
-                > AimingConstants.kHubPositionRed.getY() + AimingConstants.trenchOffsetY
-            || robotPose.get().getY()
-                < AimingConstants.kHubPositionBlue.getY() - AimingConstants.trenchOffsetY;
-    if (nearTrenchX && nearTrenchY) {
-      nearTrench = true;
-    } else {
-      nearTrench = false;
-    }
+
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);
-    double hoodAngle = AimingConstants.kHoodAngleTable.get(distanceToTarget);
-    this.targetState.setHood(nearTrench ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
-    double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(distanceToTarget);
+    double hoodAngle = AimingConstants.kHoodAngleTable.get(targetDist);
+    rawHoodTarget = Degrees.of(hoodAngle);
+    this.targetState.setHood(nearTrench.getAsBoolean() ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
+    double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
-  }
-
-  public Command waitUntilAtGoal() {
-    return sequence(
-        waitSeconds(RobotConstants.kDt),
-        waitUntil(turret.atAngle()),
-        waitUntil(flywheel.atAngle()));
   }
 
   public Command toggleDisabled() {
@@ -190,11 +188,40 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         () -> disabled);
   }
 
-  public Command set(ShooterState state) {
-    return set(() -> state);
+
+  // Trench code
+  private boolean isNearTrench() {
+    Pose2d currentPose = this.robotPose.get();
+     Translation2d hubPosition =
+        alliance == Alliance.Blue
+            ? FieldConstants.kHubPositionBlue
+            : FieldConstants.kHubPositionRed;
+    
+    // Check X
+    boolean nearX = Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
+    boolean nearY = currentPose.getY() < FieldConstants.trenchWidthY || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
+    return nearX && nearY;
   }
 
-  public Command set(Supplier<ShooterState> state) {
-    return Commands.run(() -> this.targetState = state.get(), this);
+  private boolean isInAllianceZone() {
+    Pose2d currentPose = this.robotPose.get();
+    if (alliance == Alliance.Blue) {
+      return currentPose.getX() < FieldConstants.kHubPositionBlue.getX();
+    } else {
+      return currentPose.getX() > FieldConstants.kHubPositionRed.getX();
+    }
+  }
+  
+  private boolean isAimed() {
+    double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
+    double errorAtTarget = targetDist * Math.sin(turretErr);
+    double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
+    double flywheelErr = measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
+    if (inAllianceZone.getAsBoolean()) {
+      return errorAtTarget < (FieldConstants.hubWidth / 2.0) && hoodErr < 3.0 && flywheelErr < 1.6; // Degrees, rotations per second
+    } else {
+      // In neutral zone, more lenient since just tryna get into the alliance zone
+      return errorAtTarget < (FieldConstants.bumpWidth / 2.0) && hoodErr < 5.0 && flywheelErr < 2.0;
+    }
   }
 }

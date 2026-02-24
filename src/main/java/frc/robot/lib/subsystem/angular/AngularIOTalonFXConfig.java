@@ -27,6 +27,7 @@ public class AngularIOTalonFXConfig {
   @Builder.Default private final Angle outputAnglePerOutputRotation = Rotation.of(1.0);
   @Builder.Default private final double rotorRotationsPerSensorRotation = 1.0;
   @Builder.Default private final Optional<Integer> sensorId = Optional.empty();
+  @Builder.Default private final Angle sensorOffset = Radians.of(0.0); // This gets added to the target position, useful when using remote sensor
   private final InvertedValue inverted;
   private final Current supplyCurrentLimit;
   private final Current statorCurrentLimit;

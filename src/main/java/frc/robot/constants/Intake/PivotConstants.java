@@ -32,12 +32,12 @@ public class PivotConstants {
           .velocityTolerance(DegreesPerSecond.of(4.58))
           .kP(5)
           .kI(0.0)
-          .kD(1)
+          .kD(0.1)
           .kS(0.1)
           .kV(0.3)
           .kA(0.05)
-          .cruiseVelocity(DegreesPerSecond.of(1.2))
-          .acceleration(DegreesPerSecondPerSecond.of(2.4))
+          .cruiseVelocity(RotationsPerSecond.of(1.2))
+          .acceleration(RotationsPerSecondPerSecond.of(2.4))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =

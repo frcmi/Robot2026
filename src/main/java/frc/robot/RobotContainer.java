@@ -55,6 +55,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
+import frc.robot.subsystems.shooter.FuelSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
@@ -62,6 +63,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -108,6 +110,9 @@ public class RobotContainer {
 
   @SuppressWarnings("FieldCanBeLocal")
   private final SuperstructureVisualizer targetSuperstructureState;
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private final Optional<FuelSim> fuelSim;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -196,6 +201,7 @@ public class RobotContainer {
         } else {
           climb = new Climb();
         }
+        fuelSim = Optional.empty();
         break;
 
       case SIM:
@@ -253,6 +259,13 @@ public class RobotContainer {
                 new LinearSubsystem(
                     new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
                     ClimberConstants.kSubsystemConfigSim));
+        fuelSim =
+            Optional.of(
+                new FuelSim(
+                    shooter::getMeasuredState,
+                    () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
+                    drive::getPose,
+                    drive::getPoseVelocity));
         break;
 
       default:
@@ -270,6 +283,13 @@ public class RobotContainer {
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         transfer = new Transfer(shooter.aimed);
         climb = new Climb();
+        fuelSim =
+            Optional.of(
+                new FuelSim(
+                    shooter::getMeasuredState,
+                    () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
+                    drive::getPose,
+                    drive::getPoseVelocity));
         break;
     }
 

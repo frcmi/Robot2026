@@ -11,11 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class AllianceChecker extends VirtualSubsystem {
-
-  // 1 is blue, 0 is red
-  private LoggedTunableNumber simulationAlliance =
-      new LoggedTunableNumber("Alliance/SimulationAlliance", 0.0);
-
   private final List<AllianceUpdatedObserver> observers = new ArrayList<>();
   private Optional<Alliance> alliance = DriverStation.getAlliance();
 
@@ -28,15 +23,7 @@ public class AllianceChecker extends VirtualSubsystem {
   }
 
   public void periodic() {
-    if (Robot.isReal()) {
-      alliance = DriverStation.getAlliance();
-    } else {
-      if (simulationAlliance.get() == 1.0) {
-        alliance = Optional.of(Alliance.Blue);
-      } else {
-        alliance = Optional.of(Alliance.Red);
-      }
-    }
+    alliance = DriverStation.getAlliance();
     alliance.ifPresent(color -> observers.forEach(observer -> observer.onAllianceFound(color)));
   }
 }

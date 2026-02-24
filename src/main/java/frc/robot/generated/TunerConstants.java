@@ -1,6 +1,6 @@
 package frc.robot.generated;
 
-// HELIX V3
+// Beta V3
 
 import static edu.wpi.first.units.Units.*;
 

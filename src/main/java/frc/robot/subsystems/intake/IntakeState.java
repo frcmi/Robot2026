@@ -66,13 +66,11 @@ public class IntakeState implements StructSerializable {
   public static final IntakeState kInit =
       new IntakeState(Degrees.of(90.0), Volts.of(0.0f), "kInit");
   public static final IntakeState kStowed =
-      new IntakeState(Degrees.of(15.0), Volts.of(0.0f), "kStowed");
+      new IntakeState(Degrees.of(30.0), Volts.of(0.0f), "kStowed");
   public static final IntakeState kIntaking =
       new IntakeState(Degrees.of(0.0), Volts.of(7.0f), "kIntaking");
   public static final IntakeState kReversing =
       new IntakeState(Degrees.of(0.0), Volts.of(-8.0f), "kReversing");
-  public static final IntakeState kBump =
-      new IntakeState(Degrees.of(30.0), Volts.of(0.0f), "kBump");
 
   @SuppressWarnings("unused")
   public static final Struct<IntakeState> struct =

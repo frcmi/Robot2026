@@ -51,7 +51,7 @@ public class Intake extends VirtualSubsystem {
 
     pivot.setDefaultCommand(
         pivot.holdAtGoal(
-            () -> isNearBump() ? IntakeState.kBump.getPivot() : getTargetState().getPivot()));
+            () -> isNearBump() ? IntakeState.kStowed.getPivot() : getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
     this.setDefaultCommand(this.set(IntakeState.kStowed));
 

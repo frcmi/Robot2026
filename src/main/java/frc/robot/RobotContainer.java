@@ -172,7 +172,8 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                  drive::getPose);
           transfer =
               new Transfer(
                   new AngularSubsystem(
@@ -183,7 +184,7 @@ public class RobotContainer {
                       KickerConstants.kSubsystemConfigReal),
                   shooter.aimed);
         } else {
-          intake = new Intake();
+          intake = new Intake(drive::getPose);
           transfer = new Transfer(shooter.aimed);
         }
 
@@ -222,7 +223,8 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
                     RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                drive::getPose);
 
         shooter =
             new Shooter(
@@ -266,7 +268,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision =
             new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
-        intake = new Intake();
+        intake = new Intake(drive::getPose);
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         transfer = new Transfer(shooter.aimed);
         climb = new Climb();

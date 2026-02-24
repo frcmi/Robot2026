@@ -9,6 +9,8 @@ public class FieldConstants {
       new Translation2d(11.91641, 4.03479); // Meters
   public static final double trenchWidthX = 2.0; // Meters, from hub center
   public static final double trenchWidthY = 1.6; // Meters
+  public static final double hubWidthY = 1.2; // Meters
+  public static final double bumpWidthY = 1.85; // Meters
   public static final double fieldWidthY = 8.06958; // Meters
 
   public static final double allianceZoneXBlue = 2.4; // Meters, where we shoot when in neutral zone

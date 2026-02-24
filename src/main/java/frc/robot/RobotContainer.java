@@ -384,8 +384,8 @@ public class RobotContainer {
         .rightBumper
         .whileTrue(
             Commands.parallel(
-                DriveCommands.joystickDriveThroughTrench(
-                    drive, () -> -controller.getLeftStickY() * 0.75, drive::getPose),
+                DriveCommands.joystickDriveThroughTrench(   
+                    drive, () -> controller.getLeftStickY() * 0.75, drive::getPose),
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
   }

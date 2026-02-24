@@ -180,7 +180,7 @@ public class DriveCommands {
               // snap to closest 180
               double targetAngle = 0.0;
               if (Math.abs(currentPose.getRotation().getDegrees()) > 90) {
-                targetAngle = 180.0;
+                targetAngle = Math.PI;
               }
 
               // Calculate angular speed

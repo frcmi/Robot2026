@@ -2,8 +2,6 @@ package frc.robot.lib.alliancecolor;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Robot;
-import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import java.util.ArrayList;
 import java.util.Collections;

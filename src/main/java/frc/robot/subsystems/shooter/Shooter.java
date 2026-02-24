@@ -155,7 +155,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =
-        Radians.of(angleToTarget - currentPose.getRotation().getRadians() + Math.toRadians(180.0));
+        Radians.of(angleToTarget - currentPose.getRotation().getRadians() - TurretConstants.kTurretZero.in(Radians));
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);

@@ -144,7 +144,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
             .plus(
                 new Transform3d(
                     TurretConstants.TurretOffset,
-                    new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians)))));
+                    new Rotation3d(0.0, 0.0, shooterState.get().getTurret().in(Radians) - Math.PI + TurretConstants.kTurretZero.in(Radians)))));
     Logger.recordOutput(String.format("Superstructure/%sShooter", logKey), mechanismShooter);
     Logger.recordOutput(String.format("Superstructure/%sClimb", logKey), mechanismClimb);
   }

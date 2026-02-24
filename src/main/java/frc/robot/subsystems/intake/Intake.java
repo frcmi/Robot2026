@@ -49,7 +49,9 @@ public class Intake extends VirtualSubsystem {
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
 
-    pivot.setDefaultCommand(pivot.holdAtGoal(() -> getTargetState().getPivot()));
+    pivot.setDefaultCommand(
+        pivot.holdAtGoal(
+            () -> isNearBump() ? IntakeState.kBump.getPivot() : getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
     this.setDefaultCommand(this.set(IntakeState.kStowed));
 
@@ -61,8 +63,6 @@ public class Intake extends VirtualSubsystem {
     // This method will be called once per scheduler run
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
-    measuredState.setPivot(
-        nearBump.getAsBoolean() ? IntakeState.kBump.getPivot() : pivot.getAngle());
 
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);

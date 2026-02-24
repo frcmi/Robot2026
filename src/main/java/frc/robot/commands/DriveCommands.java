@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
 
@@ -197,7 +198,10 @@ public class DriveCommands {
               }
 
               // PID to trench coordinates
-              double yVelocity = yController.calculate(currentPose.getY(), trenchY);
+              double yVelocity = -yController.calculate(currentPose.getY(), trenchY);
+
+              Logger.recordOutput("Drive/TrenchY", trenchY);
+              Logger.recordOutput("Drive/YError", yController.getPositionError());
 
               // Convert from field relative speeds & send command
               ChassisSpeeds speeds =
@@ -218,7 +222,11 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(
+            () -> {
+              angleController.reset(drive.getRotation().getRadians());
+              yController.reset();
+            });
   }
 
   /**

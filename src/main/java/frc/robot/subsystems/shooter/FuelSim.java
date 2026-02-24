@@ -34,6 +34,8 @@ public class FuelSim extends VirtualSubsystem {
   // Constants
   LoggedTunableNumber kLaunchHeight =
       new LoggedTunableNumber("FuelSim/LaunchHeightM", Inches.of(22).in(Meters));
+  LoggedTunableNumber kHubHeight =
+      new LoggedTunableNumber("FuelSim/HubHeightM", Inches.of(65).in(Meters));
   LoggedTunableNumber kBPS = new LoggedTunableNumber("FuelSim/BPS", 5);
   LoggedTunableNumber kGravity = new LoggedTunableNumber("FuelSim/GravityMS^2", -9.81);
   LoggedTunableNumber kExitVelocity =
@@ -73,8 +75,8 @@ public class FuelSim extends VirtualSubsystem {
       fuelVelocities.set(
           i, new Translation3d(v.getX(), v.getY(), v.getZ() + kGravity.get() * RobotConstants.kDt));
 
-      // Remove fuel below launch height
-      if (fuel.get(i).getZ() < kLaunchHeight.get()) {
+      // Remove fuel below hub height and falling
+      if (fuel.get(i).getZ() < kHubHeight.get() && fuelVelocities.get(i).getZ() < 0) {
         fuel.remove(i);
         fuelVelocities.remove(i);
         i--;

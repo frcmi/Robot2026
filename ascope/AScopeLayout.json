@@ -27,10 +27,13 @@
             "/PathPlanner",
             "/ReplayOutputs",
             "/ReplayOutputs/Odometry",
-            "/RealOutputs",
-            "/RealOutputs/AngularSubsystems",
             "/RealOutputs/Superstructure",
-            "/RealOutputs/SwerveStates"
+            "/RealOutputs/SwerveStates",
+            "/RealOutputs",
+            "/RealOutputs/FuelSim",
+            "/RealOutputs/Transfer",
+            "/RealOutputs/Transfer/MeasuredState",
+            "/Tuning/FuelSim"
           ]
         },
         "tabs": {
@@ -51,7 +54,7 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "/RealOutputs/AngularSubsystems/Turret/AngleDeg",
+                    "logKey": "/AngularSubsystems/Kicker/StatorCurrent",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -61,7 +64,7 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "/RealOutputs/AngularSubsystems/Turret/GoalAngleDeg",
+                    "logKey": "/AngularSubsystems/Kicker/SupplyCurrent",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -70,7 +73,18 @@
                     }
                   }
                 ],
-                "rightSources": [],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/AngularSubsystems/Kicker/Velocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "discreteSources": [],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
@@ -79,7 +93,7 @@
                   "preset": null
                 },
                 "rightUnitConversion": {
-                  "autoTarget": null,
+                  "autoTarget": "rotations/minute",
                   "preset": null
                 },
                 "leftFilter": 0,
@@ -87,7 +101,7 @@
               },
               "controllerUUID": "sn5bo480ghjt7yu25u388dqieqcz5jz1",
               "renderer": null,
-              "controlsHeight": 397
+              "controlsHeight": 393
             },
             {
               "type": 3,
@@ -196,23 +210,32 @@
                     "options": {
                       "plane": "xz"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "/RealOutputs/FuelSim/Fuel",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Fuel"
+                    }
                   }
                 ],
                 "game": "FRC:2026 Field"
               },
               "controllerUUID": "w50jx3bbda9a450nyf6lhabhbigrh93v",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -1.5272906643702577,
-                  2.207581681543128,
-                  0.03934497916888986
+                  9.809038942665982,
+                  4.518465450918041,
+                  1.3629423389418023
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  2.7098691697259074,
+                  -0.7677859784352689,
+                  -0.04162461612902198
                 ]
               },
               "controlsHeight": 200

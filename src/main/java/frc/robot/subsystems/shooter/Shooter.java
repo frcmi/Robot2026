@@ -28,6 +28,7 @@ import frc.robot.lib.subsystem.angular.AngularSubsystem;
 import frc.robot.lib.utils.AngleUtils;
 import java.util.function.Supplier;
 import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver {
@@ -44,6 +45,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<ChassisSpeeds> robotVel;
 
   private boolean disabled = false;
+
+  // for crossing trench: if true, hood will be locked into lowest position.
+  @Getter @Setter private boolean hoodLocked = false;
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -169,8 +173,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.targetState.setTurret(turretTarget);
     double hoodAngle = AimingConstants.kHoodAngleTable.get(targetDist);
     rawHoodTarget = Degrees.of(hoodAngle);
+
+    // if we're near the trench or forcing the hood to be locked, hood goes to min angle
     this.targetState.setHood(
-        nearTrench.getAsBoolean() ? HoodConstants.kMinHoodAngle : Degrees.of(hoodAngle));
+        (nearTrench.getAsBoolean() || hoodLocked)
+            ? HoodConstants.kMinHoodAngle
+            : Degrees.of(hoodAngle));
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));

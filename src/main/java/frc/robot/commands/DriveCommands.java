@@ -7,7 +7,10 @@
 
 package frc.robot.commands;
 
+import static frc.robot.constants.DriveConstants.*;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -31,15 +35,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
-  private static final double FF_START_DELAY = 2.0; // Secs
-  private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   public DriveCommands() {}
 
@@ -133,6 +128,82 @@ public class DriveCommands {
                   new ChassisSpeeds(
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  /**
+   * Command to enhance driving through the trench. Forces alignment in the y direction (side to
+   * side) to the nearest trench, while giving driver control of x. Snaps heading to the nearest 180
+   * degree interval, forcing intake to either be forwards or backwards.
+   *
+   * @param xSupplier From the controller.
+   */
+  public static Command joystickDriveThroughTrench(
+      Drive drive, DoubleSupplier xSupplier, Supplier<Pose2d> robotPoseSupplier) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Holonomic PID controller
+    // TODO: if this doesn't work change it to profiled
+    PIDController yController = new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+
+    return Commands.run(
+            () -> {
+              Pose2d currentPose = robotPoseSupplier.get();
+
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), 0.0);
+
+              // snap to closest 180
+              double targetAngle = 0.0;
+              if (Math.abs(currentPose.getRotation().getDegrees()) > 90) {
+                targetAngle = 180.0;
+              }
+
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(drive.getRotation().getRadians(), targetAngle);
+
+              // update controller constants
+              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+
+              // find closest trench coordinates
+              double trenchY = DriveConstants.LEFT_TRENCH_Y;
+              if (Math.abs(currentPose.getY() - trenchY)
+                  > Math.abs(currentPose.getY() - DriveConstants.RIGHT_TRENCH_Y)) {
+                trenchY = DriveConstants.RIGHT_TRENCH_Y;
+              }
+
+              // PID to trench coordinates
+              double yVelocity = yController.calculate(currentPose.getY(), trenchY);
+
+              // Convert from field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      yVelocity,
                       omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()

@@ -378,6 +378,16 @@ public class RobotContainer {
     controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
 
     controller.buttonB.onTrue(shooter.toggleDisabled());
+
+    // trench controls
+    controller
+        .rightBumper
+        .whileTrue(
+            Commands.parallel(
+                superstructure.lockHoodDown(),
+                DriveCommands.joystickDriveThroughTrench(
+                    drive, () -> -controller.getLeftStickX() * 0.5, drive::getPose)))
+        .whileFalse(superstructure.unlockHood());
   }
 
   private void logInit() {

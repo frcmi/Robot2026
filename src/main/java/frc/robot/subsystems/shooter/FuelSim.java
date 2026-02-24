@@ -87,32 +87,37 @@ public class FuelSim extends VirtualSubsystem {
     if (isShooting.getAsBoolean() && lastShot.hasElapsed(1 / kBPS.get())) {
       lastShot.restart();
 
-    Pose2d rPose = robotPose.get();
-    ChassisSpeeds rSpeeds = robotSpeeds.get();
+      Pose2d rPose = robotPose.get();
+      ChassisSpeeds rSpeeds = robotSpeeds.get();
 
-    ShooterState sState = shooterState.get();
+      ShooterState sState = shooterState.get();
 
-    Pose3d turretPoseWorld =
-      new Pose3d(rPose)
-        .plus(
-          new Transform3d(
-            TurretConstants.TurretOffset,
-            new Rotation3d(0.0, 0.0, sState.getTurret().in(Radians))));
+      Pose3d turretPoseWorld =
+          new Pose3d(rPose)
+              .plus(
+                  new Transform3d(
+                      TurretConstants.TurretOffset,
+                      new Rotation3d(0.0, 0.0, sState.getTurret().in(Radians))));
 
-    fuel.add(
-      new Pose3d(turretPoseWorld.getX(), turretPoseWorld.getY(), kLaunchHeight.get(), new Rotation3d()));
+      fuel.add(
+          new Pose3d(
+              turretPoseWorld.getX(),
+              turretPoseWorld.getY(),
+              kLaunchHeight.get(),
+              new Rotation3d()));
 
-    double exitVel = kExitVelocity.get() * sState.getFlywheel().in(RadiansPerSecond);
-    double turretGlobal = sState.getTurret().in(Radians) + rPose.getRotation().getRadians() + Math.PI;
+      double exitVel = kExitVelocity.get() * sState.getFlywheel().in(RadiansPerSecond);
+      double turretGlobal =
+          sState.getTurret().in(Radians) + rPose.getRotation().getRadians() + Math.PI;
 
-    double hoodAngle = sState.getHood().in(Radians);
-    double horizSpeed = exitVel * Math.sin(hoodAngle);
+      double hoodAngle = sState.getHood().in(Radians);
+      double horizSpeed = exitVel * Math.sin(hoodAngle);
 
-    double vx = horizSpeed * Math.cos(turretGlobal) + rSpeeds.vxMetersPerSecond;
-    double vy = horizSpeed * Math.sin(turretGlobal) + rSpeeds.vyMetersPerSecond;
-    double vz = exitVel * Math.cos(hoodAngle);
+      double vx = horizSpeed * Math.cos(turretGlobal) + rSpeeds.vxMetersPerSecond;
+      double vy = horizSpeed * Math.sin(turretGlobal) + rSpeeds.vyMetersPerSecond;
+      double vz = exitVel * Math.cos(hoodAngle);
 
-    fuelVelocities.add(new Translation3d(vx, vy, vz));
+      fuelVelocities.add(new Translation3d(vx, vy, vz));
     }
   }
 }

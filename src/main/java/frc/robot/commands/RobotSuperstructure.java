@@ -42,4 +42,12 @@ public class RobotSuperstructure {
   public Command climbClimbed() {
     return parallel(climb.set(ClimbState.kClimbed), idle()).withDeadline(climb.waitUntilAtGoal());
   }
+
+  public Command lockHoodDown() {
+    return runOnce(() -> shooter.setHoodLocked(true));
+  }
+
+  public Command unlockHood() {
+    return runOnce(() -> shooter.setHoodLocked(false));
+  }
 }

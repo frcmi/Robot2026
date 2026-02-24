@@ -7,31 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterNeutralIntakeLeft"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": null
+            "pathName": "LeftIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterNeutralIntakeRight"
+            "pathName": "LeftScoreClimbDepot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": null
+            "name": "Climb"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Center Auto",
+  "folder": "Left Auto",
   "choreoAuto": false
 }

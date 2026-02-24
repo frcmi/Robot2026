@@ -1,0 +1,187 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.8,
+        "y": 3.3912504649077118
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.789140407978767,
+        "y": 2.6016723090317453
+      },
+      "isLocked": false,
+      "linkedName": "RightIntakeEnd"
+    },
+    {
+      "anchor": {
+        "x": 5.644524038184835,
+        "y": 0.5882250958106476
+      },
+      "prevControl": {
+        "x": 6.686792790067417,
+        "y": 0.5998571767875922
+      },
+      "nextControl": {
+        "x": 4.6022552863022534,
+        "y": 0.5765930148337032
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.7562921972604695,
+        "y": 0.7154678263988921
+      },
+      "prevControl": {
+        "x": 3.9688684713982365,
+        "y": 0.5838953077116483
+      },
+      "nextControl": {
+        "x": 2.936628760007878,
+        "y": 1.2227924718824918
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.5896903536537161,
+        "y": 1.313314943630495
+      },
+      "prevControl": {
+        "x": 2.0998254924364597,
+        "y": 0.8331289360999585
+      },
+      "nextControl": {
+        "x": 1.181887025803613,
+        "y": 1.6971768597597503
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.0581558883028428,
+        "y": 2.300150048908997
+      },
+      "prevControl": {
+        "x": 1.0674990182949524,
+        "y": 2.0503246980697547
+      },
+      "nextControl": {
+        "x": 1.0488127583107332,
+        "y": 2.5499753997482397
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.0581558883028428,
+        "y": 2.847514973962301
+      },
+      "prevControl": {
+        "x": 1.0581558883028428,
+        "y": 2.5942161247874096
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 4,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Shooting",
+      "minWaypointRelativePos": 2.3,
+      "maxWaypointRelativePos": 3.5999999999999996,
+      "constraints": {
+        "maxVelocity": 0.2,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Climbing",
+      "minWaypointRelativePos": 4.0,
+      "maxWaypointRelativePos": 5.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 4.63,
+        "y": 4.03
+      },
+      "rotationOffset": 180.0,
+      "minWaypointRelativePos": 2.3,
+      "maxWaypointRelativePos": 3.6,
+      "name": "Point Towards Zone"
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "",
+      "waypointRelativePos": 2.2095588235294135,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "ClimbRaise"
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 2.3,
+      "endWaypointRelativePos": 3.3,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.53557937216506
+  },
+  "reversed": false,
+  "folder": "Right Auto",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

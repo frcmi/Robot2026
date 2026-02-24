@@ -27,8 +27,8 @@ public class HoodConstants {
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
 
-  public static final Angle kMinHoodAngle = Degrees.of(10);
-  public static final Angle kMaxHoodAngle = Degrees.of(28);
+  public static final Angle kMinHoodAngle = Degrees.of(25.2);
+  public static final Angle kMaxHoodAngle = Degrees.of(43.2);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()

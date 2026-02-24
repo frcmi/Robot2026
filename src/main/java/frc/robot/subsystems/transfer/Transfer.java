@@ -6,6 +6,7 @@ package frc.robot.subsystems.transfer;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.transfer.KickerConstants;
 import frc.robot.constants.transfer.TransferConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -22,19 +23,23 @@ public class Transfer extends VirtualSubsystem {
   @Getter private TransferState targetState = TransferState.kIdle;
   @Getter private TransferState measuredState;
 
+  private Trigger aimed;
+
   /** Creates a new Transfer. */
-  public Transfer() {
+  public Transfer(Trigger aimed) {
     this(
         new AngularSubsystem(new AngularIO() {}, TransferConstants.kSubsystemConfigReal),
-        new AngularSubsystem(new AngularIO() {}, KickerConstants.kSubsystemConfigReal));
+        new AngularSubsystem(new AngularIO() {}, KickerConstants.kSubsystemConfigReal),
+        aimed);
   }
 
-  public Transfer(AngularSubsystem transfer, AngularSubsystem kicker) {
+  public Transfer(AngularSubsystem transfer, AngularSubsystem kicker, Trigger aimed) {
     this.transfer = transfer;
     this.kicker = kicker;
+    this.aimed = aimed;
 
-    transfer.setDefaultCommand(transfer.openLoop(() -> getTargetState().getTransfer()));
-    kicker.setDefaultCommand(kicker.openLoop(() -> getTargetState().getKicker()));
+    transfer.setDefaultCommand(transfer.openLoop(() -> targetStateAimed().getTransfer()));
+    kicker.setDefaultCommand(kicker.openLoop(() -> targetStateAimed().getKicker()));
 
     this.setDefaultCommand(this.set(TransferState.kIdle));
 
@@ -44,11 +49,18 @@ public class Transfer extends VirtualSubsystem {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    measuredState.setTransfer(targetState.getTransfer());
-    measuredState.setKicker(targetState.getKicker());
+    measuredState.setTransfer(targetStateAimed().getTransfer());
+    measuredState.setKicker(targetStateAimed().getKicker());
 
     Logger.recordOutput("Transfer/TargetState", targetState);
     Logger.recordOutput("Transfer/MeasuredState", measuredState);
+  }
+
+  private TransferState targetStateAimed() {
+    if (aimed.getAsBoolean()) {
+      return getTargetState();
+    }
+    return TransferState.kIdle;
   }
 
   public Command set(TransferState state) {

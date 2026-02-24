@@ -29,8 +29,8 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-10.0f).in(Meters), Inches.of(10.0f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-200);
-  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(0);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-90);
+  public static final Angle kTurretPhysicalMaxAngle = Degrees.of(90);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -83,7 +83,7 @@ public class TurretConstants {
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.07); // TODO: Figure out
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.09);
 
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

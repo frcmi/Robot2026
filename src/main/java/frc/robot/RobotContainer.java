@@ -56,7 +56,6 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
 import frc.robot.subsystems.vision.Vision;
@@ -142,30 +141,6 @@ public class RobotContainer {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
 
-        if (Constants.intakeHardwareExists) {
-          AngularIOSim pivotIO =
-              new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-          pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-              PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
-          intake =
-              new Intake(
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
-                      RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
-          transfer =
-              new Transfer(
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
-                      TransferConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
-                      KickerConstants.kSubsystemConfigReal));
-        } else {
-          intake = new Intake();
-          transfer = new Transfer();
-        }
-
         if (Constants.shooterHardwareExists) {
           shooter =
               new Shooter(
@@ -185,6 +160,31 @@ public class RobotContainer {
                   drive::getPoseVelocity);
         } else {
           shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        }
+
+        if (Constants.intakeHardwareExists) {
+          AngularIOSim pivotIO =
+              new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+          pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+              PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
+          intake =
+              new Intake(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
+                      RollerConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
+          transfer =
+              new Transfer(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
+                      TransferConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
+                      KickerConstants.kSubsystemConfigReal),
+                  shooter.aimed);
+        } else {
+          intake = new Intake();
+          transfer = new Transfer(shooter.aimed);
         }
 
         if (Constants.climbHardwareExists) {
@@ -224,15 +224,6 @@ public class RobotContainer {
                     RollerConstants.kSubsystemConfigSim),
                 new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal));
 
-        transfer =
-            new Transfer(
-                new AngularSubsystem(
-                    new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
-                    TransferConstants.kSubsystemConfigSim),
-                new AngularSubsystem(
-                    new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
-                    KickerConstants.kSubsystemConfigSim));
-
         shooter =
             new Shooter(
                 new AngularSubsystem(
@@ -246,6 +237,17 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
                 drive::getPoseVelocity);
+
+        transfer =
+            new Transfer(
+                new AngularSubsystem(
+                    new AngularIOSim(TransferConstants.kSimConfig, currentDrawCalculatorSim),
+                    TransferConstants.kSubsystemConfigSim),
+                new AngularSubsystem(
+                    new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
+                    KickerConstants.kSubsystemConfigSim),
+                shooter.aimed);
+
         climb =
             new Climb(
                 new LinearSubsystem(
@@ -265,8 +267,8 @@ public class RobotContainer {
         vision =
             new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
         intake = new Intake();
-        transfer = new Transfer();
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        transfer = new Transfer(shooter.aimed);
         climb = new Climb();
         break;
     }
@@ -332,7 +334,6 @@ public class RobotContainer {
             () -> -controller.getLeftStickX() * 0.75,
             () -> controller.getRightStickX() * 0.75));
     // Switch to X pattern when X button is pressed
-    controller.buttonX.whileTrue(shooter.set(ShooterState.kStowed));
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));

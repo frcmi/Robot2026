@@ -135,8 +135,12 @@ public class AngularIOTalonFX implements AngularIO {
         deviceConfig.getKI() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     configuration.Slot0.kD =
         deviceConfig.getKD() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+    configuration.Slot0.kS =
+        deviceConfig.getKS() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     configuration.Slot0.kV =
-        deviceConfig.getKV() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+            deviceConfig.getKV() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+    configuration.Slot0.kA =
+            deviceConfig.getKA() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
 
     configuration.MotionMagic.MotionMagicCruiseVelocity =
         deviceConfig.getCruiseVelocity().in(RadiansPerSecond)

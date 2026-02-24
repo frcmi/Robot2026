@@ -52,6 +52,7 @@ public class TurretConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(22)
           .sensorId(Optional.of(42))
+          .sensorOffset(Degrees.of(90))
           .bus(kRioBus)
           .resetAngle(ShooterState.kStowed.getTurret())
           .softMinAngle(kTurretPhysicalMinAngle)

@@ -276,7 +276,7 @@ public class AngularIOTalonFX implements AngularIO {
   public void setAngle(Angle angle) {
     master.setControl(
         motionMagicPos.withPosition(
-            angle.in(Radians) / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
+            (angle.in(Radians) + this.deviceConfig.getSensorOffset().in(Radians)) / deviceConfig.getOutputAnglePerOutputRotation().in(Radians)));
     goalPos = Optional.of(angle);
     goalVel = Optional.empty();
     outputMode = kClosedLoop;

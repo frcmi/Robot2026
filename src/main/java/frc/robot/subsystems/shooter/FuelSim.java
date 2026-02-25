@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotConstants;
-import frc.robot.constants.Shooter.TurretConstants;
+import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import java.util.ArrayList;

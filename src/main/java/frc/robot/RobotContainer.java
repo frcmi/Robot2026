@@ -47,6 +47,7 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -75,7 +76,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Controller
-  private final Joysticks controller = new Joysticks(0);
+  private final Joysticks driverController = new Joysticks(0);
+  private final Joysticks operatorController = new Joysticks(1);
   private final Joysticks sysIdcontroller = new Joysticks(4);
 
   // Dashboard inputs
@@ -352,40 +354,42 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftStickY() * 0.75,
-            () -> -controller.getLeftStickX() * 0.75,
-            () -> controller.getRightStickX() * 0.75));
+            () -> driverController.getLeftStickY() * 0.75,
+            () -> -driverController.getLeftStickX() * 0.75,
+            () -> driverController.getRightStickX() * 0.75));
     // Switch to X pattern when X button is pressed
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    controller.buttonA.onTrue(
+    driverController.buttonA.onTrue(
         Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
 
     // Intake controls
-    controller
+    operatorController
         .rightTrigger
         .debounce(0.05)
         .whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDrive(
                     drive,
-                    () -> controller.getLeftStickY() * 0.5,
-                    () -> -controller.getLeftStickX() * 0.5,
-                    () -> controller.getRightStickX() * 0.75),
+                    () -> operatorController.getLeftStickY() * 0.5,
+                    () -> -operatorController.getLeftStickX() * 0.5,
+                    () -> operatorController.getRightStickX() * 0.75),
                 transfer.set(TransferState.kTransferring)));
-    controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
-    controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
-
-    controller.buttonB.onTrue(shooter.toggleDisabled());
+    operatorController.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
+    operatorController.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
+    operatorController.buttonY.whileTrue(intake.set(IntakeState.kInit));
+    operatorController.buttonB.whileTrue(intake.set(IntakeState.kStowed));
+    // operatorController.buttonX.whileTrue(climb.set(ClimbState.));
+    driverController.buttonX.onTrue(shooter.toggleDisabled());
 
     // trench controls
-    controller
+    driverController
         .rightBumper
         .whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
-                    drive, () -> -controller.getLeftStickY() * 0.75, drive::getPose),
+                    drive, () -> -driverController.getLeftStickY() * 0.75, drive::getPose),
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
   }

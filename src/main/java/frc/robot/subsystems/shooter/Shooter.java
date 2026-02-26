@@ -155,7 +155,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =
-        Radians.of(angleToTarget - currentPose.getRotation().getRadians() - TurretConstants.kTurretZero.in(Radians));
+        Radians.of(
+            angleToTarget
+                - currentPose.getRotation().getRadians()
+                - TurretConstants.kTurretZero.in(Radians));
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);
@@ -179,6 +182,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         (nearTrench.getAsBoolean() || hoodLocked)
             ? HoodConstants.kMinHoodAngle
             : Degrees.of(hoodAngle));
+
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));

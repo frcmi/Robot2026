@@ -151,6 +151,22 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
+  public void updatePathplannerPIDConstants() {
+    AutoBuilder.configure(
+        this::getPose,
+        this::setPose,
+        this::getChassisSpeeds,
+        this::runVelocity,
+        new PPHolonomicDriveController(
+            new PIDConstants(
+                DriveConstants.TRANSLATION_KP.get(), 0.0, DriveConstants.TRANSLATION_KD.get()),
+            new PIDConstants(
+                DriveConstants.PP_ANGLE_KP.get(), 0.0, DriveConstants.PP_ANGLE_KD.get())),
+        PP_CONFIG,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        this);
+  }
+
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -217,10 +233,6 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     Logger.recordOutput("SwerveStates/Speeds", speeds);
-    if (Constants.currentMode == Constants.Mode.REAL) {
-      speeds.omegaRadiansPerSecond *= -1.0;
-      // TODO: WHY IS THIS HAPPENING???
-    }
 
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);

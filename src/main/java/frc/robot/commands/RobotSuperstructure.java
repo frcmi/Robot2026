@@ -41,7 +41,7 @@ public class RobotSuperstructure {
   }
 
   public Command climbClimbed() {
-    return parallel(climb.set(ClimbState.kClimbed), idle()).withDeadline(climb.waitUntilAtGoal());
+    return parallel(climb.set(ClimbState.kStowed), idle()).withDeadline(climb.waitUntilAtGoal());
   }
 
   public Command lockHoodDown() {

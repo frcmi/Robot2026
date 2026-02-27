@@ -49,7 +49,6 @@ public class ClimbState implements StructSerializable {
   // States
   public static final ClimbState kStowed = new ClimbState(Inches.of(3.0), "kStowed");
   public static final ClimbState kRaised = new ClimbState(Inches.of(15.5), "kRaised");
-  public static final ClimbState kClimbed = new ClimbState(Inches.of(3.0), "kClimbed");
 
   @SuppressWarnings("unused")
   public static final Struct<ClimbState> struct =

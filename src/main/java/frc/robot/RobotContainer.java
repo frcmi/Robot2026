@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
@@ -19,6 +20,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -353,10 +355,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    boolean sim = Constants.currentMode == Constants.simMode;
+
     /* DRIVE COMMANDS
     - Left joystick: drive
     - Right joystick: turn
-    - Hold X: stop and move modules to X pattern to resist push (won't be able to drive while doing this)
+    - Hold X (real only): stop and move modules to X pattern to resist push (won't be able to drive while doing this)
     - Hold right bumper: Dynamically align heading & x position with trench, you just control forward/backward speed
      */
     drive.setDefaultCommand(
@@ -365,7 +369,9 @@ public class RobotContainer {
             () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
             () -> -driverController.getLeftStickX() * superstructure.getDriveSpeed(false),
             () -> -driverController.getRightStickX() * superstructure.getDriveSpeed(true)));
-    driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
+    if (!sim) {
+      driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
+    }
     driverController
         .rightBumper
         .whileTrue(
@@ -377,64 +383,46 @@ public class RobotContainer {
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
 
-    // Intake controls
-    operatorController.rightTrigger.whileTrue(
-        // Commands.parallel(
-        //     DriveCommands.joystickDrive(
-        //         drive,
-        //         () ->
-        //             driverController.getLeftStickY()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getLeftStickX()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getRightStickX()
-        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
-        transfer.set(TransferState.kTransferring)); // );
+    /* INTAKE CONTROLS
+    - Driver left trigger: Intake
+    - Driver left bumper: Reverse intake
+     */
+    driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
+    driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+
+    /* SHOOTER CONTROLS
+    - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
+    - Operator right bumper: Reverse transfer (why is this useful?)
+     */
+    (sim ? driverController : operatorController).rightTrigger.whileTrue(Commands.parallel(
+      transfer.set(TransferState.kTransferring), 
+      intake.set(IntakeState.kTransferring)));
+    operatorController.rightTrigger.and(shooter.aimed.negate()).onTrue(
+      Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0))
+    ).onFalse(
+      Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0))
+    );
     operatorController
         .rightBumper
-        .onTrue(transfer.set(TransferState.kReverse))
-        .onFalse(transfer.set(TransferState.kIdle));
+        .whileTrue(transfer.set(TransferState.kReverse));
 
-    operatorController.leftTrigger.whileTrue(
-        // Commands.parallel(
-        //     DriveCommands.joystickDrive(
-        //         drive,
-        //         () ->
-        //             driverController.getLeftStickY()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getLeftStickX()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getRightStickX()
-        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
-        intake.set(IntakeState.kIntaking)); // );
-    operatorController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-    operatorController.buttonY.whileTrue(intake.set(IntakeState.kInit));
-    operatorController.buttonB.whileTrue(intake.set(IntakeState.kStowed));
-    // operatorController.buttonX.whileTrue(climb.set(ClimbState.));
-    operatorController.buttonX.onTrue(shooter.toggleDisabled());
+    /* CLIMBER CONTROLS
+    - Operator Y (sim driver): Raise climb
+    - Operator X (sim driver): Lower climb
+     */
+    (sim ? driverController : operatorController).buttonY.onTrue(superstructure.climbRaise());
+    (sim ? driverController : operatorController).buttonX.onTrue(superstructure.climbClimbed());
 
-    // zero hood (in-match)
-    operatorController.dPadDown.whileTrue(shooter.moveHood(-2.0)).onFalse(shooter.zeroHood());
-
-    // update pathplanner (TEMP, DELETE LATER)
-    driverController.buttonB.onTrue(Commands.runOnce(() -> drive.updatePathplannerPIDConstants()));
-
-    driverController.buttonX.onTrue(
-        Commands.either(
-            superstructure.climbClimbed(),
-            superstructure.climbRaise(),
-            () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    driverController.buttonY.onTrue(climb.set(ClimbState.kStowed));
+    /* DEBUG/FAILSAFE CONTROLS:
+      - Operator B (HOLD): Stow intake
+      - Operator DPad right: Disable shooter
+      - Operator DPad Left: Moves hood down when held, release to zero hood
+      - Operator DPad Down: Moves climb down when held, release to zero climb
+     */
+    operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
+    operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    operatorController.dPadLeft.whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE)).onFalse(shooter.zeroHood());
+    operatorController.dPadDown.whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE)).onFalse(climb.resetClimb());
   }
 
   private void logInit() {

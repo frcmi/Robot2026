@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
@@ -29,6 +31,7 @@ public class HoodConstants {
 
   public static final Angle kMinHoodAngle = Degrees.of(25.2);
   public static final Angle kMaxHoodAngle = Degrees.of(43.2);
+  public static final Voltage MANUAL_OVERRIDE = Volts.of(-2.0);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()

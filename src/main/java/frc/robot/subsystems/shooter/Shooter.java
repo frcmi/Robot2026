@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -188,8 +189,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
   }
 
-  public Command moveHood(double volts) {
-    return this.hood.openLoop(() -> Volts.of(volts));
+  public Command overrideHood(Voltage volts) {
+    return this.hood.openLoop(() -> volts);
   }
 
   public Command zeroHood() {

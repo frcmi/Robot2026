@@ -12,6 +12,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.subsystem.linear.LinearIOSimConfig;
 import frc.robot.lib.subsystem.linear.LinearIOTalonFXConfig;
 import frc.robot.lib.subsystem.linear.LinearSubsystemConfig;
@@ -27,6 +28,8 @@ public class ClimberConstants {
   public static final Distance kClimberBaseHeight =
       Inches.of(24.0); // Height of climber base from ground
   public static final Distance kClimberWidth = Inches.of(3.0); // Width of climber visualization
+
+  public static final Voltage MANUAL_OVERRIDE = Volts.of(-2.0); // Voltage applied when manually overriding the climber
 
   public static final LinearSubsystemConfig kSubsystemConfigReal =
       LinearSubsystemConfig.builder()

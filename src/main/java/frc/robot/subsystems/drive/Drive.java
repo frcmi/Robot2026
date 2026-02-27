@@ -151,22 +151,6 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-  public void updatePathplannerPIDConstants() {
-    AutoBuilder.configure(
-        this::getPose,
-        this::setPose,
-        this::getChassisSpeeds,
-        this::runVelocity,
-        new PPHolonomicDriveController(
-            new PIDConstants(
-                DriveConstants.TRANSLATION_KP.get(), 0.0, DriveConstants.TRANSLATION_KD.get()),
-            new PIDConstants(
-                DriveConstants.PP_ANGLE_KP.get(), 0.0, DriveConstants.PP_ANGLE_KD.get())),
-        PP_CONFIG,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-        this);
-  }
-
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -224,6 +208,28 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // Check if PID changed for pathplanner, update automatically
+    if (Constants.kTuningMode &&
+      DriveConstants.TRANSLATION_KP.hasChanged(DriveConstants.TRANSLATION_KD.hashCode()) &&
+      DriveConstants.TRANSLATION_KD.hasChanged(DriveConstants.TRANSLATION_KP.hashCode()) &&
+      DriveConstants.PP_ANGLE_KP.hasChanged(DriveConstants.PP_ANGLE_KD.hashCode()) &&
+      DriveConstants.PP_ANGLE_KD.hasChanged(DriveConstants.PP_ANGLE_KP.hashCode())
+    ) {
+      AutoBuilder.configure(
+        this::getPose,
+        this::setPose,
+        this::getChassisSpeeds,
+        this::runVelocity,
+        new PPHolonomicDriveController(
+            new PIDConstants(
+                DriveConstants.TRANSLATION_KP.get(), 0.0, DriveConstants.TRANSLATION_KD.get()),
+            new PIDConstants(
+                DriveConstants.PP_ANGLE_KP.get(), 0.0, DriveConstants.PP_ANGLE_KD.get())),
+        PP_CONFIG,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        this);
+    }
   }
 
   /**

@@ -67,7 +67,7 @@ public class IntakeState implements StructSerializable {
       new IntakeState(Degrees.of(90.0), Volts.of(0.0f), "kInit");
   public static final IntakeState kStowed =
       new IntakeState(Degrees.of(20.0), Volts.of(0.0f), "kStowed");
-  public static final IntakeState kTransfer =
+  public static final IntakeState kTransferring =
       new IntakeState(Degrees.of(45.0), Volts.of(0.0f), "kTransfer");
   public static final IntakeState kIntaking =
       new IntakeState(Degrees.of(0.0), Volts.of(5.0f), "kIntaking");

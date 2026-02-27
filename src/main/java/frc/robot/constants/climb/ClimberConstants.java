@@ -29,7 +29,8 @@ public class ClimberConstants {
       Inches.of(24.0); // Height of climber base from ground
   public static final Distance kClimberWidth = Inches.of(3.0); // Width of climber visualization
 
-  public static final Voltage MANUAL_OVERRIDE = Volts.of(-2.0); // Voltage applied when manually overriding the climber
+  public static final Voltage MANUAL_OVERRIDE =
+      Volts.of(-2.0); // Voltage applied when manually overriding the climber
 
   public static final LinearSubsystemConfig kSubsystemConfigReal =
       LinearSubsystemConfig.builder()

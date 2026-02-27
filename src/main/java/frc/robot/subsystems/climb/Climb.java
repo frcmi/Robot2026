@@ -63,7 +63,7 @@ public class Climb extends VirtualSubsystem {
         Commands.runOnce(() -> this.targetState = state.get()),
         climber.length(() -> state.get().getClimber()));
   }
-  
+
   public Command overrideClimb(Voltage override) {
     return climber.openLoop(override);
   }

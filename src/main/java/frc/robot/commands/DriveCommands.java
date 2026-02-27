@@ -36,13 +36,15 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static PIDController yController = new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+  private static PIDController yController =
+      new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
   private static ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+      new ProfiledPIDController(
+          ANGLE_KP,
+          0.0,
+          ANGLE_KD,
+          new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+
   static {
     angleController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -145,7 +147,7 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
-  
+
   /**
    * Command to enhance driving through the trench. Forces alignment in the y direction (side to
    * side) to the nearest trench, while giving driver control of x. Snaps heading to the nearest 180

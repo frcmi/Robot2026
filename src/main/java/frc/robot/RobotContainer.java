@@ -7,20 +7,15 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
-import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
@@ -52,7 +46,6 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -394,17 +387,16 @@ public class RobotContainer {
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
      */
-    (sim ? driverController : operatorController).rightTrigger.whileTrue(Commands.parallel(
-      transfer.set(TransferState.kTransferring), 
-      intake.set(IntakeState.kTransferring)));
-    operatorController.rightTrigger.and(shooter.aimed.negate()).onTrue(
-      Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0))
-    ).onFalse(
-      Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0))
-    );
+    (sim ? driverController : operatorController)
+        .rightTrigger.whileTrue(
+            Commands.parallel(
+                transfer.set(TransferState.kTransferring), intake.set(IntakeState.kTransferring)));
     operatorController
-        .rightBumper
-        .whileTrue(transfer.set(TransferState.kReverse));
+        .rightTrigger
+        .and(shooter.aimed.negate())
+        .onTrue(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0)))
+        .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
+    operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
 
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb
@@ -414,15 +406,22 @@ public class RobotContainer {
     (sim ? driverController : operatorController).buttonX.onTrue(superstructure.climbClimbed());
 
     /* DEBUG/FAILSAFE CONTROLS:
-      - Operator B (HOLD): Stow intake
-      - Operator DPad right: Disable shooter
-      - Operator DPad Left: Moves hood down when held, release to zero hood
-      - Operator DPad Down: Moves climb down when held, release to zero climb
-     */
+     - Operator B (HOLD): Stow intake
+     - Operator DPad right: Disable shooter
+     - Operator DPad Left: Moves hood down when held, release to zero hood
+     - Operator DPad Down: Moves climb down when held, release to zero climb
+    */
+    // TODO: lock turret control
     operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
     operatorController.dPadRight.onTrue(shooter.toggleDisabled());
-    operatorController.dPadLeft.whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE)).onFalse(shooter.zeroHood());
-    operatorController.dPadDown.whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE)).onFalse(climb.resetClimb());
+    operatorController
+        .dPadLeft
+        .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
+        .onFalse(shooter.zeroHood());
+    operatorController
+        .dPadDown
+        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
+        .onFalse(climb.resetClimb());
   }
 
   private void logInit() {

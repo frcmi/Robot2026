@@ -139,18 +139,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     targetDist = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
-    // for (int i = 0; i < 5; i++) {
-    //   double airtime = AimingConstants.kAirtimeTable.get(targetDist);
-    //   dx =
-    //       targetPosition.getX()
-    //           - (currentPose.getX() + turretOffset.getX())
-    //           - robotVelocity.vxMetersPerSecond * airtime;
-    //   dy =
-    //       targetPosition.getY()
-    //           - (currentPose.getY() + turretOffset.getY())
-    //           - robotVelocity.vyMetersPerSecond * airtime;
-    //   targetDist = Math.hypot(dx, dy);
-    // }
+    for (int i = 0; i < 5; i++) {
+      double airtime = AimingConstants.kAirtimeTable.get(targetDist);
+      dx =
+          targetPosition.getX()
+              - (currentPose.getX() + turretOffset.getX())
+              - robotVelocity.vxMetersPerSecond * airtime;
+      dy =
+          targetPosition.getY()
+              - (currentPose.getY() + turretOffset.getY())
+              - robotVelocity.vyMetersPerSecond * airtime;
+      targetDist = Math.hypot(dx, dy);
+    }
 
     Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
 

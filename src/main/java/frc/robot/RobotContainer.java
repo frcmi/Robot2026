@@ -342,8 +342,6 @@ public class RobotContainer {
 
     logInit();
 
-    configureNamedComands();
-
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -355,19 +353,29 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
+    /* DRIVE COMMANDS
+    - Left joystick: drive
+    - Right joystick: turn
+    - Hold X: stop and move modules to X pattern to resist push (won't be able to drive while doing this)
+    - Hold right bumper: Dynamically align heading & x position with trench, you just control forward/backward speed
+     */
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
-            () -> -driverController.getLeftStickX() * DriveConstants.MAX_SPEED_MULTIPLIER,
-            () -> -driverController.getRightStickX() * DriveConstants.MAX_ROTATION_MULTIPLIER));
-    // Switch to X pattern when X button is pressed
-    // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    driverController.buttonA.onTrue(
-        Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
+            () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+            () -> -driverController.getLeftStickX() * superstructure.getDriveSpeed(false),
+            () -> -driverController.getRightStickX() * superstructure.getDriveSpeed(true)));
+    driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
+    driverController
+        .rightBumper
+        .whileTrue(
+            Commands.parallel(
+                DriveCommands.joystickDriveThroughTrench(
+                    drive,
+                    () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+                    drive::getPose),
+                superstructure.lockHoodDown()))
+        .whileFalse(superstructure.unlockHood());
 
     // Intake controls
     operatorController.rightTrigger.whileTrue(
@@ -421,18 +429,6 @@ public class RobotContainer {
     // update pathplanner (TEMP, DELETE LATER)
     driverController.buttonB.onTrue(Commands.runOnce(() -> drive.updatePathplannerPIDConstants()));
 
-    // trench controls
-    driverController
-        .rightBumper
-        .whileTrue(
-            Commands.parallel(
-                DriveCommands.joystickDriveThroughTrench(
-                    drive,
-                    () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
-                    drive::getPose),
-                superstructure.lockHoodDown()))
-        .whileFalse(superstructure.unlockHood());
-
     driverController.buttonX.onTrue(
         Commands.either(
             superstructure.climbClimbed(),
@@ -452,16 +448,9 @@ public class RobotContainer {
     Logger.recordOutput(
         "Poses/AndyMarkAprilTagField",
         VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
-  }
 
-  private void configureNamedComands() {
-    // TODO: make this allow other actions after
-    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
-
-    // intake in intake zones
-    new EventTrigger("Intake")
-        .onTrue(intake.set(IntakeState.kIntaking))
-        .onFalse(intake.set(IntakeState.kStowed));
+    Logger.recordOutput("Drive/TrenchDrive/TrenchY", 0);
+    Logger.recordOutput("Drive/TrenchDrive/YError", 0);
   }
 
   /**

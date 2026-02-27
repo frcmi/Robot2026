@@ -36,6 +36,16 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
+  private static PIDController yController = new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+  private static ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+  static {
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   public DriveCommands() {}
 
@@ -44,8 +54,8 @@ public class DriveCommands {
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
-    // Square magnitude for more precise control
-    linearMagnitude = linearMagnitude * linearMagnitude;
+    // Cube magnitude for more precise control
+    linearMagnitude = Math.pow(linearMagnitude, 3);
 
     // Return new linear velocity
     return new Pose2d(Translation2d.kZero, linearDirection)
@@ -102,16 +112,6 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
     // Construct command
     return Commands.run(
             () -> {
@@ -145,7 +145,7 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
-
+  
   /**
    * Command to enhance driving through the trench. Forces alignment in the y direction (side to
    * side) to the nearest trench, while giving driver control of x. Snaps heading to the nearest 180
@@ -167,7 +167,6 @@ public class DriveCommands {
 
     // Holonomic PID controller
     // TODO: if this doesn't work change it to profiled
-    PIDController yController = new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
 
     return Commands.run(
             () -> {
@@ -200,8 +199,8 @@ public class DriveCommands {
               // PID to trench coordinates
               double yVelocity = -yController.calculate(currentPose.getY(), trenchY);
 
-              Logger.recordOutput("Drive/TrenchY", trenchY);
-              Logger.recordOutput("Drive/YError", yController.getPositionError());
+              Logger.recordOutput("Drive/TrenchDrive/TrenchY", trenchY);
+              Logger.recordOutput("Drive/TrenchDrive/YError", yController.getError());
 
               // Convert from field relative speeds & send command
               ChassisSpeeds speeds =

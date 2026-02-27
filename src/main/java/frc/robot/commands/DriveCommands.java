@@ -157,16 +157,6 @@ public class DriveCommands {
    */
   public static Command joystickDriveThroughTrench(
       Drive drive, DoubleSupplier xSupplier, Supplier<Pose2d> robotPoseSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
     // Holonomic PID controller
     // TODO: if this doesn't work change it to profiled
 
@@ -181,7 +171,7 @@ public class DriveCommands {
               // snap to closest 180
               double targetAngle = 0.0;
               if (Math.abs(currentPose.getRotation().getDegrees()) > 90) {
-                targetAngle = 180.0;
+                targetAngle = Math.PI;
               }
 
               // Calculate angular speed

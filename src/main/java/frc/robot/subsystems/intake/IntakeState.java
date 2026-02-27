@@ -19,7 +19,10 @@ import lombok.Setter;
 /** Add your docs here. */
 public class IntakeState implements StructSerializable {
   @Setter private Angle pivot;
+  @Setter private Angle minPivot;
+  @Setter private Angle maxPivot;
   @Setter private Voltage rollers;
+  private boolean oscillating;
   private final String type;
 
   private final Optional<LoggedTunableNumber> pivotTunable;
@@ -28,6 +31,19 @@ public class IntakeState implements StructSerializable {
   public IntakeState(Angle pivot, Voltage rollers) {
     this.pivot = pivot;
     this.rollers = rollers;
+    oscillating = false;
+
+    pivotTunable = Optional.empty();
+    rollerVoltageTunable = Optional.empty();
+
+    type = "kNotTunable";
+  }
+
+  public IntakeState(Angle minPivot, Angle maxPivot) {
+    this.minPivot = minPivot;
+    this.maxPivot = maxPivot;
+    this.rollers = Volts.of(0);
+    oscillating = true;
 
     pivotTunable = Optional.empty();
     rollerVoltageTunable = Optional.empty();
@@ -39,6 +55,24 @@ public class IntakeState implements StructSerializable {
     this.pivot = pivot;
     this.rollers = rollers;
     this.type = logKey;
+    oscillating = false;
+
+    pivotTunable =
+        Optional.of(
+            new LoggedTunableNumber(
+                String.format("IntakeStates/%s/PivotAngleDegrees", logKey), pivot.in(Degrees)));
+    rollerVoltageTunable =
+        Optional.of(
+            new LoggedTunableNumber(
+                String.format("IntakeStates/%s/RollersVolts", logKey), rollers.in(Volts)));
+  }
+
+  public IntakeState(Angle minPivot, Angle maxPivot, String logKey) {
+    this.minPivot = minPivot;
+    this.maxPivot = maxPivot;
+    this.rollers = Volts.of(0);
+    this.type = logKey;
+    oscillating = true;
 
     pivotTunable =
         Optional.of(
@@ -62,15 +96,33 @@ public class IntakeState implements StructSerializable {
         .orElse(rollers);
   }
 
+  public boolean oscillating() {
+    return oscillating;
+  }
+
+  public Angle getMin() {
+    return minPivot;
+  }
+
+  public Angle getMax() {
+    return maxPivot;
+  }
+
   // States
   public static final IntakeState kInit =
       new IntakeState(Degrees.of(90.0), Volts.of(0.0f), "kInit");
   public static final IntakeState kStowed =
-      new IntakeState(Degrees.of(30.0), Volts.of(0.0f), "kStowed");
+      new IntakeState(Degrees.of(90.0), Volts.of(0.0f), "kStowed");
+  public static final IntakeState kBump =
+      new IntakeState(Degrees.of(30.0), Volts.of(0.0f), "kBump");
   public static final IntakeState kIntaking =
       new IntakeState(Degrees.of(0.0), Volts.of(7.0f), "kIntaking");
   public static final IntakeState kReversing =
       new IntakeState(Degrees.of(0.0), Volts.of(-8.0f), "kReversing");
+  public static final IntakeState kOscillating =
+      new IntakeState(Degrees.of(10), Degrees.of(30), "kOscillating");
+  public static final IntakeState kDown =
+      new IntakeState(Degrees.of(0), Volts.of(0f), "kDown");
 
   @SuppressWarnings("unused")
   public static final Struct<IntakeState> struct =

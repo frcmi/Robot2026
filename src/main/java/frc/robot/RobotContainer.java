@@ -75,7 +75,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Controller
-  private final Joysticks controller = new Joysticks(0);
+  private final Joysticks driveController = new Joysticks(0);
+  private final Joysticks operatorController = new Joysticks(1);
   private final Joysticks sysIdcontroller = new Joysticks(4);
 
   // Dashboard inputs
@@ -352,17 +353,20 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftStickY() * 0.75,
-            () -> -controller.getLeftStickX() * 0.75,
-            () -> controller.getRightStickX() * 0.75));
+            () -> driveController.getLeftStickY() * 0.75,
+            () -> -driveController.getLeftStickX() * 0.75,
+            () -> driveController.getRightStickX() * 0.75));
     // Switch to X pattern when X button is pressed
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    /*
     controller.buttonA.onTrue(
         Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
+    */
 
     // Intake controls
+    /*
     controller
         .rightTrigger
         .debounce(0.05)
@@ -376,16 +380,20 @@ public class RobotContainer {
                 transfer.set(TransferState.kTransferring)));
     controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
     controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
-
-    controller.buttonB.onTrue(shooter.toggleDisabled());
+    */
+    operatorController.buttonY.onTrue(intake.set(IntakeState.kStowed));
+    operatorController.buttonX.onTrue(intake.set(IntakeState.kBump));
+    operatorController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
+    operatorController.buttonA.onFalse(intake.set(IntakeState.kDown));
+    operatorController.buttonB.onTrue(shooter.toggleDisabled());
 
     // trench controls
-    controller
+    driveController
         .rightBumper
         .whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
-                    drive, () -> -controller.getLeftStickY() * 0.75, drive::getPose),
+                    drive, () -> -driveController.getLeftStickY() * 0.75, drive::getPose),
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
   }

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.Intake;
 
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
@@ -10,6 +10,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,6 +29,7 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends VirtualSubsystem {
   private final AngularSubsystem rollers;
   private final AngularSubsystem pivot;
+  private Angle oscillatingAngle;
   private Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
   private Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
@@ -51,7 +53,7 @@ public class Intake extends VirtualSubsystem {
 
     pivot.setDefaultCommand(
         pivot.holdAtGoal(
-            () -> isNearBump() ? IntakeState.kStowed.getPivot() : getTargetState().getPivot()));
+            () -> isNearBump() ? IntakeState.kStowed.getPivot() : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
     this.setDefaultCommand(this.set(IntakeState.kStowed));
 
@@ -61,6 +63,11 @@ public class Intake extends VirtualSubsystem {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if (targetState.oscillating()) { // UNTESTED might or might not work
+      if (pivot.getAngle().isNear(targetState.getMin(), 0.05)) oscillatingAngle = targetState.getMax();
+      if (pivot.getAngle().isNear(targetState.getMax(), 0.05)) oscillatingAngle = targetState.getMin();
+    }
+
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 

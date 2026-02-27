@@ -36,13 +36,13 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static PIDController yController =
-      new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+  private static ProfiledPIDController yController =
+      new ProfiledPIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get(), new TrapezoidProfile.Constraints(DriveConstants.TRANSLATION_MAX_VELOCITY, DriveConstants.TRANSLATION_MAX_ACCELERATION));
   private static ProfiledPIDController angleController =
       new ProfiledPIDController(
-          ANGLE_KP,
+          PP_ANGLE_KP.get(),
           0.0,
-          ANGLE_KD,
+          PP_ANGLE_KD.get(),
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
   static {
@@ -162,6 +162,10 @@ public class DriveCommands {
 
     return Commands.run(
             () -> {
+              // update controller constants
+              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+              angleController.setPID(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+
               Pose2d currentPose = robotPoseSupplier.get();
 
               // Get linear velocity
@@ -178,9 +182,6 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(drive.getRotation().getRadians(), targetAngle);
 
-              // update controller constants
-              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
-
               // find closest trench coordinates
               double trenchY = DriveConstants.LEFT_TRENCH_Y;
               if (Math.abs(currentPose.getY() - trenchY)
@@ -189,20 +190,20 @@ public class DriveCommands {
               }
 
               // PID to trench coordinates
-              double yVelocity = -yController.calculate(currentPose.getY(), trenchY);
+              double yVelocity = yController.calculate(currentPose.getY(), trenchY);
 
               Logger.recordOutput("Drive/TrenchDrive/TrenchY", trenchY);
-              Logger.recordOutput("Drive/TrenchDrive/YError", yController.getError());
+              Logger.recordOutput("Drive/TrenchDrive/YError", yController.getPositionError());
 
               // Convert from field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      yVelocity,
-                      omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      (yVelocity + yController.getSetpoint().velocity) * (isFlipped ? -1 : 1),
+                      omega + angleController.getSetpoint().velocity);
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
@@ -216,7 +217,7 @@ public class DriveCommands {
         .beforeStarting(
             () -> {
               angleController.reset(drive.getRotation().getRadians());
-              yController.reset();
+              yController.reset(robotPoseSupplier.get().getY());
             });
   }
 

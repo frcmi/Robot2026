@@ -10,7 +10,6 @@ package frc.robot.commands;
 import static frc.robot.constants.DriveConstants.*;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,7 +36,13 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static ProfiledPIDController yController =
-      new ProfiledPIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get(), new TrapezoidProfile.Constraints(DriveConstants.TRANSLATION_MAX_VELOCITY, DriveConstants.TRANSLATION_MAX_ACCELERATION));
+      new ProfiledPIDController(
+          TRANSLATION_KP.get(),
+          0.0,
+          TRANSLATION_KD.get(),
+          new TrapezoidProfile.Constraints(
+              DriveConstants.TRANSLATION_MAX_VELOCITY,
+              DriveConstants.TRANSLATION_MAX_ACCELERATION));
   private static ProfiledPIDController angleController =
       new ProfiledPIDController(
           PP_ANGLE_KP.get(),

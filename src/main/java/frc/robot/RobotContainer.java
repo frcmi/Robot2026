@@ -145,8 +145,8 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
+                  //   new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation));
-          // new VisionIOLimelight(camera1Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -371,44 +371,44 @@ public class RobotContainer {
 
     // Intake controls
     operatorController.rightTrigger.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDrive(
-                drive,
-                () ->
-                    driverController.getLeftStickY()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getLeftStickX()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getRightStickX()
-                        * DriveConstants.MAX_ROTATION_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
-            transfer.set(TransferState.kTransferring)));
+        // Commands.parallel(
+        //     DriveCommands.joystickDrive(
+        //         drive,
+        //         () ->
+        //             driverController.getLeftStickY()
+        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
+        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
+        //         () ->
+        //             -driverController.getLeftStickX()
+        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
+        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
+        //         () ->
+        //             -driverController.getRightStickX()
+        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
+        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
+        transfer.set(TransferState.kTransferring)); // );
     operatorController
         .rightBumper
         .onTrue(transfer.set(TransferState.kReverse))
         .onFalse(transfer.set(TransferState.kIdle));
 
     operatorController.leftTrigger.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDrive(
-                drive,
-                () ->
-                    driverController.getLeftStickY()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getLeftStickX()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getRightStickX()
-                        * DriveConstants.MAX_ROTATION_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
-            intake.set(IntakeState.kIntaking)));
+        // Commands.parallel(
+        //     DriveCommands.joystickDrive(
+        //         drive,
+        //         () ->
+        //             driverController.getLeftStickY()
+        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
+        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
+        //         () ->
+        //             -driverController.getLeftStickX()
+        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
+        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
+        //         () ->
+        //             -driverController.getRightStickX()
+        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
+        //                 * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
+        intake.set(IntakeState.kIntaking)); // );
     operatorController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
     operatorController.buttonY.whileTrue(intake.set(IntakeState.kInit));
     operatorController.buttonB.whileTrue(intake.set(IntakeState.kStowed));

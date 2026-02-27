@@ -63,6 +63,14 @@ public class Transfer extends VirtualSubsystem {
     return TransferState.kIdle;
   }
 
+  public boolean isAttemptingShooting() {
+    return this.targetState == TransferState.kTransferring;
+  }
+
+  public boolean isShooting() {
+    return (measuredState.getKicker().baseUnitMagnitude() > 0);
+  }
+
   public Command set(TransferState state) {
     return set(() -> state);
   }

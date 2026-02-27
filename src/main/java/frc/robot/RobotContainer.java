@@ -168,6 +168,16 @@ public class RobotContainer {
         }
 
         if (Constants.intakeHardwareExists) {
+          transfer =
+              new Transfer(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
+                      TransferConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
+                      KickerConstants.kSubsystemConfigReal),
+                  shooter.aimed);
+
           AngularIOSim pivotIO =
               new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
           pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
@@ -178,19 +188,11 @@ public class RobotContainer {
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-                  drive::getPose);
-          transfer =
-              new Transfer(
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
-                      TransferConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
-                      KickerConstants.kSubsystemConfigReal),
-                  shooter.aimed);
+                  drive::getPose,
+                  transfer::isAttemptingShooting);
         } else {
-          intake = new Intake(drive::getPose);
           transfer = new Transfer(shooter.aimed);
+          intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         }
 
         if (Constants.climbHardwareExists) {
@@ -220,18 +222,6 @@ public class RobotContainer {
                 // new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        AngularIOSim pivotIO =
-            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
-        intake =
-            new Intake(
-                new AngularSubsystem(
-                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
-                    RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-                drive::getPose);
-
         shooter =
             new Shooter(
                 new AngularSubsystem(
@@ -256,6 +246,19 @@ public class RobotContainer {
                     KickerConstants.kSubsystemConfigSim),
                 shooter.aimed);
 
+        AngularIOSim pivotIO =
+            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
+        intake =
+            new Intake(
+                new AngularSubsystem(
+                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                    RollerConstants.kSubsystemConfigSim),
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                drive::getPose,
+                transfer::isAttemptingShooting);
+
         climb =
             new Climb(
                 new LinearSubsystem(
@@ -265,7 +268,7 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
-                    () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
+                    transfer::isShooting,
                     drive::getPose,
                     drive::getPoseVelocity));
         break;
@@ -281,9 +284,9 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision =
             new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
-        intake = new Intake(drive::getPose);
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         transfer = new Transfer(shooter.aimed);
+        intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         climb = new Climb();
         fuelSim =
             Optional.of(
@@ -388,9 +391,7 @@ public class RobotContainer {
     - Operator right bumper: Reverse transfer (why is this useful?)
      */
     (sim ? driverController : operatorController)
-        .rightTrigger.whileTrue(
-            Commands.parallel(
-                transfer.set(TransferState.kTransferring), intake.set(IntakeState.kTransferring)));
+        .rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     operatorController
         .rightTrigger
         .and(shooter.aimed.negate())

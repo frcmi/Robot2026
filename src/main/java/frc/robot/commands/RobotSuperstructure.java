@@ -5,7 +5,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
@@ -34,10 +33,7 @@ public class RobotSuperstructure {
     NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
 
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
-    new EventTrigger("Shoot").whileTrue(Commands.parallel(
-      transfer.set(TransferState.kTransferring),
-      intake.set(IntakeState.kTransferring)
-    ));
+    new EventTrigger("Shoot").whileTrue(transfer.set(TransferState.kTransferring));
   }
 
   public Command climbRaise() {

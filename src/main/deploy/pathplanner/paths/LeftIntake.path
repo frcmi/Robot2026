@@ -110,7 +110,7 @@
   "folder": "Left Auto",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -51.911227119024744
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

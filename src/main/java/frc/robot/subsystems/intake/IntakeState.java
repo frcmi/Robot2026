@@ -70,6 +70,7 @@ public class IntakeState implements StructSerializable {
   public IntakeState(Angle minPivot, Angle maxPivot, String logKey) {
     this.minPivot = minPivot;
     this.maxPivot = maxPivot;
+    this.pivot = minPivot.plus(maxPivot).div(2);
     this.rollers = Volts.of(0);
     this.type = logKey;
     oscillating = true;

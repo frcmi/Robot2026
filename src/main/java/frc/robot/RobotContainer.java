@@ -7,10 +7,7 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera2Name;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -149,7 +146,8 @@ public class RobotContainer {
                   drive::addVisionMeasurement,
                   new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation),
-                  new VisionIOLimelight(camera2Name, drive::getRotation));
+                  new VisionIOLimelight(camera2Name, drive::getRotation),
+                  new VisionIOLimelight(camera3Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -185,17 +183,14 @@ public class RobotContainer {
                       new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
                       KickerConstants.kSubsystemConfigReal),
                   shooter.aimed);
-
-          AngularIOSim pivotIO =
-              new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-          pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-              PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
           intake =
               new Intake(
                   new AngularSubsystem(
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
+                      PivotConstants.kSubsystemConfigReal),
                   drive::getPose,
                   transfer::isAttemptingShooting);
         } else {
@@ -258,17 +253,14 @@ public class RobotContainer {
                     new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
                     KickerConstants.kSubsystemConfigSim),
                 shooter.aimed);
-
-        AngularIOSim pivotIO =
-            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
         intake =
             new Intake(
                 new AngularSubsystem(
                     new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
                     RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                new AngularSubsystem(
+                    new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim),
+                    PivotConstants.kSubsystemConfigSim),
                 drive::getPose,
                 transfer::isAttemptingShooting);
 
@@ -282,6 +274,7 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
+                    transfer::getMeasuredState,
                     transfer::isShooting,
                     drive::getPose,
                     drive::getPoseVelocity));
@@ -307,6 +300,7 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
+                    transfer::getMeasuredState,
                     () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
                     drive::getPose,
                     drive::getPoseVelocity));

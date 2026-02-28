@@ -7,7 +7,9 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera2Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -145,8 +147,9 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
-                  //   new VisionIOLimelight(camera0Name, drive::getRotation),
-                  new VisionIOLimelight(camera1Name, drive::getRotation));
+                  new VisionIOLimelight(camera0Name, drive::getRotation),
+                  new VisionIOLimelight(camera1Name, drive::getRotation),
+                  new VisionIOLimelight(camera2Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -210,7 +213,7 @@ public class RobotContainer {
           climb = new Climb();
         }
         if (Constants.ledHardwareExists) {
-          led = new CANdleSystem(new CANdleIOReal());
+          led = new CANdleSystem(new CANdleIOReal(), shooter.aimed);
         } else {
           led = new CANdleSystem();
         }
@@ -274,7 +277,7 @@ public class RobotContainer {
                 new LinearSubsystem(
                     new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
                     ClimberConstants.kSubsystemConfigSim));
-        led = new CANdleSystem(new CANdleIOSim());
+        led = new CANdleSystem(new CANdleIOSim(), shooter.aimed);
         fuelSim =
             Optional.of(
                 new FuelSim(

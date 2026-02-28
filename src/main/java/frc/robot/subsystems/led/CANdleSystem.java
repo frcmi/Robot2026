@@ -24,12 +24,7 @@ public class CANdleSystem extends SubsystemBase {
   public CANdleSystem(CANdleIO io, Trigger aimed) {
     this.io = io;
     this.inputs = new CANdleIOInputsAutoLogged();
-    aimed.whileTrue(
-      setToGreen()
-    ).whileFalse(
-      setToRed()
-    );
-
+    aimed.whileTrue(setToGreen()).whileFalse(setToRed());
   }
 
   @Override
@@ -40,7 +35,7 @@ public class CANdleSystem extends SubsystemBase {
   }
 
   private Command setToRed() {
-     return run(
+    return run(
         () -> {
           io.setControl(
               new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
@@ -50,7 +45,7 @@ public class CANdleSystem extends SubsystemBase {
   }
 
   private Command setToGreen() {
-     return run(
+    return run(
         () -> {
           io.setControl(
               new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)

@@ -30,10 +30,7 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    // NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
-    // NamedCommands.registerCommand("Oscillate Intake", intake.set(IntakeState.kOscillating));
 
-    new EventTrigger("Oscillate Intake").onTrue(intake.set(IntakeState.kIntaking));
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
     new EventTrigger("Shoot").whileTrue(transfer.set(TransferState.kTransferring));
   }

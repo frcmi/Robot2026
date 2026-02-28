@@ -30,13 +30,12 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends VirtualSubsystem {
   private final AngularSubsystem rollers;
   private final AngularSubsystem pivot;
-  private Angle oscillatingAngle;
   private final Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
   private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
 
-  @Getter private IntakeState targetState = IntakeState.kDown;
+  @Getter private IntakeState targetState = IntakeState.kStowed;
   @Getter private IntakeState measuredState;
 
   /** Creates a new Intake. */
@@ -58,17 +57,9 @@ public class Intake extends VirtualSubsystem {
     this.robotPose = robotPoseSupplier;
     this.shooting = shooting;
 
-    this.oscillatingAngle =
-        IntakeState.kOscillating.getMax().plus(IntakeState.kOscillating.getMin()).div(2);
-
-    pivot.setDefaultCommand(
-        pivot.holdAtGoal(
-            () ->
-                isNearBump()
-                    ? getStowedPivot()
-                    : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
+    pivot.setDefaultCommand(pivot.holdAtGoal(this::getStowedPivot));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
-    // this.setDefaultCommand(this.set(IntakeState.kStowed));
+    this.setDefaultCommand(this.set(IntakeState.kStowed));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
   }
@@ -85,14 +76,6 @@ public class Intake extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    if (targetState.oscillating()) { // UNTESTED might or might not work
-      if (pivot.getAngle().isNear(targetState.getMin(), 0.05))
-        oscillatingAngle = targetState.getMax();
-      if (pivot.getAngle().isNear(targetState.getMax(), 0.05))
-        oscillatingAngle = targetState.getMin();
-    }
-
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 

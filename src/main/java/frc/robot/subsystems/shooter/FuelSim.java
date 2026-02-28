@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -24,7 +25,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class FuelSim extends VirtualSubsystem {
   private final Supplier<ShooterState> shooterState;
-  private final Supplier<TransferState> transferState;
   private final BooleanSupplier isShooting;
   private final Supplier<Pose2d> robotPose;
   private final Supplier<ChassisSpeeds> robotSpeeds;
@@ -32,26 +32,23 @@ public class FuelSim extends VirtualSubsystem {
   public ArrayList<Pose3d> fuel = new ArrayList<>();
   private ArrayList<Translation3d> fuelVelocities = new ArrayList<>();
   private Timer lastShot = new Timer();
-  private double bps = 0;
 
   // Constants
   LoggedTunableNumber kLaunchHeight =
       new LoggedTunableNumber("FuelSim/LaunchHeightM", Inches.of(22).in(Meters));
   LoggedTunableNumber kHubHeight =
       new LoggedTunableNumber("FuelSim/HubHeightM", Inches.of(65).in(Meters));
-  LoggedTunableNumber kBPSOffset = new LoggedTunableNumber("FuelSim/BPSOffset", 5 / 12);
+  LoggedTunableNumber kBPS = new LoggedTunableNumber("FuelSim/BPS", 5);
   LoggedTunableNumber kGravity = new LoggedTunableNumber("FuelSim/GravityMS^2", -9.81);
   LoggedTunableNumber kExitVelocity =
       new LoggedTunableNumber("FuelSim/ExitVelocityMSPerRadS", 0.035);
 
   public FuelSim(
       Supplier<ShooterState> shooterState,
-      Supplier<TransferState> transferState,
       BooleanSupplier isShooting,
       Supplier<Pose2d> robotPose,
       Supplier<ChassisSpeeds> robotSpeeds) {
     this.shooterState = shooterState;
-    this.transferState = transferState;
     this.robotPose = robotPose;
     this.robotSpeeds = robotSpeeds;
     this.isShooting = isShooting;
@@ -61,7 +58,6 @@ public class FuelSim extends VirtualSubsystem {
   @Override
   public void periodic() {
     Logger.recordOutput("FuelSim/Fuel", fuel.toArray(new Pose3d[0]));
-    bps = transferState.get().getKicker().baseUnitMagnitude() * kBPSOffset.get();
 
     // Update all existing fuel
     for (int i = 0; i < fuel.size(); i++) {
@@ -90,7 +86,7 @@ public class FuelSim extends VirtualSubsystem {
     }
 
     // Add new fuel if shooting
-    if (isShooting.getAsBoolean() && lastShot.hasElapsed(1 / bps)) {
+    if (isShooting.getAsBoolean() && lastShot.hasElapsed(1 / kBPS.get())) {
       lastShot.restart();
 
       Pose2d rPose = robotPose.get();

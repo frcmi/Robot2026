@@ -22,7 +22,6 @@ public class IntakeState implements StructSerializable {
   @Setter private Angle minPivot;
   @Setter private Angle maxPivot;
   @Setter private Voltage rollers;
-  private boolean oscillating;
   private final String type;
 
   private final Optional<LoggedTunableNumber> pivotTunable;
@@ -31,7 +30,6 @@ public class IntakeState implements StructSerializable {
   public IntakeState(Angle pivot, Voltage rollers) {
     this.pivot = pivot;
     this.rollers = rollers;
-    oscillating = false;
 
     pivotTunable = Optional.empty();
     rollerVoltageTunable = Optional.empty();
@@ -43,7 +41,6 @@ public class IntakeState implements StructSerializable {
     this.minPivot = minPivot;
     this.maxPivot = maxPivot;
     this.rollers = Volts.of(0);
-    oscillating = true;
 
     pivotTunable = Optional.empty();
     rollerVoltageTunable = Optional.empty();
@@ -55,7 +52,6 @@ public class IntakeState implements StructSerializable {
     this.pivot = pivot;
     this.rollers = rollers;
     this.type = logKey;
-    oscillating = false;
 
     pivotTunable =
         Optional.of(
@@ -73,7 +69,6 @@ public class IntakeState implements StructSerializable {
     this.pivot = minPivot.plus(maxPivot).div(2);
     this.rollers = Volts.of(0);
     this.type = logKey;
-    oscillating = true;
 
     pivotTunable =
         Optional.of(
@@ -97,10 +92,6 @@ public class IntakeState implements StructSerializable {
         .orElse(rollers);
   }
 
-  public boolean oscillating() {
-    return oscillating;
-  }
-
   public Angle getMin() {
     return minPivot;
   }
@@ -120,9 +111,6 @@ public class IntakeState implements StructSerializable {
       new IntakeState(Degrees.of(0.0), Volts.of(5.0f), "kIntaking");
   public static final IntakeState kReversing =
       new IntakeState(Degrees.of(0.0), Volts.of(-8.0f), "kReversing");
-  public static final IntakeState kOscillating =
-      new IntakeState(Degrees.of(10), Degrees.of(30), "kOscillating");
-  public static final IntakeState kDown = new IntakeState(Degrees.of(0), Volts.of(0f), "kDown");
 
   @SuppressWarnings("unused")
   public static final Struct<IntakeState> struct =

@@ -272,7 +272,6 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
-                    transfer::getMeasuredState,
                     transfer::isShooting,
                     drive::getPose,
                     drive::getPoseVelocity));
@@ -298,8 +297,7 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
-                    transfer::getMeasuredState,
-                    () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
+                    transfer::isShooting,
                     drive::getPose,
                     drive::getPoseVelocity));
         break;
@@ -376,6 +374,16 @@ public class RobotContainer {
     if (!sim) {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }
+    driverController.rightBumper.whileTrue(
+        Commands.parallel(
+            DriveCommands.joystickDriveThroughTrench(
+                drive,
+                () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+                drive::getPose)));
+    // TODO: fix stall whistle when this runs
+    // ,
+    // superstructure.lockHoodDown()))
+    // .whileFalse(superstructure.unlockHood());
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
@@ -401,19 +409,19 @@ public class RobotContainer {
      - Operator DPad right: Disable shooter
      - Operator DPad Left: Moves hood down when held, release to zero hood
      - Operator DPad Down: Moves climb down when held, release to zero climb
+     - Operator DPad Up: Zero intake pivot (doesn't actually lift it)
     */
-    // TODO: lock turret control
+    // TODO: lock turret control (Operator A), needed for the intake init stow
     // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
-    // operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    operatorController.dPadRight.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
-    // TODO: fix this, it overlaps with intake zeroing and climber currently doesnt actually exist
-    // operatorController
-    //     .dPadDown
-    //     .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
-    //     .onFalse(climb.resetClimb());
+    operatorController
+        .dPadDown
+        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
+        .onFalse(climb.resetClimb());
 
     // Intake controls
     operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
@@ -421,21 +429,7 @@ public class RobotContainer {
         .rightBumper
         .onTrue(transfer.set(TransferState.kReverse))
         .onFalse(transfer.set(TransferState.kIdle));
-
-    operatorController.dPadDown.onTrue(intake.zeroPivot());
-    operatorController.dPadUp.onTrue(shooter.toggleDisabled());
-
-    // trench controls
-    driverController.rightBumper.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDriveThroughTrench(
-                drive,
-                () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
-                drive::getPose)));
-    // TODO: fix stall whistle when this runs
-    // ,
-    // superstructure.lockHoodDown()))
-    // .whileFalse(superstructure.unlockHood());
+    operatorController.dPadUp.onTrue(intake.zeroPivot());
 
     /* INTAKE CONTROLS
     - Driver left trigger: Intake
@@ -443,12 +437,6 @@ public class RobotContainer {
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-
-    // TODO: fix, goes past hard stop
-    // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
-    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
-    driverController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
-    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
   }
 
   private void logInit() {

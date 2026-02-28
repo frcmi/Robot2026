@@ -48,7 +48,9 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
           new double[][] {
-            {1.6, 0.72},
-            {3.184, 1.07},
+            {2, 0.95},
+            {3, 1.0},
+            {4, 1.1},
+            {5.0, 1.15},
           });
 }

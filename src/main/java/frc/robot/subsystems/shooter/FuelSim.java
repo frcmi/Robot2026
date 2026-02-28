@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -17,7 +16,6 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.VirtualSubsystem;
-import frc.robot.subsystems.transfer.TransferState;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;

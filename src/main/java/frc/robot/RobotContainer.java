@@ -482,6 +482,12 @@ public class RobotContainer {
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
 
+    driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
+    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
+    driverController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
+    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
+    driverController.buttonB.onTrue(shooter.toggleDisabled());
+
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
@@ -509,8 +515,8 @@ public class RobotContainer {
      - Operator DPad Down: Moves climb down when held, release to zero climb
     */
     // TODO: lock turret control
-    operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
-    operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    //operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
+    //operatorController.dPadRight.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public class PivotConstants {
   public static final Distance PivotLength = Inches.of(14.9);
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
-      () -> Rotation2d.kZero;
+      () -> Rotation2d.fromRotations(0.165);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
@@ -46,7 +46,7 @@ public class PivotConstants {
           .followerId(33)
           .opposeMaster(true)
           .bus(kRioBus)
-          .resetAngle(IntakeState.kInit.getPivot())
+          .resetAngle(IntakeState.kIntaking.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kInit.getPivot())
           .motorRotationsPerOutputRotations(5.0 * 5.0) // The reductions on the intake

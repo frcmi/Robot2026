@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 1.9209999999999998,
-        "y": 5.333659090909091
+        "x": 1.829663137632339,
+        "y": 5.431953801732435
       },
       "prevControl": {
-        "x": 2.0573637779286944,
-        "y": 6.630124436119598
+        "x": 1.9660269155610335,
+        "y": 6.728419146942942
       },
       "nextControl": null,
       "isLocked": false,
@@ -108,6 +108,12 @@
       "waypointRelativePos": 0,
       "endWaypointRelativePos": 1.4444444444444444,
       "command": null
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 4.0,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -120,7 +126,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 165.9637565320735
   },
   "reversed": false,
   "folder": "Left Auto",

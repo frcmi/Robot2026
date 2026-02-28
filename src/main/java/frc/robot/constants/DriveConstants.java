@@ -24,8 +24,8 @@ public class DriveConstants {
   public static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   public static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  public static final double RIGHT_TRENCH_Y = 0.625 - 0.1;
-  public static final double LEFT_TRENCH_Y = 7.425 + 0.1;
+  public static final double RIGHT_TRENCH_Y = 0.625;
+  public static final double LEFT_TRENCH_Y = 7.425;
 
   // DT speed config
   public static final double MAX_SPEED = 1.0;

@@ -10,14 +10,13 @@ package frc.robot.commands;
 import static frc.robot.constants.DriveConstants.*;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -35,20 +34,15 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static ProfiledPIDController yController =
-      new ProfiledPIDController(
-          TRANSLATION_KP.get(),
-          0.0,
-          TRANSLATION_KD.get(),
-          new TrapezoidProfile.Constraints(
-              DriveConstants.TRANSLATION_MAX_VELOCITY,
-              DriveConstants.TRANSLATION_MAX_ACCELERATION));
-  private static ProfiledPIDController angleController =
-      new ProfiledPIDController(
-          PP_ANGLE_KP.get(),
-          0.0,
-          PP_ANGLE_KD.get(),
-          new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+  private static PIDController yController =
+      new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+  // new TrapezoidProfile.Constraints(
+  //     DriveConstants.TRANSLATION_MAX_VELOCITY,
+  //     DriveConstants.TRANSLATION_MAX_ACCELERATION));
+  private static PIDController angleController =
+      new PIDController(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+
+  // new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
   static {
     angleController.enableContinuousInput(-Math.PI, Math.PI);
@@ -150,7 +144,7 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> angleController.reset()); // drive.getRotation().getRadians()));
   }
 
   /**
@@ -185,7 +179,11 @@ public class DriveCommands {
 
               // Calculate angular speed
               double omega =
-                  angleController.calculate(drive.getRotation().getRadians(), targetAngle);
+                  angleController.calculate(
+                      MathUtil.angleModulus(drive.getRotation().getRadians()), targetAngle);
+              if (Math.abs(angleController.getError()) < 5 / 180 * Math.PI) {
+                omega = 0;
+              }
 
               // find closest trench coordinates
               double trenchY = DriveConstants.LEFT_TRENCH_Y;
@@ -197,6 +195,12 @@ public class DriveCommands {
               // PID to trench coordinates
               double yVelocity = yController.calculate(currentPose.getY(), trenchY);
 
+              if (Math.abs(yController.getError()) < 0.1) {
+                yVelocity = 0;
+              }
+
+              yVelocity = Math.signum(yVelocity) * Math.min(Math.abs(yVelocity), 1);
+
               Logger.recordOutput("Drive/TrenchDrive/TrenchY", trenchY);
               Logger.recordOutput("Drive/TrenchDrive/YError", yController.getPositionError());
 
@@ -207,8 +211,8 @@ public class DriveCommands {
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      (yVelocity + yController.getSetpoint().velocity) * (isFlipped ? -1 : 1),
-                      omega + angleController.getSetpoint().velocity);
+                      (yVelocity) * (isFlipped ? -1 : 1),
+                      omega); // + angleController.getSetpoint().velocity);
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
@@ -221,8 +225,11 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(
             () -> {
-              angleController.reset(drive.getRotation().getRadians());
-              yController.reset(robotPoseSupplier.get().getY());
+              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+              angleController.setPID(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+
+              angleController.reset(); // drive.getRotation().getRadians());
+              yController.reset(); // (robotPoseSupplier.get().getY());
             });
   }
 

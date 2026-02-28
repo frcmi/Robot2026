@@ -96,6 +96,13 @@ public class Intake extends VirtualSubsystem {
     return Commands.run(() -> this.targetState = state.get(), this);
   }
 
+  public Command zeroPivot() {
+    return run(
+        () -> {
+          pivot.resetAngle();
+        });
+  }
+
   private boolean isNearBump() {
     Pose2d currentPose = this.robotPose.get();
     Translation2d hubPosition =

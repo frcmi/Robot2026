@@ -35,10 +35,6 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
           new double[][] {
-            {0, 0},
-            {0.9, 0.1},
-            {1, 24},
-            {1.5, 25},
             {2, 26},
             {2.5, 26},
             {3, 30},

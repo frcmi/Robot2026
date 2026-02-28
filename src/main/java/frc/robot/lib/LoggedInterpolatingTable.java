@@ -259,6 +259,38 @@ public class LoggedInterpolatingTable {
   }
 
   /**
+   * Get the minimum key (input) in the lookup table.
+   *
+   * @return minimum key value, or 0.0 if the table is not initialized or empty
+   */
+  public double getMinKey() {
+    if (!hasDefault) {
+      return 0.0;
+    }
+    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    if (table.isEmpty()) {
+      return 0.0;
+    }
+    return table.firstKey();
+  }
+
+  /**
+   * Get the maximum key (input) in the lookup table.
+   *
+   * @return maximum key value, or 0.0 if the table is not initialized or empty
+   */
+  public double getMaxKey() {
+    if (!hasDefault) {
+      return 0.0;
+    }
+    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    if (table.isEmpty()) {
+      return 0.0;
+    }
+    return table.lastKey();
+  }
+
+  /**
    * Get the number of entries in the table
    *
    * @return Number of entries

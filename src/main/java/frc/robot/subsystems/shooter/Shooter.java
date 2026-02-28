@@ -243,17 +243,20 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double flywheelErr =
         measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
     double maxHoodErr = HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
+    boolean shooterDistInRange = targetDist > AimingConstants.kFlywheelSpeedTable.getMinKey();
     if (inAllianceZone.getAsBoolean()) {
       return errorAtTarget < (FieldConstants.hubWidth)
           && hoodErr < maxHoodErr
-          && flywheel.isAtAngle();
+          && flywheel.isAtAngle()
+          && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
       return errorAtTarget < (FieldConstants.bumpWidth)
           && hoodErr < maxHoodErr * 1.8
           && flywheelErr
               < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
-                  * 1.8;
+                  * 1.8
+          && shooterDistInRange;
     }
   }
 }

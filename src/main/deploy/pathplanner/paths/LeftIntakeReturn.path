@@ -48,21 +48,41 @@
     },
     {
       "anchor": {
-        "x": 3.5257680121527786,
+        "x": 3.353647727272727,
         "y": 7.425
       },
       "prevControl": {
-        "x": 3.922983638113571,
-        "y": 7.35629658230626
+        "x": 3.7564677929857293,
+        "y": 7.440375557524789
+      },
+      "nextControl": {
+        "x": 2.838306818181818,
+        "y": 7.405329545454546
+      },
+      "isLocked": false,
+      "linkedName": "LeftIntakeStart"
+    },
+    {
+      "anchor": {
+        "x": 1.9209999999999998,
+        "y": 5.333659090909091
+      },
+      "prevControl": {
+        "x": 2.0573637779286944,
+        "y": 6.630124436119598
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftIntakeStart"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 2.1475155279503078,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 3,
       "rotationDegrees": 0.0
     }
   ],
@@ -100,7 +120,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Left Auto",

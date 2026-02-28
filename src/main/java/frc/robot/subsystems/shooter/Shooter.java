@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -138,18 +139,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     targetDist = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
-    // for (int i = 0; i < 5; i++) {
-    //   double airtime = AimingConstants.kAirtimeTable.get(targetDist);
-    //   dx =
-    //       targetPosition.getX()
-    //           - (currentPose.getX() + turretOffset.getX())
-    //           - robotVelocity.vxMetersPerSecond * airtime;
-    //   dy =
-    //       targetPosition.getY()
-    //           - (currentPose.getY() + turretOffset.getY())
-    //           - robotVelocity.vyMetersPerSecond * airtime;
-    //   targetDist = Math.hypot(dx, dy);
-    // }
+    for (int i = 0; i < 5; i++) {
+      double airtime = AimingConstants.kAirtimeTable.get(targetDist);
+      dx =
+          targetPosition.getX()
+              - (currentPose.getX() + turretOffset.getX())
+              - robotVelocity.vxMetersPerSecond * airtime;
+      dy =
+          targetPosition.getY()
+              - (currentPose.getY() + turretOffset.getY())
+              - robotVelocity.vyMetersPerSecond * airtime;
+      targetDist = Math.hypot(dx, dy);
+    }
 
     Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
 
@@ -188,8 +189,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
   }
 
-  public Command moveHood(double volts) {
-    return this.hood.openLoop(() -> Volts.of(volts));
+  public Command overrideHood(Voltage volts) {
+    return this.hood.openLoop(() -> volts);
   }
 
   public Command zeroHood() {
@@ -241,11 +242,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
     double flywheelErr =
         measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
+    double maxHoodErr = HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
     if (inAllianceZone.getAsBoolean()) {
-      return errorAtTarget < (FieldConstants.hubWidth) && hood.isAtAngle() && flywheel.isAtAngle();
+      return errorAtTarget < (FieldConstants.hubWidth)
+          && hoodErr < maxHoodErr
+          && flywheel.isAtAngle();
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return errorAtTarget < (FieldConstants.bumpWidth) && hoodErr < 5.0 && flywheelErr < 2.0;
+      return errorAtTarget < (FieldConstants.bumpWidth)
+          && hoodErr < maxHoodErr * 1.8
+          && flywheelErr
+              < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
+                  * 1.8;
     }
   }
 }

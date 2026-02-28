@@ -11,13 +11,10 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
-import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
@@ -50,7 +46,6 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -145,8 +140,8 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
+                  //   new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation));
-          // new VisionIOLimelight(camera1Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -173,6 +168,16 @@ public class RobotContainer {
         }
 
         if (Constants.intakeHardwareExists) {
+          transfer =
+              new Transfer(
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
+                      TransferConstants.kSubsystemConfigReal),
+                  new AngularSubsystem(
+                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
+                      KickerConstants.kSubsystemConfigReal),
+                  shooter.aimed);
+
           AngularIOSim pivotIO =
               new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
           pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
@@ -183,19 +188,11 @@ public class RobotContainer {
                       new AngularIOTalonFX(RollerConstants.kTalonFXConfig),
                       RollerConstants.kSubsystemConfigReal),
                   new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-                  drive::getPose);
-          transfer =
-              new Transfer(
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(TransferConstants.kTalonFXConfig),
-                      TransferConstants.kSubsystemConfigReal),
-                  new AngularSubsystem(
-                      new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
-                      KickerConstants.kSubsystemConfigReal),
-                  shooter.aimed);
+                  drive::getPose,
+                  transfer::isAttemptingShooting);
         } else {
-          intake = new Intake(drive::getPose);
           transfer = new Transfer(shooter.aimed);
+          intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         }
 
         if (Constants.climbHardwareExists) {
@@ -225,18 +222,6 @@ public class RobotContainer {
                 // new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        AngularIOSim pivotIO =
-            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
-        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
-            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
-        intake =
-            new Intake(
-                new AngularSubsystem(
-                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
-                    RollerConstants.kSubsystemConfigSim),
-                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
-                drive::getPose);
-
         shooter =
             new Shooter(
                 new AngularSubsystem(
@@ -261,6 +246,19 @@ public class RobotContainer {
                     KickerConstants.kSubsystemConfigSim),
                 shooter.aimed);
 
+        AngularIOSim pivotIO =
+            new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim);
+        pivotIO.setRealAngleFromSubsystemAngleZeroSupplier(
+            PivotConstants.kRealAngleFromSubsystemAngleZeroSupplier);
+        intake =
+            new Intake(
+                new AngularSubsystem(
+                    new AngularIOSim(RollerConstants.kSimConfig, currentDrawCalculatorSim),
+                    RollerConstants.kSubsystemConfigSim),
+                new AngularSubsystem(pivotIO, PivotConstants.kSubsystemConfigReal),
+                drive::getPose,
+                transfer::isAttemptingShooting);
+
         climb =
             new Climb(
                 new LinearSubsystem(
@@ -270,7 +268,7 @@ public class RobotContainer {
             Optional.of(
                 new FuelSim(
                     shooter::getMeasuredState,
-                    () -> (transfer.getMeasuredState().getKicker().baseUnitMagnitude() > 0),
+                    transfer::isShooting,
                     drive::getPose,
                     drive::getPoseVelocity));
         break;
@@ -286,9 +284,9 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision =
             new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
-        intake = new Intake(drive::getPose);
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         transfer = new Transfer(shooter.aimed);
+        intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         climb = new Climb();
         fuelSim =
             Optional.of(
@@ -342,8 +340,6 @@ public class RobotContainer {
 
     logInit();
 
-    configureNamedComands();
-
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -355,97 +351,84 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
+    boolean sim = Constants.currentMode == Constants.simMode;
+
+    /* DRIVE COMMANDS
+    - Left joystick: drive
+    - Right joystick: turn
+    - Hold X (real only): stop and move modules to X pattern to resist push (won't be able to drive while doing this)
+    - Hold right bumper: Dynamically align heading & x position with trench, you just control forward/backward speed
+     */
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
-            () -> -driverController.getLeftStickX() * DriveConstants.MAX_SPEED_MULTIPLIER,
-            () -> -driverController.getRightStickX() * DriveConstants.MAX_ROTATION_MULTIPLIER));
-    // Switch to X pattern when X button is pressed
-    // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    
-    driverController.buttonA.onTrue(
-        Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
-    
-
-    // Intake controls
-    
-    operatorController.rightTrigger.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDrive(
-                drive,
-                () ->
-                    driverController.getLeftStickY()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getLeftStickX()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getRightStickX()
-                        * DriveConstants.MAX_ROTATION_MULTIPLIER
-                        * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
-            transfer.set(TransferState.kTransferring)));
-    
-    operatorController
-        .rightBumper
-        .onTrue(transfer.set(TransferState.kReverse))
-        .onFalse(transfer.set(TransferState.kIdle));
-    
-    operatorController.leftTrigger.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDrive(
-                drive,
-                () ->
-                    driverController.getLeftStickY()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getLeftStickX()
-                        * DriveConstants.MAX_SPEED_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-                () ->
-                    -driverController.getRightStickX()
-                        * DriveConstants.MAX_ROTATION_MULTIPLIER
-                        * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
-            intake.set(IntakeState.kIntaking)));
-    
-    operatorController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-
-    operatorController.buttonY.onTrue(intake.set(IntakeState.kStowed));
-    operatorController.buttonX.onTrue(intake.set(IntakeState.kBump));
-    operatorController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
-    operatorController.buttonA.onFalse(intake.set(IntakeState.kDown));
-    operatorController.buttonB.onTrue(shooter.toggleDisabled());
-
-    // zero hood (in-match)
-    operatorController.dPadDown.whileTrue(shooter.moveHood(-2.0)).onFalse(shooter.zeroHood());
-
-    // update pathplanner (TEMP, DELETE LATER)
-    driverController.buttonB.onTrue(Commands.runOnce(() -> drive.updatePathplannerPIDConstants()));
-
-    // trench controls
+            () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+            () -> -driverController.getLeftStickX() * superstructure.getDriveSpeed(false),
+            () -> -driverController.getRightStickX() * superstructure.getDriveSpeed(true)));
+    if (!sim) {
+      driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
+    }
     driverController
         .rightBumper
         .whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
                     drive,
-                    () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
+                    () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
                     drive::getPose),
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
 
-    driverController.buttonX.onTrue(
-        Commands.either(
-            superstructure.climbClimbed(),
-            superstructure.climbRaise(),
-            () -> climb.getTargetState().equals(ClimbState.kRaised)));
-    driverController.buttonY.onTrue(climb.set(ClimbState.kStowed));
+    /* INTAKE CONTROLS
+    - Driver left trigger: Intake
+    - Driver left bumper: Reverse intake
+     */
+    driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
+    driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+
+    driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
+    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
+    driverController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
+    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
+    driverController.buttonB.onTrue(shooter.toggleDisabled());
+
+    /* SHOOTER CONTROLS
+    - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
+    - Operator right bumper: Reverse transfer (why is this useful?)
+     */
+    (sim ? driverController : operatorController)
+        .rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
+    operatorController
+        .rightTrigger
+        .and(shooter.aimed.negate())
+        .onTrue(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0)))
+        .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
+    operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
+
+    /* CLIMBER CONTROLS
+    - Operator Y (sim driver): Raise climb
+    - Operator X (sim driver): Lower climb
+     */
+    (sim ? driverController : operatorController).buttonY.onTrue(superstructure.climbRaise());
+    (sim ? driverController : operatorController).buttonX.onTrue(superstructure.climbClimbed());
+
+    /* DEBUG/FAILSAFE CONTROLS:
+     - Operator B (HOLD): Stow intake
+     - Operator DPad right: Disable shooter
+     - Operator DPad Left: Moves hood down when held, release to zero hood
+     - Operator DPad Down: Moves climb down when held, release to zero climb
+    */
+    // TODO: lock turret control
+    //operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
+    //operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    operatorController
+        .dPadLeft
+        .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
+        .onFalse(shooter.zeroHood());
+    operatorController
+        .dPadDown
+        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
+        .onFalse(climb.resetClimb());
   }
 
   private void logInit() {
@@ -459,16 +442,9 @@ public class RobotContainer {
     Logger.recordOutput(
         "Poses/AndyMarkAprilTagField",
         VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
-  }
 
-  private void configureNamedComands() {
-    // TODO: make this allow other actions after
-    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
-
-    // intake in intake zones
-    new EventTrigger("Intake")
-        .onTrue(intake.set(IntakeState.kIntaking))
-        .onFalse(intake.set(IntakeState.kStowed));
+    Logger.recordOutput("Drive/TrenchDrive/TrenchY", 0);
+    Logger.recordOutput("Drive/TrenchDrive/YError", 0);
   }
 
   /**

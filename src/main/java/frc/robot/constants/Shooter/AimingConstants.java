@@ -45,7 +45,7 @@ public class AimingConstants {
             {3.75, 34},
             {4.5, 41}
           });
-  
+
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",

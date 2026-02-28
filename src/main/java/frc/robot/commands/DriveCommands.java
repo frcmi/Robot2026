@@ -10,7 +10,6 @@ package frc.robot.commands;
 import static frc.robot.constants.DriveConstants.*;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -36,6 +35,24 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
+  private static ProfiledPIDController yController =
+      new ProfiledPIDController(
+          TRANSLATION_KP.get(),
+          0.0,
+          TRANSLATION_KD.get(),
+          new TrapezoidProfile.Constraints(
+              DriveConstants.TRANSLATION_MAX_VELOCITY,
+              DriveConstants.TRANSLATION_MAX_ACCELERATION));
+  private static ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          PP_ANGLE_KP.get(),
+          0.0,
+          PP_ANGLE_KD.get(),
+          new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+
+  static {
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   public DriveCommands() {}
 
@@ -44,8 +61,8 @@ public class DriveCommands {
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
-    // Square magnitude for more precise control
-    linearMagnitude = linearMagnitude * linearMagnitude;
+    // Cube magnitude for more precise control
+    linearMagnitude = Math.pow(linearMagnitude, 3);
 
     // Return new linear velocity
     return new Pose2d(Translation2d.kZero, linearDirection)
@@ -102,16 +119,6 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
     // Construct command
     return Commands.run(
             () -> {
@@ -155,22 +162,15 @@ public class DriveCommands {
    */
   public static Command joystickDriveThroughTrench(
       Drive drive, DoubleSupplier xSupplier, Supplier<Pose2d> robotPoseSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
     // Holonomic PID controller
     // TODO: if this doesn't work change it to profiled
-    PIDController yController = new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
 
     return Commands.run(
             () -> {
+              // update controller constants
+              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+              angleController.setPID(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+
               Pose2d currentPose = robotPoseSupplier.get();
 
               // Get linear velocity
@@ -180,15 +180,12 @@ public class DriveCommands {
               // snap to closest 180
               double targetAngle = 0.0;
               if (Math.abs(currentPose.getRotation().getDegrees()) > 90) {
-                targetAngle = 180.0;
+                targetAngle = Math.PI;
               }
 
               // Calculate angular speed
               double omega =
                   angleController.calculate(drive.getRotation().getRadians(), targetAngle);
-
-              // update controller constants
-              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
 
               // find closest trench coordinates
               double trenchY = DriveConstants.LEFT_TRENCH_Y;
@@ -198,20 +195,20 @@ public class DriveCommands {
               }
 
               // PID to trench coordinates
-              double yVelocity = -yController.calculate(currentPose.getY(), trenchY);
+              double yVelocity = yController.calculate(currentPose.getY(), trenchY);
 
-              Logger.recordOutput("Drive/TrenchY", trenchY);
-              Logger.recordOutput("Drive/YError", yController.getPositionError());
+              Logger.recordOutput("Drive/TrenchDrive/TrenchY", trenchY);
+              Logger.recordOutput("Drive/TrenchDrive/YError", yController.getPositionError());
 
               // Convert from field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      yVelocity,
-                      omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      (yVelocity + yController.getSetpoint().velocity) * (isFlipped ? -1 : 1),
+                      omega + angleController.getSetpoint().velocity);
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
@@ -225,7 +222,7 @@ public class DriveCommands {
         .beforeStarting(
             () -> {
               angleController.reset(drive.getRotation().getRadians());
-              yController.reset();
+              yController.reset(robotPoseSupplier.get().getY());
             });
   }
 

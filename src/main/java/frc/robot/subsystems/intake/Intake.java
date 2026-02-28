@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
@@ -22,6 +22,7 @@ import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -30,34 +31,50 @@ public class Intake extends VirtualSubsystem {
   private final AngularSubsystem rollers;
   private final AngularSubsystem pivot;
   private Angle oscillatingAngle;
-  private Supplier<Pose2d> robotPose;
+  private final Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
-  private Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
+  private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
+  private final BooleanSupplier shooting;
 
   @Getter private IntakeState targetState = IntakeState.kStowed;
   @Getter private IntakeState measuredState;
 
   /** Creates a new Intake. */
-  public Intake(Supplier<Pose2d> robotPose) {
+  public Intake(Supplier<Pose2d> robotPose, BooleanSupplier shooting) {
     this(
         new AngularSubsystem(new AngularIO() {}, RollerConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, PivotConstants.kSubsystemConfigReal),
-        robotPose);
+        robotPose,
+        shooting);
   }
 
   public Intake(
-      AngularSubsystem rollers, AngularSubsystem pivot, Supplier<Pose2d> robotPoseSupplier) {
+      AngularSubsystem rollers,
+      AngularSubsystem pivot,
+      Supplier<Pose2d> robotPoseSupplier,
+      BooleanSupplier shooting) {
     this.rollers = rollers;
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
+    this.shooting = shooting;
 
     pivot.setDefaultCommand(
         pivot.holdAtGoal(
-            () -> isNearBump() ? IntakeState.kStowed.getPivot() : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
+            () -> isNearBump() ? getStowedPivot() : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
-    this.setDefaultCommand(this.set(IntakeState.kStowed));
+    //this.setDefaultCommand(this.set(IntakeState.kStowed));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
+  }
+
+  private Angle getStowedPivot() {
+    if (nearBump.getAsBoolean()) {
+      return IntakeState.kStowed.getPivot();
+    }
+    if (shooting.getAsBoolean() && this.targetState == IntakeState.kStowed) {
+      return IntakeState.kTransferring.getPivot();
+    }
+    return targetState.getPivot();
   }
 
   @Override

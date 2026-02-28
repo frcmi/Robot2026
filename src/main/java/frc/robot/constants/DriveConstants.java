@@ -12,26 +12,28 @@ public class DriveConstants {
   public static LoggedTunableNumber PP_ANGLE_KP = new LoggedTunableNumber("Drive/PPAngleKp", 5.0);
   public static LoggedTunableNumber PP_ANGLE_KD = new LoggedTunableNumber("Drive/PPAngleKd", 0.4);
 
-  public static final double DEADBAND = 0.1;
+  public static final double DEADBAND = 0.05;
 
-  // p gain for the drive angle controller
-  public static final double ANGLE_KP = 5.0;
-  public static final double ANGLE_KD = 0.4;
-  public static final double ANGLE_MAX_VELOCITY = 8.0;
-  public static final double ANGLE_MAX_ACCELERATION = 20.0;
+  // p gain for the drive angle controller;
+  public static final double ANGLE_MAX_VELOCITY = 8.0; // Rad per sec
+  public static final double ANGLE_MAX_ACCELERATION = 20.0; // Rad per sec^2
+  public static final double TRANSLATION_MAX_VELOCITY = 3.0; // Meters per sec
+  public static final double TRANSLATION_MAX_ACCELERATION = 5.0; // Meters per sec^2
   public static final double FF_START_DELAY = 2.0; // Secs
   public static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   public static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   public static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  public static final double RIGHT_TRENCH_Y = 0.625;
-  public static final double LEFT_TRENCH_Y = 7.425;
+  public static final double RIGHT_TRENCH_Y = 0.625 - 0.1;
+  public static final double LEFT_TRENCH_Y = 7.425 + 0.1;
 
-  public static final double MAX_SPEED_MULTIPLIER = 0.75;
-  public static final double MAX_ROTATION_MULTIPLIER = 0.75;
+  // DT speed config
+  public static final double MAX_SPEED = 1.0;
+  public static final double MAX_SPEED_W = 1.0;
 
-  public static final double INTAKING_DRIVETRAIN_SPEED_MULTIPLIER = 0.5;
-  public static final double INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER = 1.0;
-  public static final double TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER = 0.5;
-  public static final double TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER = 1.0;
+  public static final double INTAKE_MULT = 1.0;
+  public static final double INTAKE_MULT_W = 1.0;
+
+  public static final double TRANSFER_MULT = 0.6;
+  public static final double TRANSFER_MULT_W = 0.6;
 }

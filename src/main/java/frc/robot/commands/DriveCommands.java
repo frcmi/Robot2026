@@ -35,12 +35,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static PIDController yController =
-      new PIDController(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
+      new PIDController(TRENCH_TRANSLATION_KP.get(), 0.0, TRENCH_TRANSLATION_KD.get());
   // new TrapezoidProfile.Constraints(
   //     DriveConstants.TRANSLATION_MAX_VELOCITY,
   //     DriveConstants.TRANSLATION_MAX_ACCELERATION));
   private static PIDController angleController =
-      new PIDController(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+      new PIDController(TRENCH_ANGLE_KP.get(), 0.0, TRENCH_ANGLE_KD.get());
 
   // new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
@@ -160,8 +160,8 @@ public class DriveCommands {
     return Commands.run(
             () -> {
               // update controller constants
-              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
-              angleController.setPID(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+              yController.setPID(TRENCH_TRANSLATION_KP.get(), 0.0, TRENCH_TRANSLATION_KD.get());
+              angleController.setPID(TRENCH_ANGLE_KP.get(), 0.0, TRENCH_ANGLE_KD.get());
 
               Pose2d currentPose = robotPoseSupplier.get();
 
@@ -224,8 +224,8 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(
             () -> {
-              yController.setPID(TRANSLATION_KP.get(), 0.0, TRANSLATION_KD.get());
-              angleController.setPID(PP_ANGLE_KP.get(), 0.0, PP_ANGLE_KD.get());
+              yController.setPID(TRENCH_TRANSLATION_KP.get(), 0.0, TRENCH_TRANSLATION_KD.get());
+              angleController.setPID(TRENCH_ANGLE_KP.get(), 0.0, TRENCH_ANGLE_KD.get());
 
               angleController.reset(); // drive.getRotation().getRadians());
               yController.reset(); // (robotPoseSupplier.get().getY());

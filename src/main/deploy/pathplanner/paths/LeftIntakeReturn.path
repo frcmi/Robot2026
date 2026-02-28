@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 1.829663137632339,
-        "y": 5.431953801732435
+        "x": 2.066005774783446,
+        "y": 4.908623676612126
       },
       "prevControl": {
-        "x": 1.9660269155610335,
-        "y": 6.728419146942942
+        "x": 2.2023695527121405,
+        "y": 6.205089021822633
       },
       "nextControl": null,
       "isLocked": false,
@@ -104,9 +104,9 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": 1.4444444444444444,
+      "name": "Oscillate Intake",
+      "waypointRelativePos": 3.810699588477369,
+      "endWaypointRelativePos": null,
       "command": null
     },
     {
@@ -126,7 +126,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 165.9637565320735
+    "rotation": -179.0122396003603
   },
   "reversed": false,
   "folder": "Left Auto",

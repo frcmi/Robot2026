@@ -65,7 +65,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -79,7 +78,6 @@ public class RobotContainer {
   // Controller
   private final Joysticks driverController = new Joysticks(0);
   private final Joysticks operatorController = new Joysticks(1);
-  private final Joysticks sysIdcontroller = new Joysticks(4);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -144,10 +142,10 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
-                  new VisionIOLimelight(camera0Name, drive::getRotation),
-                  new VisionIOLimelight(camera1Name, drive::getRotation),
-                  new VisionIOLimelight(camera2Name, drive::getRotation),
-                  new VisionIOLimelight(camera3Name, drive::getRotation));
+                  // new VisionIOLimelight(camera0Name, drive::getRotation),
+                  new VisionIOLimelight(camera1Name, drive::getRotation));
+          // new VisionIOLimelight(camera2Name, drive::getRotation),
+          // new VisionIOLimelight(camera3Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -361,6 +359,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     boolean sim = Constants.currentMode == Constants.simMode;
+    Joysticks simController = (sim ? driverController : operatorController);
 
     /* DRIVE COMMANDS
     - Left joystick: drive
@@ -377,131 +376,12 @@ public class RobotContainer {
     if (!sim) {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }
-    // driverController
-    //     .rightBumper
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             DriveCommands.joystickDriveThroughTrench(
-    //                 drive,
-    //                 () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
-    //                 drive::getPose),
-    //             superstructure.lockHoodDown()))
-    //     .whileFalse(superstructure.unlockHood());
-
-    // Switch to X pattern when X button is pressed
-    // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // driverController.buttonA.onTrue(
-    //     Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
-
-    // Intake controls
-    operatorController.rightTrigger.whileTrue(
-        // Commands.parallel(
-        //     DriveCommands.joystickDrive(
-        //         drive,
-        //         () ->
-        //             driverController.getLeftStickY()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getLeftStickX()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getRightStickX()
-        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
-        //                 * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
-        transfer.set(TransferState.kTransferring)); // );
-    operatorController
-        .rightBumper
-        .onTrue(transfer.set(TransferState.kReverse))
-        .onFalse(transfer.set(TransferState.kIdle));
-
-    operatorController.leftTrigger.whileTrue(
-        // Commands.parallel(
-        //     DriveCommands.joystickDrive(
-        //         drive,
-        //         () ->
-        //             driverController.getLeftStickY()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getLeftStickX()
-        //                 * DriveConstants.MAX_SPEED_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
-        //         () ->
-        //             -driverController.getRightStickX()
-        //                 * DriveConstants.MAX_ROTATION_MULTIPLIER
-        //                 * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
-        intake.set(IntakeState.kIntaking)); // );
-
-    operatorController.dPadDown.onTrue(intake.zeroPivot());
-    operatorController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-    operatorController.buttonY.whileTrue(intake.set(IntakeState.kInit));
-    operatorController.buttonX.whileTrue(intake.set(IntakeState.kStowed));
-
-    AtomicReference<IntakeState> osscilationStatus =
-        new AtomicReference<IntakeState>(IntakeState.kIntaking);
-    operatorController
-        .buttonB
-        .whileTrue(
-            Commands.run(() -> osscilationStatus.set(IntakeState.kIntaking), intake)
-                .andThen(
-                    Commands.repeatingSequence(
-                        intake.set(osscilationStatus::get),
-                        Commands.waitSeconds(0.3),
-                        Commands.run(
-                            () -> {
-                              IntakeState state = osscilationStatus.get();
-
-                              if (state == IntakeState.kIntaking) {
-                                osscilationStatus.set(IntakeState.kStowed);
-                              } else {
-                                osscilationStatus.set(IntakeState.kIntaking);
-                              }
-                            }))))
-        .onFalse(intake.set(IntakeState.kIntaking));
-
-    // operatorController.buttonX.whileTrue(climb.set(ClimbState.));
-    operatorController.dPadUp.onTrue(shooter.toggleDisabled());
-
-    // zero hood (in-match)
-    // operatorController.dPadDown.whileTrue(shooter.overrideHood(-2.0)).onFalse(shooter.zeroHood());
-
-    // update pathplanner (TEMP, DELETE LATER)
-    // driverController.buttonB.onTrue(Commands.runOnce(() ->
-    // drive.updatePathplannerPIDConstants()));
-
-    // trench controls
-    driverController.rightBumper.whileTrue(
-        Commands.parallel(
-            DriveCommands.joystickDriveThroughTrench(
-                drive,
-                () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
-                drive::getPose))); // ,
-    // superstructure.lockHoodDown()))
-    // .whileFalse(superstructure.unlockHood());
-
-    /* INTAKE CONTROLS
-    - Driver left trigger: Intake
-    - Driver left bumper: Reverse intake
-     */
-    driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
-    driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-
-    driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
-    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
-    driverController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
-    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
-    driverController.buttonB.onTrue(shooter.toggleDisabled());
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
      */
-    (sim ? driverController : operatorController)
-        .rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
+    simController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     operatorController
         .rightTrigger
         .and(shooter.aimed.negate())
@@ -513,8 +393,8 @@ public class RobotContainer {
     - Operator Y (sim driver): Raise climb
     - Operator X (sim driver): Lower climb
      */
-    (sim ? driverController : operatorController).buttonY.onTrue(superstructure.climbRaise());
-    (sim ? driverController : operatorController).buttonX.onTrue(superstructure.climbClimbed());
+    simController.buttonY.onTrue(superstructure.climbRaise());
+    simController.buttonX.onTrue(superstructure.climbClimbed());
 
     /* DEBUG/FAILSAFE CONTROLS:
      - Operator B (HOLD): Stow intake
@@ -529,10 +409,46 @@ public class RobotContainer {
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
+    // TODO: fix this, it overlaps with intake zeroing and climber currently doesnt actually exist
+    // operatorController
+    //     .dPadDown
+    //     .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
+    //     .onFalse(climb.resetClimb());
+
+    // Intake controls
+    operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     operatorController
-        .dPadDown
-        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
-        .onFalse(climb.resetClimb());
+        .rightBumper
+        .onTrue(transfer.set(TransferState.kReverse))
+        .onFalse(transfer.set(TransferState.kIdle));
+
+    operatorController.dPadDown.onTrue(intake.zeroPivot());
+    operatorController.dPadUp.onTrue(shooter.toggleDisabled());
+
+    // trench controls
+    driverController.rightBumper.whileTrue(
+        Commands.parallel(
+            DriveCommands.joystickDriveThroughTrench(
+                drive,
+                () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+                drive::getPose)));
+    // TODO: fix stall whistle when this runs
+    // ,
+    // superstructure.lockHoodDown()))
+    // .whileFalse(superstructure.unlockHood());
+
+    /* INTAKE CONTROLS
+    - Driver left trigger: Intake
+    - Driver left bumper: Reverse intake
+     */
+    driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
+    driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+
+    // TODO: fix, goes past hard stop
+    // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
+    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
+    driverController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
+    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
   }
 
   private void logInit() {

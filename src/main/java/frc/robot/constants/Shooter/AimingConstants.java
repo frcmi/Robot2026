@@ -20,13 +20,14 @@ public class AimingConstants {
             {0, 25.2},
             {0.9, 25.3},
             {1, 26.2},
+            {1.5, 26.7},
             {2, 27.2},
+            {2.5, 26.2},
             {3, 25.2},
-            {4, 29},
-            {5, 30.2},
             {3.5, 26},
-            {3.75, 27},
-            {4.5, 33}
+            {4, 30},
+            {4.5, 31},
+            {5, 32},
           });
 
   // No idea where these numbers even came from, copilot just made them up but whatever :shrug:
@@ -36,14 +37,15 @@ public class AimingConstants {
           new double[][] {
             {0, 0},
             {0.9, 0.1},
-            {1, 25},
+            {1, 24},
+            {1.5, 25},
             {2, 26},
+            {2.5, 26},
             {3, 30},
-            {4, 36},
-            {5, 40},
             {3.5, 33},
-            {3.75, 34},
-            {4.5, 41}
+            {4, 36},
+            {4.5, 55},
+            {5, 60},
           });
 
   public static LoggedInterpolatingTable kAirtimeTable =

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -40,6 +41,8 @@ public class FlywheelConstants {
           .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
+          .supplyCurrentLowerTime(Seconds.of(0.5))
+          .supplyCurrentLower(Amps.of(15.0))
           .statorCurrentLimit(Amps.of(60.0))
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

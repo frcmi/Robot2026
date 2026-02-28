@@ -34,6 +34,9 @@ public class AngularIOTalonFXConfig {
 
   private final InvertedValue inverted;
   private final Current supplyCurrentLimit;
+  private final Current supplyCurrentLower;
+  private final Time supplyCurrentLowerTime;
+
   private final Current statorCurrentLimit;
   @Builder.Default @Setter private NeutralModeValue neutralMode = NeutralModeValue.Brake;
   @Builder.Default @Setter private double kP = 0.0;

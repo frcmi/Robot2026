@@ -12,6 +12,16 @@ public class DriveConstants {
   public static LoggedTunableNumber PP_ANGLE_KP = new LoggedTunableNumber("Drive/PPAngleKp", 5.0);
   public static LoggedTunableNumber PP_ANGLE_KD = new LoggedTunableNumber("Drive/PPAngleKd", 0.4);
 
+  // p gain for the drive x and y controllers (side to side and forward/back)
+  public static LoggedTunableNumber TRENCH_TRANSLATION_KP =
+      new LoggedTunableNumber("Drive/Trench/TranslationKp", 2.0);
+  public static LoggedTunableNumber TRENCH_TRANSLATION_KD =
+      new LoggedTunableNumber("Drive/Trench/TranslationKd", 0.0);
+  public static LoggedTunableNumber TRENCH_ANGLE_KP =
+      new LoggedTunableNumber("Drive/Trench/AngleKp", 4.0);
+  public static LoggedTunableNumber TRENCH_ANGLE_KD =
+      new LoggedTunableNumber("Drive/Trench/AngleKd", 0.0);
+
   public static final double DEADBAND = 0.05;
 
   // p gain for the drive angle controller;

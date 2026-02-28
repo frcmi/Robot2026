@@ -36,7 +36,7 @@ public class Intake extends VirtualSubsystem {
   private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
 
-  @Getter private IntakeState targetState = IntakeState.kStowed;
+  @Getter private IntakeState targetState = IntakeState.kDown;
   @Getter private IntakeState measuredState;
 
   /** Creates a new Intake. */
@@ -57,6 +57,9 @@ public class Intake extends VirtualSubsystem {
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
     this.shooting = shooting;
+
+    this.oscillatingAngle =
+        IntakeState.kOscillating.getMax().plus(IntakeState.kOscillating.getMin()).div(2);
 
     pivot.setDefaultCommand(
         pivot.holdAtGoal(

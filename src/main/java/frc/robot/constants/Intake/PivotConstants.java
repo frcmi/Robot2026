@@ -46,7 +46,7 @@ public class PivotConstants {
           .followerId(33)
           .opposeMaster(true)
           .bus(kRioBus)
-          .resetAngle(IntakeState.kIntaking.getPivot())
+          .resetAngle(IntakeState.kInit.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kInit.getPivot())
           .motorRotationsPerOutputRotations(5.0 * 5.0) // The reductions on the intake

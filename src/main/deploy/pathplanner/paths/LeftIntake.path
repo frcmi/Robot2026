@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 7.8,
-        "y": 6.578754690491946
+        "y": 6.951299326275264
       },
       "prevControl": {
         "x": 7.8,
-        "y": 6.931148438861515
+        "y": 7.303693074644833
       },
       "nextControl": {
         "x": 7.8,
-        "y": 6.233759353861814
+        "y": 6.606303989645132
       },
       "isLocked": false,
       "linkedName": null
@@ -63,7 +63,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7313664596273296,
-      "rotationDegrees": 0.0
+      "rotationDegrees": -179.18193989457484
     },
     {
       "waypointRelativePos": 2.0,
@@ -78,6 +78,19 @@
       "constraints": {
         "maxVelocity": 1.2,
         "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.2592592592592592,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -110,7 +123,7 @@
   "folder": "Left Auto",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -151,6 +151,17 @@ public class AngularIOTalonFX implements AngularIO {
 
     configuration.CurrentLimits.SupplyCurrentLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
     configuration.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    if (deviceConfig.getSupplyCurrentLowerTime() != null) {
+      configuration.CurrentLimits.SupplyCurrentLowerTime =
+          deviceConfig.getSupplyCurrentLowerTime().in(Seconds);
+    }
+
+    if (deviceConfig.getSupplyCurrentLower() != null) {
+      configuration.CurrentLimits.SupplyCurrentLowerLimit =
+          deviceConfig.getSupplyCurrentLower().in(Amps);
+    }
+
     configuration.CurrentLimits.StatorCurrentLimit = deviceConfig.getStatorCurrentLimit().in(Amps);
     configuration.CurrentLimits.StatorCurrentLimitEnable = true;
 

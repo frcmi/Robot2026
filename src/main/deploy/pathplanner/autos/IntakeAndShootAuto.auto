@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Neutral Zone Intake Test"
+            "pathName": "LeftIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "IntakeAndClimbTest"
+            "pathName": "LeftIntakeReturn"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

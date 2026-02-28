@@ -9,6 +9,8 @@ public class DriveConstants {
       new LoggedTunableNumber("Drive/TranslationKp", 1.0);
   public static LoggedTunableNumber TRANSLATION_KD =
       new LoggedTunableNumber("Drive/TranslationKd", 0.0);
+  public static LoggedTunableNumber PP_ANGLE_KP = new LoggedTunableNumber("Drive/PPAngleKp", 5.0);
+  public static LoggedTunableNumber PP_ANGLE_KD = new LoggedTunableNumber("Drive/PPAngleKd", 0.4);
 
   public static final double DEADBAND = 0.1;
 
@@ -24,4 +26,12 @@ public class DriveConstants {
 
   public static final double RIGHT_TRENCH_Y = 0.625;
   public static final double LEFT_TRENCH_Y = 7.425;
+
+  public static final double MAX_SPEED_MULTIPLIER = 0.75;
+  public static final double MAX_ROTATION_MULTIPLIER = 0.75;
+
+  public static final double INTAKING_DRIVETRAIN_SPEED_MULTIPLIER = 0.5;
+  public static final double INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER = 1.0;
+  public static final double TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER = 0.5;
+  public static final double TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER = 1.0;
 }

@@ -22,7 +22,7 @@ public class FlywheelConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Flywheel")
-          .velocityTolerance(RotationsPerSecond.of(0.333)) // 20rpm
+          .velocityTolerance(RotationsPerSecond.of(1.6))
           .acceleration(RotationsPerSecondPerSecond.of(200.0)) // 12000rpm/s, 0.5s spinup
           .kP(0.08)
           .kI(0.0)

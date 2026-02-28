@@ -108,7 +108,9 @@ public class FuelSim extends VirtualSubsystem {
 
       double exitVel = kExitVelocity.get() * sState.getFlywheel().in(RadiansPerSecond);
       double turretGlobal =
-          sState.getTurret().in(Radians) + rPose.getRotation().getRadians() + TurretConstants.kTurretZero.in(Radians);
+          sState.getTurret().in(Radians)
+              + rPose.getRotation().getRadians()
+              + TurretConstants.kTurretZero.in(Radians);
 
       double hoodAngle = sState.getHood().in(Radians);
       double horizSpeed = exitVel * Math.sin(hoodAngle);

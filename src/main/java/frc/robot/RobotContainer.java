@@ -11,6 +11,8 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.climb.ClimberConstants;
@@ -47,6 +50,7 @@ import frc.robot.lib.subsystem.linear.LinearIOTalonFX;
 import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -75,7 +79,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Controller
-  private final Joysticks driveController = new Joysticks(0);
+  private final Joysticks driverController = new Joysticks(0);
   private final Joysticks operatorController = new Joysticks(1);
   private final Joysticks sysIdcontroller = new Joysticks(4);
 
@@ -338,6 +342,8 @@ public class RobotContainer {
 
     logInit();
 
+    configureNamedComands();
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -353,49 +359,93 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driveController.getLeftStickY() * 0.75,
-            () -> -driveController.getLeftStickX() * 0.75,
-            () -> driveController.getRightStickX() * 0.75));
+            () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
+            () -> -driverController.getLeftStickX() * DriveConstants.MAX_SPEED_MULTIPLIER,
+            () -> -driverController.getRightStickX() * DriveConstants.MAX_ROTATION_MULTIPLIER));
     // Switch to X pattern when X button is pressed
     // controller.buttonY.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // // controller.buttonA.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // controller.buttonB.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    /*
-    controller.buttonA.onTrue(
+    
+    driverController.buttonA.onTrue(
         Commands.runOnce(() -> drive.setPose(new Pose2d(13.0, 0.88, new Rotation2d(0)))));
-    */
+    
 
     // Intake controls
-    /*
-    controller
-        .rightTrigger
-        .debounce(0.05)
-        .whileTrue(
-            Commands.parallel(
-                DriveCommands.joystickDrive(
-                    drive,
-                    () -> controller.getLeftStickY() * 0.5,
-                    () -> -controller.getLeftStickX() * 0.5,
-                    () -> controller.getRightStickX() * 0.75),
-                transfer.set(TransferState.kTransferring)));
-    controller.leftTrigger.debounce(0.05).whileTrue(intake.set(IntakeState.kIntaking));
-    controller.leftBumper.debounce(0.05).whileTrue(intake.set(IntakeState.kReversing));
-    */
+    
+    operatorController.rightTrigger.whileTrue(
+        Commands.parallel(
+            DriveCommands.joystickDrive(
+                drive,
+                () ->
+                    driverController.getLeftStickY()
+                        * DriveConstants.MAX_SPEED_MULTIPLIER
+                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
+                () ->
+                    -driverController.getLeftStickX()
+                        * DriveConstants.MAX_SPEED_MULTIPLIER
+                        * DriveConstants.TRANSFERRING_DRIVETRAIN_SPEED_MULTIPLIER,
+                () ->
+                    -driverController.getRightStickX()
+                        * DriveConstants.MAX_ROTATION_MULTIPLIER
+                        * DriveConstants.TRANSFERRING_DRIVETRAIN_ROTATION_MULTIPLIER),
+            transfer.set(TransferState.kTransferring)));
+    
+    operatorController
+        .rightBumper
+        .onTrue(transfer.set(TransferState.kReverse))
+        .onFalse(transfer.set(TransferState.kIdle));
+    
+    operatorController.leftTrigger.whileTrue(
+        Commands.parallel(
+            DriveCommands.joystickDrive(
+                drive,
+                () ->
+                    driverController.getLeftStickY()
+                        * DriveConstants.MAX_SPEED_MULTIPLIER
+                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
+                () ->
+                    -driverController.getLeftStickX()
+                        * DriveConstants.MAX_SPEED_MULTIPLIER
+                        * DriveConstants.INTAKING_DRIVETRAIN_SPEED_MULTIPLIER,
+                () ->
+                    -driverController.getRightStickX()
+                        * DriveConstants.MAX_ROTATION_MULTIPLIER
+                        * DriveConstants.INTAKING_DRIVETRAIN_ROTATION_MULTIPLIER),
+            intake.set(IntakeState.kIntaking)));
+    
+    operatorController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+
     operatorController.buttonY.onTrue(intake.set(IntakeState.kStowed));
     operatorController.buttonX.onTrue(intake.set(IntakeState.kBump));
     operatorController.buttonA.whileTrue(intake.set(IntakeState.kOscillating));
     operatorController.buttonA.onFalse(intake.set(IntakeState.kDown));
     operatorController.buttonB.onTrue(shooter.toggleDisabled());
 
+    // zero hood (in-match)
+    operatorController.dPadDown.whileTrue(shooter.moveHood(-2.0)).onFalse(shooter.zeroHood());
+
+    // update pathplanner (TEMP, DELETE LATER)
+    driverController.buttonB.onTrue(Commands.runOnce(() -> drive.updatePathplannerPIDConstants()));
+
     // trench controls
-    driveController
+    driverController
         .rightBumper
         .whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
-                    drive, () -> -driveController.getLeftStickY() * 0.75, drive::getPose),
+                    drive,
+                    () -> driverController.getLeftStickY() * DriveConstants.MAX_SPEED_MULTIPLIER,
+                    drive::getPose),
                 superstructure.lockHoodDown()))
         .whileFalse(superstructure.unlockHood());
+
+    driverController.buttonX.onTrue(
+        Commands.either(
+            superstructure.climbClimbed(),
+            superstructure.climbRaise(),
+            () -> climb.getTargetState().equals(ClimbState.kRaised)));
+    driverController.buttonY.onTrue(climb.set(ClimbState.kStowed));
   }
 
   private void logInit() {
@@ -409,6 +459,16 @@ public class RobotContainer {
     Logger.recordOutput(
         "Poses/AndyMarkAprilTagField",
         VisionConstants.kAndyMarkAprilTagField.values().toArray(new Pose3d[0]));
+  }
+
+  private void configureNamedComands() {
+    // TODO: make this allow other actions after
+    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
+
+    // intake in intake zones
+    new EventTrigger("Intake")
+        .onTrue(intake.set(IntakeState.kIntaking))
+        .onFalse(intake.set(IntakeState.kStowed));
   }
 
   /**

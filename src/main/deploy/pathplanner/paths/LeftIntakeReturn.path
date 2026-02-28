@@ -3,77 +3,73 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5257680121527786,
-        "y": 7.425
+        "x": 7.8,
+        "y": 4.723
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.525768012152776,
+        "x": 7.721347449470645,
+        "y": 6.149210833064488
+      },
+      "isLocked": false,
+      "linkedName": "LeftIntakeEnd"
+    },
+    {
+      "anchor": {
+        "x": 7.5103272377285855,
+        "y": 6.520818094321462
+      },
+      "prevControl": {
+        "x": 7.797314725697786,
+        "y": 5.9384023099133785
+      },
+      "nextControl": {
+        "x": 7.152531410395924,
+        "y": 7.246933155673038
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.480548604427334,
+        "y": 7.425
+      },
+      "prevControl": {
+        "x": 6.896822840475973,
+        "y": 7.425
+      },
+      "nextControl": {
+        "x": 5.64448850441325,
         "y": 7.425
       },
       "isLocked": false,
-      "linkedName": "LeftIntakeStart"
-    },
-    {
-      "anchor": {
-        "x": 6.6333558616995445,
-        "y": 7.35444839014258
-      },
-      "prevControl": {
-        "x": 6.2784487611349435,
-        "y": 7.3875500256372515
-      },
-      "nextControl": {
-        "x": 6.916909237254792,
-        "y": 7.328001806047808
-      },
-      "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.8,
-        "y": 6.578754690491946
+        "x": 3.5257680121527786,
+        "y": 7.425
       },
       "prevControl": {
-        "x": 7.8,
-        "y": 6.931148438861515
-      },
-      "nextControl": {
-        "x": 7.8,
-        "y": 6.233759353861814
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.8,
-        "y": 4.72321168859095
-      },
-      "prevControl": {
-        "x": 7.8,
-        "y": 4.97321168859095
+        "x": 3.922983638113571,
+        "y": 7.35629658230626
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftIntakeEnd"
+      "linkedName": "LeftIntakeStart"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7313664596273296,
+      "waypointRelativePos": 2.1475155279503078,
       "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
     {
-      "name": "Intake",
-      "minWaypointRelativePos": 1.6995784047314575,
+      "name": "Trench",
+      "minWaypointRelativePos": 1.524691358024692,
       "maxWaypointRelativePos": 3.0,
       "constraints": {
         "maxVelocity": 1.2,
@@ -89,8 +85,8 @@
   "eventMarkers": [
     {
       "name": "Intake",
-      "waypointRelativePos": 1.080246913580247,
-      "endWaypointRelativePos": 3.0,
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 1.4444444444444444,
       "command": null
     }
   ],
@@ -104,13 +100,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Left Auto",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

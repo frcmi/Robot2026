@@ -138,24 +138,27 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     targetDist = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
-    for (int i = 0; i < 5; i++) {
-      double airtime = AimingConstants.kAirtimeTable.get(targetDist);
-      dx =
-          targetPosition.getX()
-              - (currentPose.getX() + turretOffset.getX())
-              - robotVelocity.vxMetersPerSecond * airtime;
-      dy =
-          targetPosition.getY()
-              - (currentPose.getY() + turretOffset.getY())
-              - robotVelocity.vyMetersPerSecond * airtime;
-      targetDist = Math.hypot(dx, dy);
-    }
+    // for (int i = 0; i < 5; i++) {
+    //   double airtime = AimingConstants.kAirtimeTable.get(targetDist);
+    //   dx =
+    //       targetPosition.getX()
+    //           - (currentPose.getX() + turretOffset.getX())
+    //           - robotVelocity.vxMetersPerSecond * airtime;
+    //   dy =
+    //       targetPosition.getY()
+    //           - (currentPose.getY() + turretOffset.getY())
+    //           - robotVelocity.vyMetersPerSecond * airtime;
+    //   targetDist = Math.hypot(dx, dy);
+    // }
 
     Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =
-        Radians.of(angleToTarget - currentPose.getRotation().getRadians() - TurretConstants.kTurretZero.in(Radians));
+        Radians.of(
+            angleToTarget
+                - currentPose.getRotation().getRadians()
+                - TurretConstants.kTurretZero.in(Radians));
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);
@@ -179,9 +182,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         (nearTrench.getAsBoolean() || hoodLocked)
             ? HoodConstants.kMinHoodAngle
             : Degrees.of(hoodAngle));
+
     double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
+  }
+
+  public Command moveHood(double volts) {
+    return this.hood.openLoop(() -> Volts.of(volts));
+  }
+
+  public Command zeroHood() {
+    return this.hood.resetAngle();
   }
 
   public Command toggleDisabled() {
@@ -230,12 +242,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     double flywheelErr =
         measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
     if (inAllianceZone.getAsBoolean()) {
-      return errorAtTarget < (FieldConstants.hubWidth / 2.0)
-          && hoodErr < 3.0
-          && flywheelErr < 1.6; // Degrees, rotations per second
+      return errorAtTarget < (FieldConstants.hubWidth) && hood.isAtAngle() && flywheel.isAtAngle();
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return errorAtTarget < (FieldConstants.bumpWidth / 2.0) && hoodErr < 5.0 && flywheelErr < 2.0;
+      return errorAtTarget < (FieldConstants.bumpWidth) && hoodErr < 5.0 && flywheelErr < 2.0;
     }
   }
 }

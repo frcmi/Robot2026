@@ -56,6 +56,8 @@ public class RobotSuperstructure {
     boolean intaking = intake.getTargetState() == IntakeState.kIntaking;
     boolean transferring = transfer.getTargetState() == TransferState.kTransferring;
     double speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
+    speed *= 0.9;
+
     if (transferring) {
       return speed * (rotation ? DriveConstants.TRANSFER_MULT_W : DriveConstants.TRANSFER_MULT);
     }

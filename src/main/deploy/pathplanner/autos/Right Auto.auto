@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightScoreClimb"
+            "pathName": "Right Intake Return"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Climb"
+            "name": "Shoot"
           }
         }
       ]

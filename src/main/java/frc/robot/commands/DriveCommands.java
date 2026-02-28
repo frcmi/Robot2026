@@ -156,8 +156,6 @@ public class DriveCommands {
    */
   public static Command joystickDriveThroughTrench(
       Drive drive, DoubleSupplier xSupplier, Supplier<Pose2d> robotPoseSupplier) {
-    // Holonomic PID controller
-    // TODO: if this doesn't work change it to profiled
 
     return Commands.run(
             () -> {
@@ -199,7 +197,8 @@ public class DriveCommands {
                 yVelocity = 0;
               }
 
-              yVelocity = Math.signum(yVelocity) * Math.min(Math.abs(yVelocity), 1);
+              // clamp velocity to [-1, 1]
+              yVelocity = MathUtil.clamp(yVelocity, -1, 1);
 
               Logger.recordOutput("Drive/TrenchDrive/TrenchY", trenchY);
               Logger.recordOutput("Drive/TrenchDrive/YError", yController.getPositionError());

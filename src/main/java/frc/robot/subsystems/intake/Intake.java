@@ -60,9 +60,12 @@ public class Intake extends VirtualSubsystem {
 
     pivot.setDefaultCommand(
         pivot.holdAtGoal(
-            () -> isNearBump() ? getStowedPivot() : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
+            () ->
+                isNearBump()
+                    ? getStowedPivot()
+                    : targetState.oscillating() ? oscillatingAngle : getTargetState().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
-    //this.setDefaultCommand(this.set(IntakeState.kStowed));
+    // this.setDefaultCommand(this.set(IntakeState.kStowed));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
   }
@@ -81,8 +84,10 @@ public class Intake extends VirtualSubsystem {
   public void periodic() {
     // This method will be called once per scheduler run
     if (targetState.oscillating()) { // UNTESTED might or might not work
-      if (pivot.getAngle().isNear(targetState.getMin(), 0.05)) oscillatingAngle = targetState.getMax();
-      if (pivot.getAngle().isNear(targetState.getMax(), 0.05)) oscillatingAngle = targetState.getMin();
+      if (pivot.getAngle().isNear(targetState.getMin(), 0.05))
+        oscillatingAngle = targetState.getMax();
+      if (pivot.getAngle().isNear(targetState.getMax(), 0.05))
+        oscillatingAngle = targetState.getMin();
     }
 
     measuredState.setPivot(pivot.getAngle());

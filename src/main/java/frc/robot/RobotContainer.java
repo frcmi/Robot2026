@@ -54,6 +54,9 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
+import frc.robot.subsystems.led.CANdleSystem;
+import frc.robot.subsystems.led.io.CANdleIOReal;
+import frc.robot.subsystems.led.io.CANdleIOSim;
 import frc.robot.subsystems.shooter.FuelSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.transfer.Transfer;
@@ -89,6 +92,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Transfer transfer;
   private final Climb climb;
+  private final CANdleSystem led;
 
   private final RobotSuperstructure superstructure;
 
@@ -205,6 +209,11 @@ public class RobotContainer {
         } else {
           climb = new Climb();
         }
+        if (Constants.ledHardwareExists) {
+          led = new CANdleSystem(new CANdleIOReal());
+        } else {
+          led = new CANdleSystem();
+        }
         fuelSim = Optional.empty();
         break;
 
@@ -265,6 +274,7 @@ public class RobotContainer {
                 new LinearSubsystem(
                     new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
                     ClimberConstants.kSubsystemConfigSim));
+        led = new CANdleSystem(new CANdleIOSim());
         fuelSim =
             Optional.of(
                 new FuelSim(
@@ -289,6 +299,7 @@ public class RobotContainer {
         transfer = new Transfer(shooter.aimed);
         intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         climb = new Climb();
+        led = new CANdleSystem();
         fuelSim =
             Optional.of(
                 new FuelSim(
@@ -515,8 +526,8 @@ public class RobotContainer {
      - Operator DPad Down: Moves climb down when held, release to zero climb
     */
     // TODO: lock turret control
-    //operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
-    //operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
+    // operatorController.dPadRight.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))

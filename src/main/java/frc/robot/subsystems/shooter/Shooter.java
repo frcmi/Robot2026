@@ -193,6 +193,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     return this.hood.openLoop(() -> volts);
   }
 
+  public Command overrideHoodAngle(Angle angle) {
+    return this.hood.holdAtGoal(() -> angle);
+  }
+
   public Command zeroHood() {
     return this.hood.resetAngle();
   }

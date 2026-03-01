@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
@@ -20,6 +21,8 @@ import frc.robot.subsystems.intake.IntakeState;
 import java.util.function.Supplier;
 
 public class PivotConstants {
+  public static final Voltage MANUAL_VOLTAGE = Volts.of(-2.0);
+
   public static final Distance PivotLength = Inches.of(14.9);
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.fromRotations(0.165);

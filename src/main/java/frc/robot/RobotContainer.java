@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -142,9 +143,9 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
-                  // new VisionIOLimelight(camera0Name, drive::getRotation),
-                  new VisionIOLimelight(camera1Name, drive::getRotation));
-          // new VisionIOLimelight(camera2Name, drive::getRotation),
+                  new VisionIOLimelight(camera0Name, drive::getRotation),
+                  new VisionIOLimelight(camera1Name, drive::getRotation),
+                  new VisionIOLimelight(camera2Name, drive::getRotation));
           // new VisionIOLimelight(camera3Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
@@ -418,6 +419,9 @@ public class RobotContainer {
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
+
+    operatorController.dPadRight.whileTrue(
+        shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle.minus(Degrees.of(5))));
     operatorController
         .dPadDown
         .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
@@ -437,6 +441,20 @@ public class RobotContainer {
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+
+    // TODO: fix, goes past hard stop
+    // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
+    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
+    driverController.buttonA.whileTrue(intake.set(IntakeState.kTransferring));
+    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
+
+    operatorController.buttonA.whileTrue(intake.set(IntakeState.kTransferring));
+    operatorController.buttonA.onFalse(intake.set(IntakeState.kDown));
+
+    operatorController
+        .rightMidButton
+        .whileTrue(intake.openLoopPivot(PivotConstants.MANUAL_VOLTAGE))
+        .onFalse(intake.zeroPivot());
   }
 
   private void logInit() {

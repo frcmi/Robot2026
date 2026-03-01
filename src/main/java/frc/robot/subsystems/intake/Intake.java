@@ -11,6 +11,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -96,10 +97,11 @@ public class Intake extends VirtualSubsystem {
   }
 
   public Command zeroPivot() {
-    return run(
-        () -> {
-          pivot.resetAngle();
-        });
+    return pivot.resetAngle(IntakeState.kDown.getPivot());
+  }
+
+  public Command openLoopPivot(Voltage volts) {
+    return this.pivot.openLoop(() -> volts);
   }
 
   private boolean isNearBump() {

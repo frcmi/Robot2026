@@ -259,7 +259,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     //   return errorAtTarget < (FieldConstants.bumpWidth)
     //       && hoodErr < maxHoodErr * 1.8
     //       && flywheelErr
-    //           < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
+    //           <
+    // FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
     //               * 1.8
     //       && shooterDistInRange;
     // }

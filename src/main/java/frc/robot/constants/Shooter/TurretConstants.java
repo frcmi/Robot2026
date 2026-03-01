@@ -27,14 +27,14 @@ import java.util.function.Supplier;
 public class TurretConstants {
   public static final Translation3d TurretOffset =
       new Translation3d(
-          Inches.of(-5.5f).in(Meters), Inches.of(5.5f).in(Meters), Inches.of(5.0f).in(Meters));
+          Inches.of(-5.5f).in(Meters), Inches.of(5f).in(Meters), Inches.of(5.0f).in(Meters));
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =
       Degrees.of(80); // Positive = CCW from top-down perspective
   public static final Angle kTurretZero =
       Degrees.of(
-          85); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
+          90); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
   // intake direction
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =

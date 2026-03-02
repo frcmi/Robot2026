@@ -414,9 +414,10 @@ public class RobotContainer {
     */
     // TODO: lock turret control (Operator A), needed for the intake init stow
     // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
-    operatorController.dPadRight.onTrue(shooter.toggleDisabled());
+    operatorController.dPadUp.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft
+        .debounce(1)
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
 
@@ -433,7 +434,6 @@ public class RobotContainer {
         .rightBumper
         .onTrue(transfer.set(TransferState.kReverse))
         .onFalse(transfer.set(TransferState.kIdle));
-    operatorController.dPadUp.onTrue(intake.zeroPivot());
 
     /* INTAKE CONTROLS
     - Driver left trigger: Intake

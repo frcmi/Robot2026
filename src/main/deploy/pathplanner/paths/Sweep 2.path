@@ -1,0 +1,176 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.188633301251203,
+        "y": 0.502521655437921
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.202334191749148,
+        "y": 0.4847820870999785
+      },
+      "isLocked": false,
+      "linkedName": "Rush Right Sweep One End"
+    },
+    {
+      "anchor": {
+        "x": 5.898132820019249,
+        "y": 0.6375745909528394
+      },
+      "prevControl": {
+        "x": 5.150169309838348,
+        "y": 0.6323861900409258
+      },
+      "nextControl": {
+        "x": 6.569046361644376,
+        "y": 0.6422285190974639
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.822637151106832,
+        "y": 0.9498845043310871
+      },
+      "prevControl": {
+        "x": 7.642146971195501,
+        "y": 0.41304191792815614
+      },
+      "nextControl": {
+        "x": 8.151828681424446,
+        "y": 1.9290182868142436
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.822637151106832,
+        "y": 3.558094321462945
+      },
+      "prevControl": {
+        "x": 7.817684495919623,
+        "y": 2.745858870760588
+      },
+      "nextControl": {
+        "x": 7.831077959576515,
+        "y": 4.942386910490857
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.657805582290664,
+        "y": 0.8063907603464873
+      },
+      "prevControl": {
+        "x": 7.307747834456207,
+        "y": 2.4270259865255053
+      },
+      "nextControl": {
+        "x": 6.482704379299247,
+        "y": 0.36977477366658973
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.062021174205967,
+        "y": 0.6375745909528394
+      },
+      "prevControl": {
+        "x": 4.471636188642924,
+        "y": 0.6544562078922036
+      },
+      "nextControl": {
+        "x": 1.7617915001029383,
+        "y": 0.6220029780893305
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": -0.2298941289701636,
+        "y": 0.8063907603464873
+      },
+      "prevControl": {
+        "x": 0.36096246391536657,
+        "y": 0.8232723772864361
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.9751552795031053,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 4.0,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 5.0,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 5.0,
+      "maxWaypointRelativePos": 6.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 5.049382716049388,
+      "endWaypointRelativePos": 6.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -88.05851360908561
+  },
+  "reversed": false,
+  "folder": "Rush Right",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

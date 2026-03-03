@@ -5,6 +5,7 @@
   "pathFolders": [
     "Center Auto",
     "Left Auto",
+    "Rush Right",
     "Right Auto"
   ],
   "autoFolders": [
@@ -23,9 +24,9 @@
   "driveWheelRadius": 0.051,
   "driveGearing": 6.746031746031747,
   "maxDriveSpeed": 4.7,
-  "driveMotorType": "falcon500",
+  "driveMotorType": "krakenX60",
   "driveCurrentLimit": 40.0,
-  "wheelCOF": 1.2,
+  "wheelCOF": 2.2,
   "flModuleX": 0.279,
   "flModuleY": 0.279,
   "frModuleX": 0.279,

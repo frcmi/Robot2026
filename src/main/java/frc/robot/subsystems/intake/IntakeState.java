@@ -102,13 +102,15 @@ public class IntakeState implements StructSerializable {
 
   // States
   public static final IntakeState kInit =
-      new IntakeState(Rotations.of(0.202), Volts.of(0.0f), "kInit");
+      new IntakeState(Rotations.of(0.25), Volts.of(0.0f), "kInit");
   public static final IntakeState kStowed =
       new IntakeState(Degrees.of(20.0), Volts.of(0.0f), "kStowed");
   public static final IntakeState kTransferring =
       new IntakeState(Degrees.of(30.0), Volts.of(4.0f), "kTransfer");
   public static final IntakeState kIntaking =
-      new IntakeState(Degrees.of(0.0), Volts.of(5.0f), "kIntaking");
+      new IntakeState(Degrees.of(0.0), Volts.of(6.0f), "kIntaking");
+  public static final IntakeState kIntakingAuto =
+      new IntakeState(Degrees.of(0.0), Volts.of(9.0f), "kIntakingAuto");
   public static final IntakeState kReversing =
       new IntakeState(Degrees.of(0.0), Volts.of(-8.0f), "kReversing");
   public static final IntakeState kDown = new IntakeState(Degrees.of(0.0), Volts.of(0.0f), "kDown");

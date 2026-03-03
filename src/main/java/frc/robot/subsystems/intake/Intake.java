@@ -35,6 +35,7 @@ public class Intake extends VirtualSubsystem {
   private Alliance alliance = Alliance.Red;
   private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
+  private final BooleanSupplier isAutonomous;
 
   @Getter private IntakeState targetState = IntakeState.kStowed;
   @Getter private IntakeState measuredState;
@@ -45,18 +46,21 @@ public class Intake extends VirtualSubsystem {
         new AngularSubsystem(new AngularIO() {}, RollerConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, PivotConstants.kSubsystemConfigReal),
         robotPose,
-        shooting);
+        shooting,
+        () -> false);
   }
 
   public Intake(
       AngularSubsystem rollers,
       AngularSubsystem pivot,
       Supplier<Pose2d> robotPoseSupplier,
-      BooleanSupplier shooting) {
+      BooleanSupplier shooting,
+      BooleanSupplier isAutonomous) {
     this.rollers = rollers;
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
     this.shooting = shooting;
+    this.isAutonomous = isAutonomous;
 
     pivot.setDefaultCommand(pivot.holdAtGoal(this::getStowedPivot));
     rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
@@ -66,6 +70,11 @@ public class Intake extends VirtualSubsystem {
   }
 
   private Angle getStowedPivot() {
+    // Improves shooting in auto
+    if (this.isAutonomous.getAsBoolean()) {
+      return IntakeState.kIntakingAuto.getPivot();
+    }
+
     if (nearBump.getAsBoolean()) {
       return IntakeState.kStowed.getPivot();
     }

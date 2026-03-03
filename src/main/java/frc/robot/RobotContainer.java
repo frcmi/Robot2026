@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -66,6 +65,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -117,8 +117,12 @@ public class RobotContainer {
   @SuppressWarnings("FieldCanBeLocal")
   private final Optional<FuelSim> fuelSim;
 
+  private final BooleanSupplier isAutonomous;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+  public RobotContainer(BooleanSupplier isAutonomous) {
+    this.isAutonomous = isAutonomous;
+
     switch (Constants.currentMode) {
       case REAL:
         if (Constants.driveHardwareExists) {
@@ -160,9 +164,9 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
                       HoodConstants.kSubsystemConfigReal),
-                  /*new AngularSubsystem(
-                  new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
-                  HoodConstants.kSubsystemConfigSim),*/
+                  //   new AngularSubsystem(
+                  //       new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
+                  //       HoodConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
                       new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                       FlywheelConstants.kSubsystemConfigReal),
@@ -191,7 +195,8 @@ public class RobotContainer {
                       new AngularIOTalonFX(PivotConstants.kTalonFXConfig),
                       PivotConstants.kSubsystemConfigReal),
                   drive::getPose,
-                  transfer::isAttemptingShooting);
+                  transfer::isAttemptingShooting,
+                  isAutonomous);
         } else {
           transfer = new Transfer(shooter.aimed);
           intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
@@ -261,7 +266,8 @@ public class RobotContainer {
                     new AngularIOSim(PivotConstants.kSimConfig, currentDrawCalculatorSim),
                     PivotConstants.kSubsystemConfigSim),
                 drive::getPose,
-                transfer::isAttemptingShooting);
+                transfer::isAttemptingShooting,
+                isAutonomous);
 
         climb =
             new Climb(
@@ -421,8 +427,8 @@ public class RobotContainer {
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
 
-    operatorController.dPadRight.whileTrue(
-        shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle.minus(Degrees.of(5))));
+    // operatorController.dPadRight.whileTrue(
+    //     shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle.minus(Degrees.of(5))));
     operatorController
         .dPadDown
         .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))

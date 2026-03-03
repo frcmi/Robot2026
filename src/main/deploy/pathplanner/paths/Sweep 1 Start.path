@@ -1,0 +1,124 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.429432146294514,
+        "y": 0.7557459095283923
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.429432146294513,
+        "y": 0.7557459095283923
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.159797882579403,
+        "y": 0.7557459095283923
+      },
+      "prevControl": {
+        "x": 5.159797882579403,
+        "y": 0.7557459095283924
+      },
+      "nextControl": {
+        "x": 7.159797882579403,
+        "y": 0.7557459095283923
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.675158806544754,
+        "y": 1.2731298449612405
+      },
+      "prevControl": {
+        "x": 8.676753409569942,
+        "y": 0.6235796926726135
+      },
+      "nextControl": {
+        "x": 8.673154932441001,
+        "y": 2.08939364773821
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.675158806544754,
+        "y": 3.7522329162656396
+      },
+      "prevControl": {
+        "x": 8.666717998075072,
+        "y": 2.6127237728585175
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Rush Right Sweep One Midpoint"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.9827586206896548,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.9012345679012297,
+      "maxWaypointRelativePos": 3,
+      "constraints": {
+        "maxVelocity": 1.35,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 1.4012345679012346,
+      "endWaypointRelativePos": 3.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "Rush Right",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

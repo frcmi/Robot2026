@@ -5,7 +5,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.DriveConstants;
@@ -33,20 +32,29 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
+    // TODO: find why proxy is needed, without it the auto just stops moving
+    // when trying to intake...
+    NamedCommands.registerCommand(
+        "Shoot",
+        transfer
+            .set(TransferState.kTransferring)
+            .alongWith(
+                new SequentialCommandGroup(
+                        intake.set(IntakeState.kIntaking),
+                        new WaitCommand(5),
+                        intake.set(IntakeState.kTransferring))
+                    .asProxy()));
 
-    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
+    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntakingAuto).repeatedly());
     new EventTrigger("Shoot")
         .whileTrue(
             transfer
                 .set(TransferState.kTransferring)
                 .alongWith(
-                    new RepeatCommand(
-                        new SequentialCommandGroup(
-                            intake.set(IntakeState.kIntaking),
-                            new WaitCommand(1.5),
-                            intake.set(IntakeState.kTransferring),
-                            new WaitCommand(1.5)))));
+                    new SequentialCommandGroup(
+                        intake.set(IntakeState.kIntaking),
+                        new WaitCommand(5),
+                        intake.set(IntakeState.kTransferring))));
   }
 
   public Command climbRaise() {

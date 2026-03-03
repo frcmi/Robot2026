@@ -19,8 +19,6 @@ import lombok.Setter;
 /** Add your docs here. */
 public class IntakeState implements StructSerializable {
   @Setter private Angle pivot;
-  @Setter private Angle minPivot;
-  @Setter private Angle maxPivot;
   @Setter private Voltage rollers;
   private final String type;
 
@@ -37,37 +35,9 @@ public class IntakeState implements StructSerializable {
     type = "kNotTunable";
   }
 
-  public IntakeState(Angle minPivot, Angle maxPivot) {
-    this.minPivot = minPivot;
-    this.maxPivot = maxPivot;
-    this.rollers = Volts.of(0);
-
-    pivotTunable = Optional.empty();
-    rollerVoltageTunable = Optional.empty();
-
-    type = "kNotTunable";
-  }
-
   public IntakeState(Angle pivot, Voltage rollers, String logKey) {
     this.pivot = pivot;
     this.rollers = rollers;
-    this.type = logKey;
-
-    pivotTunable =
-        Optional.of(
-            new LoggedTunableNumber(
-                String.format("IntakeStates/%s/PivotAngleDegrees", logKey), pivot.in(Degrees)));
-    rollerVoltageTunable =
-        Optional.of(
-            new LoggedTunableNumber(
-                String.format("IntakeStates/%s/RollersVolts", logKey), rollers.in(Volts)));
-  }
-
-  public IntakeState(Angle minPivot, Angle maxPivot, String logKey) {
-    this.minPivot = minPivot;
-    this.maxPivot = maxPivot;
-    this.pivot = minPivot.plus(maxPivot).div(2);
-    this.rollers = Volts.of(0);
     this.type = logKey;
 
     pivotTunable =
@@ -92,25 +62,15 @@ public class IntakeState implements StructSerializable {
         .orElse(rollers);
   }
 
-  public Angle getMin() {
-    return minPivot;
-  }
-
-  public Angle getMax() {
-    return maxPivot;
-  }
-
   // States
   public static final IntakeState kInit =
       new IntakeState(Rotations.of(0.25), Volts.of(0.0f), "kInit");
   public static final IntakeState kStowed =
       new IntakeState(Degrees.of(20.0), Volts.of(0.0f), "kStowed");
   public static final IntakeState kTransferring =
-      new IntakeState(Degrees.of(30.0), Volts.of(4.0f), "kTransfer");
+      new IntakeState(Degrees.of(50.0), Volts.of(4.0f), "kTransfer");
   public static final IntakeState kIntaking =
-      new IntakeState(Degrees.of(0.0), Volts.of(6.0f), "kIntaking");
-  public static final IntakeState kIntakingAuto =
-      new IntakeState(Degrees.of(0.0), Volts.of(9.0f), "kIntakingAuto");
+      new IntakeState(Degrees.of(0.0), Volts.of(7.0f), "kIntaking");
   public static final IntakeState kReversing =
       new IntakeState(Degrees.of(0.0), Volts.of(-8.0f), "kReversing");
   public static final IntakeState kDown = new IntakeState(Degrees.of(0.0), Volts.of(0.0f), "kDown");

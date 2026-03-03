@@ -5,8 +5,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
@@ -32,29 +30,10 @@ public class RobotSuperstructure {
   public void registerAutoCommands() {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
-    // TODO: find why proxy is needed, without it the auto just stops moving
-    // when trying to intake...
-    NamedCommands.registerCommand(
-        "Shoot",
-        transfer
-            .set(TransferState.kTransferring)
-            .alongWith(
-                new SequentialCommandGroup(
-                        intake.set(IntakeState.kIntaking),
-                        new WaitCommand(5),
-                        intake.set(IntakeState.kTransferring))
-                    .asProxy()));
+    NamedCommands.registerCommand("Shoot", transfer.set(TransferState.kTransferring));
 
-    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntakingAuto).repeatedly());
-    new EventTrigger("Shoot")
-        .whileTrue(
-            transfer
-                .set(TransferState.kTransferring)
-                .alongWith(
-                    new SequentialCommandGroup(
-                        intake.set(IntakeState.kIntaking),
-                        new WaitCommand(5),
-                        intake.set(IntakeState.kTransferring))));
+    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
+    new EventTrigger("Shoot").whileTrue(transfer.set(TransferState.kTransferring));
   }
 
   public Command climbRaise() {

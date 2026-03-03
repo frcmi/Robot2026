@@ -10,9 +10,9 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,6 +20,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FieldConstants;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -36,6 +37,11 @@ public class Intake extends VirtualSubsystem {
   private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
   private final BooleanSupplier isAutonomous;
+
+  private final LoggedTunableNumber oscillationPeriod =
+      new LoggedTunableNumber("Intake/OscillationPeriodS", 1.8);
+  private final LoggedTunableNumber oscillationDutyCycle =
+      new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.7);
 
   @Getter private IntakeState targetState = IntakeState.kStowed;
   @Getter private IntakeState measuredState;
@@ -60,28 +66,30 @@ public class Intake extends VirtualSubsystem {
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
     this.shooting = shooting;
-    this.isAutonomous = isAutonomous;
+    this.isAutonomous =
+        isAutonomous; // Unused, but may be useful at some point so just leaving it in
 
-    pivot.setDefaultCommand(pivot.holdAtGoal(this::getStowedPivot));
-    rollers.setDefaultCommand(rollers.openLoop(() -> getTargetState().getRollers()));
+    pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
+    rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
     this.setDefaultCommand(this.set(IntakeState.kStowed));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
   }
 
-  private Angle getStowedPivot() {
-    // Improves shooting in auto
-    if (this.isAutonomous.getAsBoolean()) {
-      return IntakeState.kIntakingAuto.getPivot();
-    }
-
+  private IntakeState gatedTarget() {
     if (nearBump.getAsBoolean()) {
-      return IntakeState.kStowed.getPivot();
+      return IntakeState.kStowed;
     }
     if (shooting.getAsBoolean() && this.targetState == IntakeState.kStowed) {
-      return IntakeState.kTransferring.getPivot();
+      // Oscillate
+      double timeNow = Timer.getFPGATimestamp();
+      boolean intakeUp =
+          timeNow % oscillationPeriod.get() < oscillationPeriod.get() * oscillationDutyCycle.get();
+      return new IntakeState(
+          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kStowed.getPivot(),
+          IntakeState.kTransferring.getRollers());
     }
-    return targetState.getPivot();
+    return targetState;
   }
 
   @Override

@@ -426,9 +426,6 @@ public class RobotContainer {
         .debounce(1)
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
         .onFalse(shooter.zeroHood());
-
-    // operatorController.dPadRight.whileTrue(
-    //     shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle.minus(Degrees.of(5))));
     operatorController
         .dPadDown
         .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
@@ -450,12 +447,6 @@ public class RobotContainer {
 
     // TODO: fix, goes past hard stop
     // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
-    driverController.buttonX.onTrue(intake.set(IntakeState.kStowed));
-    driverController.buttonA.whileTrue(intake.set(IntakeState.kTransferring));
-    driverController.buttonA.onFalse(intake.set(IntakeState.kDown));
-
-    operatorController.buttonA.whileTrue(intake.set(IntakeState.kTransferring));
-    operatorController.buttonA.onFalse(intake.set(IntakeState.kDown));
 
     operatorController
         .rightMidButton

@@ -38,10 +38,14 @@ public class Intake extends VirtualSubsystem {
   private final BooleanSupplier shooting;
   private final BooleanSupplier isAutonomous;
 
+  private final Timer oscillationTimer = new Timer();
+
   private final LoggedTunableNumber oscillationPeriod =
       new LoggedTunableNumber("Intake/OscillationPeriodS", 1.8);
   private final LoggedTunableNumber oscillationDutyCycle =
       new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.7);
+  private final LoggedTunableNumber oscillationInitialDelay =
+      new LoggedTunableNumber("Intake/OscillationInitialDelay", 1.0);
 
   @Getter private IntakeState targetState = IntakeState.kStowed;
   @Getter private IntakeState measuredState;
@@ -76,18 +80,30 @@ public class Intake extends VirtualSubsystem {
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
   }
 
+  private boolean prevOscillating = false;
   private IntakeState gatedTarget() {
     if (nearBump.getAsBoolean()) {
+      prevOscillating = false;
       return IntakeState.kStowed;
     }
     if (shooting.getAsBoolean() && this.targetState == IntakeState.kStowed) {
+      if (!prevOscillating) {
+        oscillationTimer.restart();
+        prevOscillating = true;
+      }
+
       // Oscillate
-      double timeNow = Timer.getFPGATimestamp();
+      double timeNow = oscillationTimer.get();
+      double per = oscillationPeriod.get();
+      double initialDelay = oscillationInitialDelay.get();
+      double duty = oscillationDutyCycle.get();
       boolean intakeUp =
-          timeNow % oscillationPeriod.get() < oscillationPeriod.get() * oscillationDutyCycle.get();
+          timeNow < initialDelay ? false : (timeNow - initialDelay) % per < per * duty;
       return new IntakeState(
           intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kStowed.getPivot(),
           IntakeState.kTransferring.getRollers());
+    } else {
+      prevOscillating = false;
     }
     return targetState;
   }

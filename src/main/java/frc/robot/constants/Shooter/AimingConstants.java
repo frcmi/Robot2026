@@ -13,6 +13,7 @@ public class AimingConstants {
       new LoggedTunableNumber(
           "Shooter/Turret/MaxAngleDeg", TurretConstants.kTurretPhysicalMaxAngle.in(Degrees));
 
+  // Regular aiming
   public static LoggedInterpolatingTable kHoodAngleTable =
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
@@ -29,8 +30,6 @@ public class AimingConstants {
             {4.5, 31},
             {5, 32},
           });
-
-  // No idea where these numbers even came from, copilot just made them up but whatever :shrug:
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
@@ -43,7 +42,6 @@ public class AimingConstants {
             {4.5, 55},
             {5, 60},
           });
-
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
@@ -51,6 +49,29 @@ public class AimingConstants {
             {2, 0.95},
             {3, 1.0},
             {4, 1.1},
+            {5.0, 1.15},
+          });
+
+  // Neutral zone aiming
+  public static LoggedInterpolatingTable kHoodAngleTableNeutral =
+      new LoggedInterpolatingTable(
+          "ShooterNeutral/HoodAngleM_Deg",
+          new double[][] {
+            {0, 43.2},
+          });
+  public static LoggedInterpolatingTable kFlywheelSpeedTableNeutral =
+      new LoggedInterpolatingTable(
+          "ShooterNeutral/FlywheelSpeedM_RPS",
+          new double[][] {
+            {2, 20},
+            {4, 25},
+            {4.5, 30},
+            {5, 35},
+          });
+  public static LoggedInterpolatingTable kAirtimeTableNeutral =
+      new LoggedInterpolatingTable(
+          "ShooterNeutral/AirtimeM_s",
+          new double[][] {
             {5.0, 1.15},
           });
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.LoggedTunableNumber;
@@ -26,6 +27,7 @@ public class FuelSim extends VirtualSubsystem {
   private final BooleanSupplier isShooting;
   private final Supplier<Pose2d> robotPose;
   private final Supplier<ChassisSpeeds> robotSpeeds;
+  private final Trigger allianceZone;
 
   public ArrayList<Pose3d> fuel = new ArrayList<>();
   private ArrayList<Translation3d> fuelVelocities = new ArrayList<>();
@@ -45,11 +47,13 @@ public class FuelSim extends VirtualSubsystem {
       Supplier<ShooterState> shooterState,
       BooleanSupplier isShooting,
       Supplier<Pose2d> robotPose,
-      Supplier<ChassisSpeeds> robotSpeeds) {
+      Supplier<ChassisSpeeds> robotSpeeds,
+      Trigger allianceZone) {
     this.shooterState = shooterState;
     this.robotPose = robotPose;
     this.robotSpeeds = robotSpeeds;
     this.isShooting = isShooting;
+    this.allianceZone = allianceZone;
     lastShot.start();
   }
 
@@ -76,7 +80,8 @@ public class FuelSim extends VirtualSubsystem {
           i, new Translation3d(v.getX(), v.getY(), v.getZ() + kGravity.get() * RobotConstants.kDt));
 
       // Remove fuel below hub height and falling
-      if (fuel.get(i).getZ() < kHubHeight.get() && fuelVelocities.get(i).getZ() < 0) {
+      double deleteHeight = allianceZone.getAsBoolean() ? kHubHeight.get() : 0;
+      if (fuel.get(i).getZ() < deleteHeight && fuelVelocities.get(i).getZ() < 0) {
         fuel.remove(i);
         fuelVelocities.remove(i);
         i--;

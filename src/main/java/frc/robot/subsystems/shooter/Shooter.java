@@ -107,7 +107,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // Aim at hub
     Translation2d targetPosition;
-    if (inAllianceZone.getAsBoolean()) {
+    boolean allianceZone = inAllianceZone.getAsBoolean();
+    if (allianceZone) {
       targetPosition =
           alliance == Alliance.Blue
               ? FieldConstants.kHubPositionBlue
@@ -140,7 +141,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     ChassisSpeeds robotVelocity = robotVel.get();
     // Found that it converges over 2 iterations, but do 5 to be safe
     for (int i = 0; i < 5; i++) {
-      double airtime = AimingConstants.kAirtimeTable.get(targetDist);
+      double airtime =
+          (allianceZone ? AimingConstants.kAirtimeTable : AimingConstants.kAirtimeTableNeutral)
+              .get(targetDist);
       dx =
           targetPosition.getX()
               - (currentPose.getX() + turretOffset.getX())
@@ -175,7 +178,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // Actually apply to hardware
     this.targetState.setTurret(turretTarget);
-    double hoodAngle = AimingConstants.kHoodAngleTable.get(targetDist);
+    double hoodAngle =
+        (allianceZone ? AimingConstants.kHoodAngleTable : AimingConstants.kHoodAngleTableNeutral)
+            .get(targetDist);
     rawHoodTarget = Degrees.of(hoodAngle);
 
     // if we're near the trench or forcing the hood to be locked, hood goes to min angle
@@ -184,7 +189,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             ? HoodConstants.kMinHoodAngle
             : Degrees.of(hoodAngle));
 
-    double flywheelRPS = AimingConstants.kFlywheelSpeedTable.get(targetDist);
+    double flywheelRPS =
+        (allianceZone
+                ? AimingConstants.kFlywheelSpeedTable
+                : AimingConstants.kFlywheelSpeedTableNeutral)
+            .get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
   }

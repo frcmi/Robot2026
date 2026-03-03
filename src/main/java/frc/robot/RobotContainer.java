@@ -281,7 +281,8 @@ public class RobotContainer {
                     shooter::getMeasuredState,
                     transfer::isShooting,
                     drive::getPose,
-                    drive::getPoseVelocity));
+                    drive::getPoseVelocity, 
+                    shooter.inAllianceZone));
         break;
 
       default:
@@ -306,7 +307,8 @@ public class RobotContainer {
                     shooter::getMeasuredState,
                     transfer::isShooting,
                     drive::getPose,
-                    drive::getPoseVelocity));
+                    drive::getPoseVelocity,
+                    shooter.inAllianceZone));
         break;
     }
 

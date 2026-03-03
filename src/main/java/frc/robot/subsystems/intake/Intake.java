@@ -81,6 +81,7 @@ public class Intake extends VirtualSubsystem {
   }
 
   private boolean prevOscillating = false;
+
   private IntakeState gatedTarget() {
     if (nearBump.getAsBoolean()) {
       prevOscillating = false;

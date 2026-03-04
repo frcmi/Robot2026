@@ -34,15 +34,13 @@ public class RobotSuperstructure {
     NamedCommands.registerCommand("Climb", climbClimbed());
     NamedCommands.registerCommand(
         "Shoot",
-        transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState(true)));
+        transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState(true)).asProxy());
 
-    NamedCommands.registerCommand("Wait 5 Seconds", new WaitCommand(Seconds.of(5)));
 
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
     new EventTrigger("Shoot")
         .whileTrue(
             transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState(true)));
-    new EventTrigger("Start Additional Sweep").onTrue(transfer.set(TransferState.kIdle));
   }
 
   public Command climbRaise() {

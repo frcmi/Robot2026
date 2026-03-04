@@ -210,6 +210,13 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     return this.hood.resetAngle();
   }
 
+  public Command forceToggleState(boolean enabled) {
+    return runOnce(
+        () -> {
+          disabled = !enabled;
+        });
+  }
+
   public Command toggleDisabled() {
     return either(
         runOnce(

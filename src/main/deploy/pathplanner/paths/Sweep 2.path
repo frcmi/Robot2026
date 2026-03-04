@@ -148,6 +148,18 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Start Additional Sweep",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 1.2839506172839512,
+      "endWaypointRelativePos": 3.913580246913582,
+      "command": null
+    },
+    {
       "name": "Shoot",
       "waypointRelativePos": 5.049382716049388,
       "endWaypointRelativePos": 6.0,

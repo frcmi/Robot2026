@@ -111,9 +111,6 @@ public class Intake extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    if(nearBump.getAsBoolean()) {
-      targetState = IntakeState.kInit;
-    }
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 

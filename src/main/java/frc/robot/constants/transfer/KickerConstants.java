@@ -41,5 +41,10 @@ public class KickerConstants {
   public static final MomentOfInertia kMOI =
       KilogramSquareMeters.of(0.000292639653); // Converted from lb in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
-      AngularIOSimConfig.builder().motor(DCMotor.getKrakenX60(1)).moi(kMOI).build();
+      AngularIOSimConfig.builder()
+          .motor(DCMotor.getKrakenX60(1))
+          .moi(kMOI)
+          .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
+          .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
+          .build();
 }

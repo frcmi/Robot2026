@@ -44,5 +44,10 @@ public class RollerConstants {
               * 3
               * 0.000292639653); // Converted from lb in^2 to kg m^2, multiply by 3 for 3 rollers
   public static final AngularIOSimConfig kSimConfig =
-      AngularIOSimConfig.builder().motor(DCMotor.getKrakenX44(1)).moi(kMOI).build();
+      AngularIOSimConfig.builder()
+          .motor(DCMotor.getKrakenX44(1))
+          .moi(kMOI)
+          .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
+          .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
+          .build();
 }

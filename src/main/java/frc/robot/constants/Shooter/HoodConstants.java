@@ -95,5 +95,7 @@ public class HoodConstants {
           .kD(kSubsystemConfigSim.getKD())
           .cruiseVelocity(kSubsystemConfigSim.getCruiseVelocity())
           .acceleration(kSubsystemConfigSim.getAcceleration())
+          .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
+          .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .build();
 }

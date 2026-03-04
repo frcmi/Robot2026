@@ -99,5 +99,7 @@ public class ClimberConstants {
           .kG(kSubsystemConfigSim.getKG())
           .cruiseVelocity(kSubsystemConfigSim.getCruiseVelocity())
           .acceleration(kSubsystemConfigSim.getAcceleration())
+          .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
+          .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .build();
 }

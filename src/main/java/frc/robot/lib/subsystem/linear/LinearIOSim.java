@@ -88,18 +88,49 @@ public class LinearIOSim implements LinearIO {
       case kNeutral -> inputs.appliedVolts = Volts.of(0.0);
     }
     linearExtension.setInput(inputs.appliedVolts.in(Volts));
+
+    // Current limiting by Nishant
+    DCMotor motor = deviceConfig.getMotor();
+    double backemf = linearExtension.getMotorVelocityRadPerSec() / motor.KvRadPerSecPerVolt; // Volts
+    double desiredI = (inputs.appliedVolts.in(Volts) - backemf) / motor.rOhms; // Amps
+
+    // Stator current limit
+    if (Math.abs(desiredI) > deviceConfig.getStatorCurrentLimit().in(Amps)) {
+      desiredI = Math.signum(desiredI) * deviceConfig.getStatorCurrentLimit().in(Amps);
+    }
+
+    // Supply current limit
+    // supplyCurrent = desiredI * applV / Vbat
+    //   = desiredI * (backemf + desiredI * rOhms) / Vbat = supplyLimit
+    // quadratic sol rOhms * I^2 + backemf * I - supplyLimit * Vbat = 0
+    double supplyLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
+    double Vbat = RobotController.getBatteryVoltage();
+    double maxStatorFromSupply =
+        (-backemf + Math.signum(desiredI) * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
+            / (2 * motor.rOhms);
+    if (Math.abs(desiredI) > Math.abs(maxStatorFromSupply)) {
+      desiredI = maxStatorFromSupply;
+    }
+
+    // Calculate applied voltage from desired current
+    double applV = backemf + desiredI * motor.rOhms;
+    if (applV > 12.0) {
+      applV = 12.0;
+    } else if (applV < -12.0) {
+      applV = -12.0;
+    }
+    double mag = applV / Vbat;
+
+    linearExtension.setInput(applV);
+
+    inputs.statorCurrent = Amps.of(linearExtension.getCurrentDrawAmps());
+    inputs.supplyCurrent = Amps.of(linearExtension.getCurrentDrawAmps() * mag);
+    this.supplyCurrent = inputs.supplyCurrent;
+
     linearExtension.update(kDt);
 
     inputs.length = Meters.of(linearExtension.getPositionMeters());
     inputs.reference = goal;
-
-    inputs.supplyCurrent =
-        Amps.of(
-            linearExtension.getCurrentDrawAmps()
-                * inputs.appliedVolts.abs(Volts)
-                / RobotController.getBatteryVoltage());
-    inputs.statorCurrent = Amps.of(linearExtension.getCurrentDrawAmps());
-    this.supplyCurrent = inputs.supplyCurrent;
 
     inputs.velocity = MetersPerSecond.of(linearExtension.getVelocityMetersPerSecond());
     this.velocity = inputs.velocity;

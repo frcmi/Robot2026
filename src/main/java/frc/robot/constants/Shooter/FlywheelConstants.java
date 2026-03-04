@@ -72,5 +72,7 @@ public class FlywheelConstants {
           .kD(kSubsystemConfigSim.getKD())
           .kV(kSubsystemConfigSim.getKV())
           .acceleration(kSubsystemConfigSim.getAcceleration())
+          .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
+          .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .build();
 }

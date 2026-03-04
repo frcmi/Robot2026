@@ -19,6 +19,8 @@ public class AngularIOSimConfig {
   @Builder.Default private final Angle physicalMaxAngle = Radians.of(Double.POSITIVE_INFINITY);
   @Builder.Default private final double motorRotationsPerOutputRotations = 1.0;
   @Builder.Default @Setter private NeutralModeValue neutralMode = NeutralModeValue.Brake;
+  @Builder.Default private final Current supplyCurrentLimit = Amps.of(Double.POSITIVE_INFINITY);
+  @Builder.Default private final Current statorCurrentLimit = Amps.of(Double.POSITIVE_INFINITY);
 
   @Builder.Default @Setter private double kP = 0.0;
   @Builder.Default @Setter private double kI = 0.0;

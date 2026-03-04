@@ -111,21 +111,51 @@ public class AngularIOSim implements AngularIO {
       }
       case kNeutral -> inputs.appliedVolts = Volts.of(0.0);
     }
-    pivot.setInput(inputs.appliedVolts.in(Volts));
+
+    // Current limiting by Nishant
+    DCMotor motor = deviceConfig.getMotor();
+    double backemf = pivot.getVelocityRadPerSec() / motor.KvRadPerSecPerVolt; // Volts
+    double desiredI = (inputs.appliedVolts.in(Volts) - backemf) / motor.rOhms; // Amps
+
+    // Stator current limit
+    if (Math.abs(desiredI) > deviceConfig.getStatorCurrentLimit().in(Amps)) {
+      desiredI = Math.signum(desiredI) * deviceConfig.getStatorCurrentLimit().in(Amps);
+    }
+
+    // Supply current limit
+    // supplyCurrent = desiredI * applV / Vbat
+    //   = desiredI * (backemf + desiredI * rOhms) / Vbat = supplyLimit
+    // quadratic sol rOhms * I^2 + backemf * I - supplyLimit * Vbat = 0
+    double supplyLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
+    double Vbat = RobotController.getBatteryVoltage();
+    double maxStatorFromSupply =
+        (-backemf + Math.signum(desiredI) * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
+            / (2 * motor.rOhms);
+    if (Math.abs(desiredI) > Math.abs(maxStatorFromSupply)) {
+      desiredI = maxStatorFromSupply;
+    }
+
+    // Calculate applied voltage from desired current
+    double applV = backemf + desiredI * motor.rOhms;
+    if (applV > 12.0) {
+      applV = 12.0;
+    } else if (applV < -12.0) {
+      applV = -12.0;
+    }
+    double mag = applV / Vbat;
+
+    pivot.setInput(applV);
+
+    inputs.statorCurrent = Amps.of(pivot.getCurrentDrawAmps());
+    inputs.supplyCurrent = Amps.of(pivot.getCurrentDrawAmps() * mag);
+    this.supplyCurrent = inputs.supplyCurrent;
+
     pivot.update(kDt);
 
     inputs.referencePos = posSet.orElse(Radians.of(0.0));
     inputs.referenceVel = velSet.orElse(RadiansPerSecond.of(0.0));
 
     inputs.angle = Radians.of(pivot.getAngleRads());
-
-    inputs.supplyCurrent =
-        Amps.of(
-            pivot.getCurrentDrawAmps()
-                * inputs.appliedVolts.abs(Volts)
-                / RobotController.getBatteryVoltage());
-    inputs.statorCurrent = Amps.of(pivot.getCurrentDrawAmps());
-    this.supplyCurrent = inputs.supplyCurrent;
 
     inputs.velocity = RadiansPerSecond.of(pivot.getVelocityRadPerSec());
     this.velocity = inputs.velocity;

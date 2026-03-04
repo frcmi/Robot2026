@@ -196,6 +196,12 @@ public class LinearExtensionSim extends LinearSystemSim<N2, N1, N2> {
     return getOutput(1);
   }
 
+  public double getMotorVelocityRadPerSec() {
+    double kA = 1 / m_plant.getB().get(1, 0);
+    double kV = -m_plant.getA().get(1, 1) * kA;
+    return m_x.get(1, 0) * kV * m_gearbox.KvRadPerSecPerVolt;
+  }
+
   /**
    * Returns the elevator current draw.
    *

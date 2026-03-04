@@ -210,7 +210,7 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
     // Check if PID changed for pathplanner, update automatically
-    if (Constants.kTuningMode
+    /*if (Constants.kTuningMode
         && DriveConstants.TRANSLATION_KP.hasChanged(DriveConstants.TRANSLATION_KD.hashCode())
         && DriveConstants.TRANSLATION_KD.hasChanged(DriveConstants.TRANSLATION_KP.hashCode())
         && DriveConstants.PP_ANGLE_KP.hasChanged(DriveConstants.PP_ANGLE_KD.hashCode())
@@ -228,7 +228,7 @@ public class Drive extends SubsystemBase {
           PP_CONFIG,
           () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
           this);
-    }
+    }*/
   }
 
   /**

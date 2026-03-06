@@ -20,7 +20,7 @@ import frc.robot.subsystems.climb.ClimbState;
 
 public class ClimberConstants {
   // Physical constants for climber-in-a-box
-  public static final Distance kSpoolDiameter = Inches.of(1.5); // Diameter of the winch spool
+  public static final Distance kSpoolDiameter = Inches.of(0.8); // Diameter of the winch spool
   public static final Distance kDistancePerRotation =
       Inches.of(Math.PI * kSpoolDiameter.in(Inches)); // Circumference
 
@@ -38,7 +38,7 @@ public class ClimberConstants {
           .bus(kRioBus)
           .positionTolerance(Inches.of(0.5))
           .velocityTolerance(InchesPerSecond.of(2.0))
-          .kP(12.0)
+          .kP(15.0)
           .kI(0.0)
           .kD(0.5)
           .kG(0.0) // Small gravity compensation for hanging climber
@@ -53,11 +53,11 @@ public class ClimberConstants {
           .resetLength(ClimbState.kStowed.getClimber())
           .softMinLength(ClimbState.kStowed.getClimber())
           .softMaxLength(ClimbState.kRaised.getClimber())
-          .motorRotationsPerOutputRotations(15.0) // 15:1 gear ratio for climber in a box
+          .motorRotationsPerOutputRotations(12.0) // 12:1 gear ratio for climber in a box
           .outputDistancePerOutputRotation(kDistancePerRotation)
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
-          .statorCurrentLimit(Amps.of(80.0)) // Higher current for climbing
+          .statorCurrentLimit(Amps.of(140.0)) // Higher current for climbing
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

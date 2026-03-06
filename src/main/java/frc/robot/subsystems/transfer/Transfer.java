@@ -39,7 +39,7 @@ public class Transfer extends VirtualSubsystem {
     this.aimed = aimed;
 
     transfer.setDefaultCommand(transfer.openLoop(() -> targetStateAimed().getTransfer()));
-    kicker.setDefaultCommand(kicker.openLoop(() -> targetStateAimed().getKicker()));
+    kicker.setDefaultCommand(kicker.velocity(() -> targetStateAimed().getKicker()));
 
     this.setDefaultCommand(this.set(TransferState.kIdle));
 

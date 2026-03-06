@@ -21,15 +21,32 @@ public class KickerConstants {
       () -> Rotation2d.kZero;
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
-      AngularSubsystemConfig.builder().logKey("Kicker").bus(kRioBus).build();
+      AngularSubsystemConfig.builder()
+          .logKey("Kicker")
+          .bus(kRioBus)
+          .kP(0.03)
+          .kI(0.0)
+          .kD(0.0)
+          .kV(
+              12.0
+                  / (1200
+                      * (2 * Math.PI
+                          / 60.0))) // 12V per 1200rpm output (6000rpm motor with 5:1 gearing)
+          .velocityTolerance(RotationsPerSecond.of(1.6))
+          .acceleration(
+              RotationsPerSecondPerSecond.of(200.0)) // 0.25 second spinup to 1200rpm output
+          .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(23)
           .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40))
-          .statorCurrentLimit(Amps.of(60))
+          .motorRotationsPerOutputRotations(5)
+          .supplyCurrentLimit(Amps.of(40.0))
+          .supplyCurrentLowerTime(Seconds.of(0.5))
+          .supplyCurrentLower(Amps.of(20.0))
+          .statorCurrentLimit(Amps.of(60.0))
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .build();
 
@@ -37,14 +54,26 @@ public class KickerConstants {
       AngularSubsystemConfig.builder()
           .logKey(kSubsystemConfigReal.getLogKey())
           .bus(kSubsystemConfigReal.getBus())
+          .kP(kSubsystemConfigReal.getKP())
+          .kI(kSubsystemConfigReal.getKI())
+          .kD(kSubsystemConfigReal.getKD())
+          .kV(kSubsystemConfigReal.getKV())
+          .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
+          .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
   public static final MomentOfInertia kMOI =
-      KilogramSquareMeters.of(0.000292639653); // Converted from lb in^2 to kg m^2
+      KilogramSquareMeters.of(0.000424327497472); // Converted from lb in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
           .motor(DCMotor.getKrakenX60(1))
           .moi(kMOI)
+          .motorRotationsPerOutputRotations(5)
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
+          .kP(kSubsystemConfigSim.getKP())
+          .kI(kSubsystemConfigSim.getKI())
+          .kD(kSubsystemConfigSim.getKD())
+          .kV(kSubsystemConfigSim.getKV())
+          .acceleration(kSubsystemConfigSim.getAcceleration())
           .build();
 }

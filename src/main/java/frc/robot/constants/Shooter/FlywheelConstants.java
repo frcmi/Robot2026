@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,22 +23,22 @@ public class FlywheelConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Flywheel")
+          .bus(kCanivoreBus)
           .velocityTolerance(RotationsPerSecond.of(1.6))
           .acceleration(RotationsPerSecondPerSecond.of(200.0)) // 12000rpm/s, 0.5s spinup
           .kP(0.08)
           .kI(0.0)
           .kD(0.0)
           .kV(12.0 / (6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm
-          .bus(kRioBus)
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(40)
           .followerIds(java.util.List.of(49, 50))
+          .bus(kCanivoreBus)
           .opposeMaster(true)
           .motorRotationsPerOutputRotations(1)
-          .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
           .supplyCurrentLowerTime(Seconds.of(0.5))

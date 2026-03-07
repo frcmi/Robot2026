@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -36,7 +36,7 @@ public class HoodConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Hood")
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .positionTolerance(Degrees.of(3.0))
           .velocityTolerance(DegreesPerSecond.of(4.58))
           .kP(60.0)
@@ -49,7 +49,7 @@ public class HoodConstants {
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(20)
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .resetAngle(kMinHoodAngle)
           .softMinAngle(kMinHoodAngle)
           .softMaxAngle(kMaxHoodAngle)

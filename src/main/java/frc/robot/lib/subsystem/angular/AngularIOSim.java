@@ -129,7 +129,9 @@ public class AngularIOSim implements AngularIO {
     double supplyLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
     double Vbat = RobotController.getBatteryVoltage();
     double maxStatorFromSupply =
-        (-backemf + Math.signum(desiredI) * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
+        (-backemf
+                + Math.signum(desiredI)
+                    * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
             / (2 * motor.rOhms);
     if (Math.abs(desiredI) > Math.abs(maxStatorFromSupply)) {
       desiredI = maxStatorFromSupply;

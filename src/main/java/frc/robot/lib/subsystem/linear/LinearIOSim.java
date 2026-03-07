@@ -91,7 +91,8 @@ public class LinearIOSim implements LinearIO {
 
     // Current limiting by Nishant
     DCMotor motor = deviceConfig.getMotor();
-    double backemf = linearExtension.getMotorVelocityRadPerSec() / motor.KvRadPerSecPerVolt; // Volts
+    double backemf =
+        linearExtension.getMotorVelocityRadPerSec() / motor.KvRadPerSecPerVolt; // Volts
     double desiredI = (inputs.appliedVolts.in(Volts) - backemf) / motor.rOhms; // Amps
 
     // Stator current limit
@@ -106,7 +107,9 @@ public class LinearIOSim implements LinearIO {
     double supplyLimit = deviceConfig.getSupplyCurrentLimit().in(Amps);
     double Vbat = RobotController.getBatteryVoltage();
     double maxStatorFromSupply =
-        (-backemf + Math.signum(desiredI) * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
+        (-backemf
+                + Math.signum(desiredI)
+                    * Math.sqrt(backemf * backemf + 4 * motor.rOhms * supplyLimit * Vbat))
             / (2 * motor.rOhms);
     if (Math.abs(desiredI) > Math.abs(maxStatorFromSupply)) {
       desiredI = maxStatorFromSupply;

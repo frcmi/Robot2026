@@ -10,7 +10,7 @@ public final class RobotConstants {
   public static final double kMaxTimeoutMS = 1;
   public static final int kMaxAttempts = 5;
 
-  public static final CANBus kCanivoreBus = new CANBus("Amelia Bernson is a meanie pants");
+  public static final CANBus kCanivoreBus = new CANBus("Shooter");
   public static final CANBus kRioBus = new CANBus("rio");
 
   public static final Color8Bit kMeasuredStateColor = new Color8Bit(255, 0, 0);

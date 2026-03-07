@@ -9,7 +9,7 @@ import com.ctre.phoenix6.signals.StripTypeValue;
 
 public class CANdleIOReal implements CANdleIO {
 
-  private final CANdle m_candle = new CANdle(1, "rio");
+  private final CANdle m_candle = new CANdle(1, "Drivetrain");
   private ControlRequest request;
 
   public CANdleIOReal() {

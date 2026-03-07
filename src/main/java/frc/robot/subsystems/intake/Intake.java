@@ -76,8 +76,27 @@ public class Intake extends VirtualSubsystem {
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
     this.setDefaultCommand(this.set(IntakeState.kStowed));
+    nearTrench.whileTrue(this.set(IntakeState.kIntaking));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
+  }
+
+  public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
+
+  private boolean isNearTrench() {
+    Pose2d currentPose = this.robotPose.get();
+    Translation2d hubPosition =
+        alliance == Alliance.Blue
+            ? FieldConstants.kHubPositionBlue
+            : FieldConstants.kHubPositionRed;
+
+    // Check X
+    boolean nearX =
+        Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
+    boolean nearY =
+        currentPose.getY() < FieldConstants.trenchWidthY
+            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
+    return nearX && nearY;
   }
 
   private boolean prevOscillating = false;

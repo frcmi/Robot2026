@@ -430,7 +430,7 @@ public class RobotContainer {
         .onFalse(shooter.zeroHood());
     operatorController
         .dPadDown
-        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE))
+        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE).repeatedly())
         .onFalse(climb.resetClimb());
 
     // Intake controls

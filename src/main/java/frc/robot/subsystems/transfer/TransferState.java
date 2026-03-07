@@ -6,6 +6,7 @@ package frc.robot.subsystems.transfer;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -18,13 +19,13 @@ import lombok.Setter;
 /** Add your docs here. */
 public class TransferState implements StructSerializable {
   @Setter private Voltage transfer;
-  @Setter private Voltage kicker;
+  @Setter private AngularVelocity kicker;
   private final String type;
 
   private final Optional<LoggedTunableNumber> transferVoltageTunable;
   private final Optional<LoggedTunableNumber> kickerVoltageTunable;
 
-  public TransferState(Voltage transfer, Voltage kicker) {
+  public TransferState(Voltage transfer, AngularVelocity kicker) {
     this.transfer = transfer;
     this.kicker = kicker;
 
@@ -34,7 +35,7 @@ public class TransferState implements StructSerializable {
     type = "kNotTunable";
   }
 
-  public TransferState(Voltage transfer, Voltage kicker, String logKey) {
+  public TransferState(Voltage transfer, AngularVelocity kicker, String logKey) {
     this.transfer = transfer;
     this.kicker = kicker;
     this.type = logKey;
@@ -46,7 +47,8 @@ public class TransferState implements StructSerializable {
     kickerVoltageTunable =
         Optional.of(
             new LoggedTunableNumber(
-                String.format("TransferStates/%s/KickerVolts", logKey), kicker.in(Volts)));
+                String.format("TransferStates/%s/KickerVoltsRPS", logKey),
+                kicker.in(RotationsPerSecond)));
   }
 
   public Voltage getTransfer() {
@@ -55,19 +57,19 @@ public class TransferState implements StructSerializable {
         .orElse(transfer);
   }
 
-  public Voltage getKicker() {
+  public AngularVelocity getKicker() {
     return kickerVoltageTunable
-        .map(loggedTunableNumber -> Volts.of(loggedTunableNumber.get()))
+        .map(loggedTunableNumber -> RotationsPerSecond.of(loggedTunableNumber.get()))
         .orElse(kicker);
   }
 
   // States
   public static final TransferState kIdle =
-      new TransferState(Volts.of(-1.0), Volts.of(0.0), "kIdle");
+      new TransferState(Volts.of(-1.0), RotationsPerSecond.of(0.0), "kIdle");
   public static final TransferState kTransferring =
-      new TransferState(Volts.of(12.0), Volts.of(12.0), "kTransferring");
+      new TransferState(Volts.of(12.0), RotationsPerSecond.of(15.0), "kTransferring");
   public static final TransferState kReverse =
-      new TransferState(Volts.of(-12.0), Volts.of(-12.0), "kReverse");
+      new TransferState(Volts.of(-12.0), RotationsPerSecond.of(-15.0), "kReverse");
 
   @SuppressWarnings("unused")
   public static final Struct<TransferState> struct =
@@ -90,14 +92,14 @@ public class TransferState implements StructSerializable {
         @Override
         public String getSchema() {
           // spotless:off
-                    return "double transferVoltageVolts;double kickerVoltageVolts;char Type[256]";
+                    return "double transferVoltageVolts;double kickerVelocityRPS;char Type[256]";
                     // spotless:on
         }
 
         @Override
         public TransferState unpack(ByteBuffer bb) {
           Voltage transfer = Volts.of(bb.getDouble());
-          Voltage kicker = Volts.of(bb.getDouble());
+          AngularVelocity kicker = RotationsPerSecond.of(bb.getDouble());
           String type = StructUtils.readString(bb, 256);
 
           return new TransferState(transfer, kicker, type);
@@ -106,7 +108,7 @@ public class TransferState implements StructSerializable {
         @Override
         public void pack(ByteBuffer bb, TransferState value) {
           bb.putDouble(value.getTransfer().in(Volts));
-          bb.putDouble(value.getKicker().in(Volts));
+          bb.putDouble(value.getKicker().in(RotationsPerSecond));
           StructUtils.writeString(bb, value.type, 256);
         }
 

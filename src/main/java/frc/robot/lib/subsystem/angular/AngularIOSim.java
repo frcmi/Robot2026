@@ -114,7 +114,10 @@ public class AngularIOSim implements AngularIO {
 
     // Current limiting by Nishant
     DCMotor motor = deviceConfig.getMotor();
-    double backemf = pivot.getVelocityRadPerSec() / motor.KvRadPerSecPerVolt; // Volts
+    double backemf =
+        pivot.getVelocityRadPerSec()
+            * deviceConfig.getMotorRotationsPerOutputRotations()
+            / motor.KvRadPerSecPerVolt; // Volts
     double desiredI = (inputs.appliedVolts.in(Volts) - backemf) / motor.rOhms; // Amps
 
     // Stator current limit

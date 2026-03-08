@@ -47,8 +47,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   private boolean disabled = false;
 
-  // for crossing trench: if true, hood will be locked into lowest position.
-  @Getter @Setter private boolean hoodLocked = false;
+  // for crossing shooting in init, if true hood will not lower when near trench
+  @Getter @Setter private boolean hoodUnlocked = true;
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -185,7 +185,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // if we're near the trench or forcing the hood to be locked, hood goes to min angle
     this.targetState.setHood(
-        (nearTrench.getAsBoolean() || hoodLocked)
+        (nearTrench.getAsBoolean() && hoodUnlocked)
             ? HoodConstants.kMinHoodAngle
             : Degrees.of(hoodAngle));
 
@@ -257,6 +257,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   }
 
   private boolean isAimed() {
+    Logger.recordOutput("Shooter/RawTurretTargetDeg", rawTurretTarget.in(Degrees));
     double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
     double errorAtTarget = targetDist * Math.sin(turretErr);
     double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
@@ -271,7 +272,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
           && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return errorAtTarget < (FieldConstants.bumpWidth)
+      return errorAtTarget < (FieldConstants.bumpWidth * 2)
           && hoodErr < maxHoodErr * 1.8
           && flywheelErr
               < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)

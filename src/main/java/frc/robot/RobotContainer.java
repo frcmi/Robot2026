@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.RobotSuperstructure;
@@ -185,7 +186,7 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
                       KickerConstants.kSubsystemConfigReal),
-                  shooter.aimed);
+                  shooter.aimed.or(new Trigger(isAutonomous)));
           intake =
               new Intake(
                   new AngularSubsystem(
@@ -256,7 +257,7 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
                     KickerConstants.kSubsystemConfigSim),
-                shooter.aimed);
+                shooter.aimed.or(new Trigger(isAutonomous)));
         intake =
             new Intake(
                 new AngularSubsystem(

@@ -28,29 +28,30 @@ public class AimingConstants {
             {3.5, 33.5},
             {4, 37},
             {4.5, 37},
-            {5, 38},
+            {5, 41},
           });
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
           new double[][] {
-            {0, 20},
-            {2, 24},
-            {2.5, 26},
-            {3, 28},
-            {3.5, 30},
-            {4, 33},
+            {0, 22},
+            {2, 26},
+            {2.5, 28},
+            {3, 30},
+            {3.5, 32},
+            {4, 35},
             {4.5, 52},
-            {5, 52},
+            {5, 60},
+            {6, 64},
           });
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
           new double[][] {
-            {2, 0.95},
-            {3, 1.0},
-            {4, 1.1},
-            {5.0, 1.15},
+            {2, 0.5},
+            {3, 0.53},
+            {4, 0.56},
+            {5.0, 0.6},
           });
 
   // Neutral zone aiming

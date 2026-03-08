@@ -29,7 +29,7 @@ public class RollerConstants {
           .bus(kSubsystemConfigReal.getBus())
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
-          .statorCurrentLimit(Amps.of(70))
+          .statorCurrentLimit(Amps.of(120))
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .build();
 

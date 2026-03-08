@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.transfer;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,7 +27,10 @@ public class Transfer extends VirtualSubsystem {
   @Getter private TransferState targetState = TransferState.kIdle;
   @Getter private TransferState measuredState;
 
-  private Trigger aimed;
+  private final Trigger aimed;
+  private final Timer jammedTimer = new Timer();
+  private final Timer unJamTimer = new Timer();
+  private boolean jammed = false;
 
   /** Creates a new Transfer. */
   public Transfer(Trigger aimed) {
@@ -54,9 +61,15 @@ public class Transfer extends VirtualSubsystem {
 
     Logger.recordOutput("Transfer/TargetState", targetState);
     Logger.recordOutput("Transfer/MeasuredState", measuredState);
+    Logger.recordOutput("Transfer/Jammed", jammed);
+
+    updateJamDetection();
   }
 
   private TransferState targetStateAimed() {
+    if (jammed) {
+      return TransferState.kReverse;
+    }
     if (aimed.getAsBoolean()) {
       return getTargetState();
     }
@@ -77,5 +90,28 @@ public class Transfer extends VirtualSubsystem {
 
   public Command set(Supplier<TransferState> state) {
     return Commands.run(() -> this.targetState = state.get(), this);
+  }
+
+  private void updateJamDetection() {
+    if (jammedTimer.isRunning() && jammedTimer.hasElapsed(Seconds.of(0.4))) {
+      jammed = true;
+      unJamTimer.start();
+      jammedTimer.stop();
+      jammedTimer.reset();
+    }
+    if (jammed && unJamTimer.isRunning() && unJamTimer.hasElapsed(0.1)) {
+      jammed = false;
+      unJamTimer.stop();
+      unJamTimer.reset();
+    }
+    if (transfer.getVelocity().abs(RotationsPerSecond) < 0.5
+        && targetState == TransferState.kTransferring
+        && aimed.getAsBoolean()
+        && !jammed) {
+      jammedTimer.start();
+    } else if (jammedTimer.isRunning()) {
+      jammedTimer.stop();
+      jammedTimer.reset();
+    }
   }
 }

@@ -5,6 +5,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
@@ -31,10 +32,18 @@ public class RobotSuperstructure {
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
     NamedCommands.registerCommand(
+        "WaitAimed",
+        new WaitUntilCommand(shooter.aimed)
+            .beforeStarting(() -> shooter.setHoodUnlocked(false))
+            .alongWith(shooter.forceToggleState(true))
+            .asProxy());
+    NamedCommands.registerCommand(
         "Shoot",
         transfer
             .set(TransferState.kTransferring)
             .alongWith(shooter.forceToggleState(true))
+            .beforeStarting(() -> shooter.setHoodUnlocked(false))
+            .finallyDo(() -> shooter.setHoodUnlocked(true))
             .asProxy());
 
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
@@ -49,14 +58,6 @@ public class RobotSuperstructure {
 
   public Command climbClimbed() {
     return parallel(climb.set(ClimbState.kStowed), idle()).withDeadline(climb.waitUntilAtGoal());
-  }
-
-  public Command lockHoodDown() {
-    return runOnce(() -> shooter.setHoodLocked(true));
-  }
-
-  public Command unlockHood() {
-    return runOnce(() -> shooter.setHoodLocked(false));
   }
 
   public double getDriveSpeed(boolean rotation) {

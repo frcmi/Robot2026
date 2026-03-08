@@ -7,7 +7,7 @@ public class FieldConstants {
       new Translation2d(4.62534, 4.03479); // Meters
   public static final Translation2d kHubPositionRed =
       new Translation2d(11.91641, 4.03479); // Meters
-  public static final double trenchWidthX = 2.0; // Meters, from hub center
+  public static final double trenchWidthX = 2.5; // Meters, from hub center
   public static final double trenchWidthY = 1.6; // Meters
   public static final double hubWidthY = 1.2; // Meters
   public static final double bumpWidthY = 2.5; // Meters

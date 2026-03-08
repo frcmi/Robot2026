@@ -24,9 +24,9 @@ public class FlywheelConstants {
       AngularSubsystemConfig.builder()
           .logKey("Flywheel")
           .bus(kCanivoreBus)
-          .velocityTolerance(RotationsPerSecond.of(1.6))
+          .velocityTolerance(RotationsPerSecond.of(6))
           .acceleration(RotationsPerSecondPerSecond.of(200.0)) // 12000rpm/s, 0.5s spinup
-          .kP(0.08)
+          .kP(0.1)
           .kI(0.0)
           .kD(0.0)
           .kV(12.0 / (6000 * (2 * Math.PI / 60.0))) // 12V per 6000rpm

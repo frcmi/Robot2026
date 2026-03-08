@@ -58,7 +58,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.1);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5);
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {

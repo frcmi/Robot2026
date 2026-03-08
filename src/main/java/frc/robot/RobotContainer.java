@@ -443,15 +443,17 @@ public class RobotContainer {
     /* INTAKE CONTROLS
     - Driver left trigger: Intake
     - Driver left bumper: Reverse intake
+    - Driver right trigger: Lift intake pivot (for bump)
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
+    driverController.rightTrigger.whileTrue(intake.set(IntakeState.kBump));
 
     // TODO: fix, goes past hard stop
     // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
 
     operatorController
-        .rightMidButton
+        .dPadRight
         .whileTrue(intake.openLoopPivot(PivotConstants.MANUAL_VOLTAGE))
         .onFalse(intake.zeroPivot());
   }

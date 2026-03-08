@@ -42,7 +42,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final Timer oscillationTimer = new Timer();
 
   private final LoggedTunableNumber oscillationPeriod =
-      new LoggedTunableNumber("Intake/OscillationPeriodS", 1.8);
+      new LoggedTunableNumber("Intake/OscillationPeriodS", 2.0);
   private final LoggedTunableNumber oscillationDutyCycle =
       new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.7);
   private final LoggedTunableNumber oscillationInitialDelay =
@@ -102,7 +102,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
       boolean intakeUp =
           timeNow < initialDelay ? false : (timeNow - initialDelay) % per < per * duty;
       return new IntakeState(
-          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kBump.getPivot(),
+          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kDown.getPivot(),
           IntakeState.kTransferring.getRollers());
     } else {
       prevOscillating = false;

@@ -24,7 +24,7 @@ public class KickerConstants {
       AngularSubsystemConfig.builder()
           .logKey("Kicker")
           .bus(kRioBus)
-          .kP(0.08)
+          .kP(0.2)
           .kI(0.0)
           .kD(0.0)
           .kV(

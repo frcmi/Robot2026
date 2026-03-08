@@ -36,7 +36,7 @@ public class PivotConstants {
           .bus(kRioBus)
           .positionTolerance(Degrees.of(2.0))
           .velocityTolerance(DegreesPerSecond.of(4.58))
-          .kP(5.1)
+          .kP(20)
           .kI(0.0)
           .kD(0.1)
           .kS(0.14)
@@ -55,7 +55,7 @@ public class PivotConstants {
           .resetAngle(IntakeState.kInit.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kInit.getPivot())
-          .motorRotationsPerOutputRotations(5.0 * 5.0) // The reductions on the intake
+          .motorRotationsPerOutputRotations(5.0 * 4.0) // The reductions on the intake
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))

@@ -66,7 +66,14 @@ public class RobotSuperstructure {
     speed *= 0.9;
 
     if (transferring) {
-      return speed * (rotation ? DriveConstants.TRANSFER_MULT_W : DriveConstants.TRANSFER_MULT);
+      if (shooter.inAllianceZone.getAsBoolean()) {
+        return speed * (rotation ? DriveConstants.TRANSFER_MULT_W : DriveConstants.TRANSFER_MULT);
+      } else {
+        return speed
+            * (rotation
+                ? DriveConstants.TRANSFER_MULT_W_NEUTRAL
+                : DriveConstants.TRANSFER_MULT_NEUTRAL);
+      }
     }
     if (intaking) {
       return speed * (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);

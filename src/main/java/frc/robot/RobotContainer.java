@@ -425,8 +425,7 @@ public class RobotContainer {
     operatorController.dPadUp.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft
-        .debounce(1)
-        .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE))
+        .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE).repeatedly())
         .onFalse(shooter.zeroHood());
     operatorController
         .dPadDown

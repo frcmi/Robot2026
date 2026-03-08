@@ -390,10 +390,6 @@ public class RobotContainer {
                 drive,
                 () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
                 drive::getPose)));
-    // TODO: fix stall whistle when this runs
-    // ,
-    // superstructure.lockHoodDown()))
-    // .whileFalse(superstructure.unlockHood());
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
@@ -415,13 +411,18 @@ public class RobotContainer {
     simController.buttonX.onTrue(superstructure.climbClimbed());
 
     /* DEBUG/FAILSAFE CONTROLS:
-     - Operator B (HOLD): Stow intake
+     - Operator A: Toggle turret manual override
+     - Operator right joystick: Control turret manually
+     - Operator B (HOLD): Stow intake (disabled)
      - Operator DPad right: Disable shooter
      - Operator DPad Left: Moves hood down when held, release to zero hood
      - Operator DPad Down: Moves climb down when held, release to zero climb
      - Operator DPad Up: Zero intake pivot (doesn't actually lift it)
     */
-    // TODO: lock turret control (Operator A), needed for the intake init stow
+    operatorController.buttonA.onTrue(shooter.toggleOverride());
+    shooter.turretOverride.whileTrue(shooter.turretPower(() -> TurretConstants.OVERRIDE_VOLTAGE.times(operatorController.getRightStickX())));
+
+    // TODO: Fix (intake goes past hard stop rn)
     // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
     operatorController.dPadUp.onTrue(shooter.toggleDisabled());
     operatorController
@@ -448,9 +449,6 @@ public class RobotContainer {
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
     driverController.rightTrigger.whileTrue(intake.set(IntakeState.kBump));
-
-    // TODO: fix, goes past hard stop
-    // driverController.buttonY.onTrue(intake.set(IntakeState.kInit));
 
     operatorController
         .dPadRight

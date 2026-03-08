@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
@@ -36,6 +38,8 @@ public class TurretConstants {
       Degrees.of(
           30); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
   // intake direction
+
+  public static final Voltage OVERRIDE_VOLTAGE = Volts.of(3.0);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;

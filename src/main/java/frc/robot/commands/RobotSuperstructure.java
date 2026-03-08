@@ -35,13 +35,13 @@ public class RobotSuperstructure {
         "WaitAimed",
         new WaitUntilCommand(shooter.aimed)
             .beforeStarting(() -> shooter.setHoodUnlocked(false))
-            .alongWith(shooter.forceToggleState(true))
+            .alongWith(shooter.forceToggleState())
             .asProxy());
     NamedCommands.registerCommand(
         "Shoot",
         transfer
             .set(TransferState.kTransferring)
-            .alongWith(shooter.forceToggleState(true))
+            .alongWith(shooter.forceToggleState())
             .beforeStarting(() -> shooter.setHoodUnlocked(false))
             .finallyDo(() -> shooter.setHoodUnlocked(true))
             .asProxy());
@@ -49,7 +49,7 @@ public class RobotSuperstructure {
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
     new EventTrigger("Shoot")
         .whileTrue(
-            transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState(true)));
+            transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
   }
 
   public Command climbRaise() {

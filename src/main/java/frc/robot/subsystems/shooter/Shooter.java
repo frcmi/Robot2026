@@ -46,6 +46,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Supplier<ChassisSpeeds> robotVel;
 
   private boolean disabled = false;
+  private boolean isTurretOverride = false;
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
@@ -59,6 +60,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
   public Trigger aimed = new Trigger(this::isAimed).debounce(0.5);
+  public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
@@ -101,6 +103,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
     Logger.recordOutput("Shooter/Disabled", disabled);
+    Logger.recordOutput("Shooter/TurretOverride", isTurretOverride);
     Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
     Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
     Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
@@ -177,7 +180,14 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
 
     // Actually apply to hardware
-    this.targetState.setTurret(turretTarget);
+    if (!isTurretOverride) {
+      this.targetState.setTurret(turretTarget);
+    } else {
+      this.targetState.setTurret(measuredState.getTurret());
+    }
+              
+
+
     double hoodAngle =
         (allianceZone ? AimingConstants.kHoodAngleTable : AimingConstants.kHoodAngleTableNeutral)
             .get(targetDist);
@@ -210,10 +220,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     return this.hood.resetAngle();
   }
 
-  public Command forceToggleState(boolean enabled) {
+  public Command forceToggleState() {
     return runOnce(
         () -> {
-          disabled = !enabled;
+          disabled = false;
+          isTurretOverride = false;
         });
   }
 
@@ -279,5 +290,22 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                   * 1.8
           && shooterDistInRange;
     }
+  }
+
+  public Command toggleOverride() {
+    return either(
+        runOnce(
+            () -> {
+              isTurretOverride = false;
+            }),
+        runOnce(
+            () -> {
+              isTurretOverride = true;
+            }),
+        () -> isTurretOverride);
+  }
+
+  public Command turretPower(Supplier<Voltage> volts) {
+    return this.turret.openLoop(volts);
   }
 }

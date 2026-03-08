@@ -10,6 +10,9 @@ package frc.robot;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -45,8 +48,18 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.currentMode) {
       case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
+        // Prefer a mounted USB drive (/u/logs), fall back to internal storage
+        String realLogPath;
+        try {
+          if (Files.isWritable(Paths.get("/U").toRealPath())) {
+            realLogPath = "/U/logs";
+          } else {
+            realLogPath = "/home/lvuser/logs";
+          }
+        } catch (IOException e) {
+          realLogPath = "/home/lvuser/logs";
+        }
+        Logger.addDataReceiver(new WPILOGWriter(realLogPath));
         Logger.addDataReceiver(new NT4Publisher());
         SignalLogger.enableAutoLogging(false);
         SignalLogger.start();

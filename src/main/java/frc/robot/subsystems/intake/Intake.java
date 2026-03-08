@@ -21,6 +21,7 @@ import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.lib.LoggedTunableNumber;
+import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends VirtualSubsystem {
+public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver {
   private final AngularSubsystem rollers;
   private final AngularSubsystem pivot;
   private final Supplier<Pose2d> robotPose;
@@ -47,7 +48,7 @@ public class Intake extends VirtualSubsystem {
   private final LoggedTunableNumber oscillationInitialDelay =
       new LoggedTunableNumber("Intake/OscillationInitialDelay", 1.0);
 
-  @Getter private IntakeState targetState = IntakeState.kStowed;
+  @Getter private IntakeState targetState = IntakeState.kDown;
   @Getter private IntakeState measuredState;
 
   /** Creates a new Intake. */
@@ -75,28 +76,9 @@ public class Intake extends VirtualSubsystem {
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
-    this.setDefaultCommand(this.set(IntakeState.kStowed));
-    nearTrench.whileTrue(this.set(IntakeState.kIntaking));
+    this.setDefaultCommand(this.set(IntakeState.kDown));
 
     measuredState = new IntakeState(pivot.getAngle(), targetState.getRollers());
-  }
-
-  public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
-
-  private boolean isNearTrench() {
-    Pose2d currentPose = this.robotPose.get();
-    Translation2d hubPosition =
-        alliance == Alliance.Blue
-            ? FieldConstants.kHubPositionBlue
-            : FieldConstants.kHubPositionRed;
-
-    // Check X
-    boolean nearX =
-        Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
-    boolean nearY =
-        currentPose.getY() < FieldConstants.trenchWidthY
-            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
-    return nearX && nearY;
   }
 
   private boolean prevOscillating = false;
@@ -104,9 +86,9 @@ public class Intake extends VirtualSubsystem {
   private IntakeState gatedTarget() {
     if (nearBump.getAsBoolean()) {
       prevOscillating = false;
-      return IntakeState.kStowed;
+      return IntakeState.kBump;
     }
-    if (shooting.getAsBoolean() && this.targetState == IntakeState.kStowed) {
+    if (shooting.getAsBoolean() && this.targetState == IntakeState.kDown) {
       if (!prevOscillating) {
         oscillationTimer.restart();
         prevOscillating = true;
@@ -120,7 +102,7 @@ public class Intake extends VirtualSubsystem {
       boolean intakeUp =
           timeNow < initialDelay ? false : (timeNow - initialDelay) % per < per * duty;
       return new IntakeState(
-          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kStowed.getPivot(),
+          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kBump.getPivot(),
           IntakeState.kTransferring.getRollers());
     } else {
       prevOscillating = false;
@@ -159,6 +141,11 @@ public class Intake extends VirtualSubsystem {
 
   private boolean isNearBump() {
     Pose2d currentPose = this.robotPose.get();
+    Translation2d currentPos =
+        currentPose
+            .getTranslation()
+            .plus(PivotConstants.IntakeOffset.rotateBy(currentPose.getRotation()));
+
     Translation2d hubPosition =
         alliance == Alliance.Blue
             ? FieldConstants.kHubPositionBlue
@@ -166,15 +153,19 @@ public class Intake extends VirtualSubsystem {
 
     // Check X
     boolean nearX =
-        Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
+        Math.abs(currentPos.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
     boolean nearY =
-        (currentPose.getY() > FieldConstants.trenchWidthY
-                && currentPose.getY() < (FieldConstants.bumpWidthY + FieldConstants.trenchWidthY))
-            || (currentPose.getY()
+        (currentPos.getY() > FieldConstants.trenchWidthY
+                && currentPos.getY() < (FieldConstants.bumpWidthY + FieldConstants.trenchWidthY))
+            || (currentPos.getY()
                     > FieldConstants.trenchWidthY
                         + FieldConstants.bumpWidthY
                         + FieldConstants.hubWidthY
-                && currentPose.getY() < (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY));
+                && currentPos.getY() < (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY));
     return nearX && nearY;
+  }
+
+  public void onAllianceFound(Alliance alliance) {
+    this.alliance = alliance;
   }
 }

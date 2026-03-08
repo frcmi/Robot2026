@@ -148,9 +148,9 @@ public class RobotContainer {
               new Vision(
                   drive::addVisionMeasurement,
                   new VisionIOLimelight(camera0Name, drive::getRotation),
-                  //   new VisionIOLimelight(camera1Name, drive::getRotation),
-                  new VisionIOLimelight(camera2Name, drive::getRotation));
-          // new VisionIOLimelight(camera3Name, drive::getRotation));
+                  new VisionIOLimelight(camera1Name, drive::getRotation),
+                  new VisionIOLimelight(camera2Name, drive::getRotation),
+                  new VisionIOLimelight(camera3Name, drive::getRotation));
         } else {
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
@@ -332,7 +332,7 @@ public class RobotContainer {
             "Target",
             RobotConstants.kTargetStateColor);
 
-    allianceChecker.registerObservers(shooter);
+    allianceChecker.registerObservers(shooter, intake);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

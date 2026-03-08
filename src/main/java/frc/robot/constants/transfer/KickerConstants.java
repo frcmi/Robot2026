@@ -24,14 +24,14 @@ public class KickerConstants {
       AngularSubsystemConfig.builder()
           .logKey("Kicker")
           .bus(kRioBus)
-          .kP(0.03)
+          .kP(0.08)
           .kI(0.0)
           .kD(0.0)
           .kV(
               12.0
-                  / (1200
+                  / ((7530.0 / 5.0)
                       * (2 * Math.PI
-                          / 60.0))) // 12V per 1200rpm output (6000rpm motor with 5:1 gearing)
+                          / 60.0))) // 12V per 1200rpm output (7530rpm motor with 5:1 gearing)
           .velocityTolerance(RotationsPerSecond.of(1.6))
           .acceleration(
               RotationsPerSecondPerSecond.of(200.0)) // 0.25 second spinup to 1200rpm output
@@ -65,7 +65,7 @@ public class KickerConstants {
       KilogramSquareMeters.of(0.000424327497472); // Converted from lb in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
-          .motor(DCMotor.getKrakenX60(1))
+          .motor(DCMotor.getKrakenX44(1))
           .moi(kMOI)
           .motorRotationsPerOutputRotations(5)
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())

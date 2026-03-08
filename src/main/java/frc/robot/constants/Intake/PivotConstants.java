@@ -10,6 +10,7 @@ import static frc.robot.constants.RobotConstants.kRioBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -21,6 +22,8 @@ import frc.robot.subsystems.intake.IntakeState;
 import java.util.function.Supplier;
 
 public class PivotConstants {
+  public static final Translation2d IntakeOffset = new Translation2d(Inches.of(16.0).in(Meters), 0);
+
   public static final Voltage MANUAL_VOLTAGE = Volts.of(-2.0);
 
   public static final Distance PivotLength = Inches.of(14.9);

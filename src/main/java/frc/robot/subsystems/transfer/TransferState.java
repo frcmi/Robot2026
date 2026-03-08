@@ -47,7 +47,7 @@ public class TransferState implements StructSerializable {
     kickerVoltageTunable =
         Optional.of(
             new LoggedTunableNumber(
-                String.format("TransferStates/%s/KickerVoltsRPS", logKey),
+                String.format("TransferStates/%s/KickerVelRPS", logKey),
                 kicker.in(RotationsPerSecond)));
   }
 

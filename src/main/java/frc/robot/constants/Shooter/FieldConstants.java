@@ -10,7 +10,7 @@ public class FieldConstants {
   public static final double trenchWidthX = 2.0; // Meters, from hub center
   public static final double trenchWidthY = 1.6; // Meters
   public static final double hubWidthY = 1.2; // Meters
-  public static final double bumpWidthY = 1.85; // Meters
+  public static final double bumpWidthY = 2.5; // Meters
   public static final double fieldWidthY = 8.06958; // Meters
 
   public static final double allianceZoneXBlue = 2.4; // Meters, where we shoot when in neutral zone

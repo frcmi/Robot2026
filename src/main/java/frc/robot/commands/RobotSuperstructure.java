@@ -48,8 +48,7 @@ public class RobotSuperstructure {
 
     new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
     new EventTrigger("Shoot")
-        .whileTrue(
-            transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
+        .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
   }
 
   public Command climbRaise() {

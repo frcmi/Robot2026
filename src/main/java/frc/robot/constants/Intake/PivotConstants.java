@@ -84,7 +84,9 @@ public class PivotConstants {
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(1.46); // KilogramSquareMeters.of(293.783602 * 0.000292639653); // Converted from lb
+  public static final MomentOfInertia kMOI =
+      KilogramSquareMeters.of(
+          1.46); // KilogramSquareMeters.of(293.783602 * 0.000292639653); // Converted from lb
   // in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()

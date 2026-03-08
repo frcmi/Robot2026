@@ -96,15 +96,20 @@ public class LinearIOSim implements LinearIO {
     double desiredI = (inputs.appliedVolts.in(Volts) - backemf) / motor.rOhms; // Amps
 
     // Stator current limit
-    if (Math.abs(desiredI) > deviceConfig.getStatorCurrentLimit().in(Amps) * deviceConfig.getNumMotors()) {
-      desiredI = Math.signum(desiredI) * deviceConfig.getStatorCurrentLimit().in(Amps) * deviceConfig.getNumMotors();
+    if (Math.abs(desiredI)
+        > deviceConfig.getStatorCurrentLimit().in(Amps) * deviceConfig.getNumMotors()) {
+      desiredI =
+          Math.signum(desiredI)
+              * deviceConfig.getStatorCurrentLimit().in(Amps)
+              * deviceConfig.getNumMotors();
     }
 
     // Supply current limit
     // supplyCurrent = desiredI * applV / Vbat
     //   = desiredI * (backemf + desiredI * rOhms) / Vbat = supplyLimit
     // quadratic sol rOhms * I^2 + backemf * I - supplyLimit * Vbat = 0
-    double supplyLimit = deviceConfig.getSupplyCurrentLimit().in(Amps) * deviceConfig.getNumMotors();
+    double supplyLimit =
+        deviceConfig.getSupplyCurrentLimit().in(Amps) * deviceConfig.getNumMotors();
     double Vbat = RobotController.getBatteryVoltage();
     double maxStatorFromSupply =
         (-backemf

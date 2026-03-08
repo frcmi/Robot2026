@@ -420,7 +420,9 @@ public class RobotContainer {
      - Operator DPad Up: Zero intake pivot (doesn't actually lift it)
     */
     operatorController.buttonA.onTrue(shooter.toggleOverride());
-    shooter.turretOverride.whileTrue(shooter.turretPower(() -> TurretConstants.OVERRIDE_VOLTAGE.times(operatorController.getRightStickX())));
+    shooter.turretOverride.whileTrue(
+        shooter.turretPower(
+            () -> TurretConstants.OVERRIDE_VOLTAGE.times(-operatorController.getRightStickX())));
 
     // TODO: Fix (intake goes past hard stop rn)
     // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));

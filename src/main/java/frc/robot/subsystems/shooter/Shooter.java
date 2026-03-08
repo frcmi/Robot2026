@@ -185,8 +185,6 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     } else {
       this.targetState.setTurret(measuredState.getTurret());
     }
-              
-
 
     double hoodAngle =
         (allianceZone ? AimingConstants.kHoodAngleTable : AimingConstants.kHoodAngleTableNeutral)

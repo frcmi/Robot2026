@@ -84,13 +84,11 @@ public class PivotConstants {
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
 
-  public static final MomentOfInertia kMOI =
-      KilogramSquareMeters.of(
-          0.00125); // KilogramSquareMeters.of(293.783602 * 0.000292639653); // Converted from lb
+  public static final MomentOfInertia kMOI = KilogramSquareMeters.of(1.46); // KilogramSquareMeters.of(293.783602 * 0.000292639653); // Converted from lb
   // in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
-          .motor(DCMotor.getKrakenX60(1))
+          .motor(DCMotor.getKrakenX60(2))
           .moi(kMOI)
           .resetAngle(kTalonFXConfig.getResetAngle())
           .physicalMinAngle(IntakeState.kIntaking.getPivot())
@@ -104,5 +102,6 @@ public class PivotConstants {
           .acceleration(kSubsystemConfigSim.getAcceleration())
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
+          .numMotors(2)
           .build();
 }

@@ -40,10 +40,10 @@ public class FlywheelConstants {
           .opposeMaster(true)
           .motorRotationsPerOutputRotations(1)
           .inverted(InvertedValue.CounterClockwise_Positive)
-          .supplyCurrentLimit(Amps.of(30.0))
-          .supplyCurrentLowerTime(Seconds.of(0.5))
+          .supplyCurrentLimit(Amps.of(40.0))
+          .supplyCurrentLowerTime(Seconds.of(2.0))
           .supplyCurrentLower(Amps.of(15.0))
-          .statorCurrentLimit(Amps.of(60.0))
+          .statorCurrentLimit(Amps.of(120.0))
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
@@ -64,7 +64,8 @@ public class FlywheelConstants {
   public static final MomentOfInertia kMOI = KilogramSquareMeters.of(0.0048975432);
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
-          .motor(DCMotor.getKrakenX60(2))
+          .motor(DCMotor.getKrakenX60(3))
+          .numMotors(3)
           .moi(kMOI)
           .motorRotationsPerOutputRotations(kTalonFXConfig.getMotorRotationsPerOutputRotations())
           .kP(kSubsystemConfigSim.getKP())

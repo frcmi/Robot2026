@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 public class AngularIOSimConfig {
   private final DCMotor motor;
+  @Builder.Default private final int numMotors = 1;
   @Builder.Default private final MomentOfInertia moi = KilogramSquareMeters.of(1.0);
   @Builder.Default private final Angle resetAngle = Radians.of(0.0);
   @Builder.Default private final Angle physicalMinAngle = Radians.of(Double.NEGATIVE_INFINITY);

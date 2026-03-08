@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 public class LinearIOSimConfig {
   private final DCMotor motor;
+  @Builder.Default private final int numMotors = 1;
   @Builder.Default private final Mass carriageMass = Kilograms.of(0.0);
   @Builder.Default private final Distance resetLength = Meters.of(0.0);
   @Builder.Default private final Distance physicalMinLength = Meters.of(Double.NEGATIVE_INFINITY);

@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "WaitAimed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "LeftIntake"
@@ -19,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Climb"
+            "name": "Shoot"
           }
         }
       ]

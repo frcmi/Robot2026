@@ -47,6 +47,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   private boolean disabled = false;
   private boolean isTurretOverride = false;
+  private boolean lockHood = false;
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
@@ -197,7 +198,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
     // if we're near the trench or forcing the hood to be locked, hood goes to min angle
     this.targetState.setHood(
-        (nearTrench.getAsBoolean() && hoodUnlocked)
+        ((nearTrench.getAsBoolean() && hoodUnlocked) || lockHood)
             ? HoodConstants.kMinHoodAngle
             : Degrees.of(hoodAngle));
 
@@ -241,6 +242,13 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
               disabled = true;
             }),
         () -> disabled);
+  }
+
+  public Command setHoodLock(boolean lock) {
+    return runOnce(
+        () -> {
+          lockHood = lock;
+        });
   }
 
   private boolean getNearTrenchFromHub(Translation2d hubPosition, Pose2d currentPose) {

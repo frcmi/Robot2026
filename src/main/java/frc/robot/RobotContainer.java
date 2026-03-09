@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -389,7 +390,10 @@ public class RobotContainer {
             DriveCommands.joystickDriveThroughTrench(
                 drive,
                 () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
-                drive::getPose)));
+                drive::getPose))
+              .beforeStarting(shooter.setHoodLock(true))
+              .andThen(shooter.setHoodLock(false))
+              .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed

@@ -85,7 +85,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.robotVel = robotVelSupplier;
     hood.setDefaultCommand(hood.holdAtGoal(() -> getTargetState().getHood()));
     turret.setDefaultCommand(turret.holdAtGoal(() -> getTargetState().getTurret()));
-    flywheel.setDefaultCommand(flywheel.velocity(() -> getTargetState().getFlywheel()));
+    flywheel.setDefaultCommand(either(
+      flywheel.openLoop(Volts.of(0)).until(() -> !disabled),
+      flywheel.velocity(() -> getTargetState().getFlywheel()).until(() -> disabled),
+      () -> disabled
+    ));
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
   }
 

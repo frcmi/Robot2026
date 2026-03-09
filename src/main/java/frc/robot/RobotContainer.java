@@ -392,7 +392,7 @@ public class RobotContainer {
                 () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
                 drive::getPose))
               .beforeStarting(shooter.setHoodLock(true))
-              .andThen(shooter.setHoodLock(false))
+              .andThen(shooter.setHoodLock(false)) // Should never run, just in case
               .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
 
     /* SHOOTER CONTROLS

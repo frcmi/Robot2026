@@ -239,14 +239,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         () -> disabled);
   }
 
-  // Trench code
-  private boolean isNearTrench() {
-    Pose2d currentPose = this.robotPose.get();
-    Translation2d hubPosition =
-        alliance == Alliance.Blue
-            ? FieldConstants.kHubPositionBlue
-            : FieldConstants.kHubPositionRed;
-
+  private boolean getNearTrenchFromHub(Translation2d hubPosition, Pose2d currentPose) {
     // Check X
     boolean nearX =
         Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
@@ -254,6 +247,13 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         currentPose.getY() < FieldConstants.trenchWidthY
             || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
     return nearX && nearY;
+  }
+
+  // Trench code
+  private boolean isNearTrench() {
+    Pose2d currentPose = this.robotPose.get();
+    return getNearTrenchFromHub(FieldConstants.kHubPositionBlue, currentPose)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, currentPose);
   }
 
   private boolean isInAllianceZone() {

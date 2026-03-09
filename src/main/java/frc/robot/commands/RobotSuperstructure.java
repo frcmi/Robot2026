@@ -59,7 +59,7 @@ public class RobotSuperstructure {
     return parallel(climb.set(ClimbState.kStowed), idle()).withDeadline(climb.waitUntilAtGoal());
   }
 
-  public double getDriveSpeed(boolean rotation) {
+  private double getDriveSpeed(boolean rotation) {
     boolean intaking = intake.getTargetState() == IntakeState.kIntaking;
     boolean transferring = transfer.getTargetState() == TransferState.kTransferring;
     double speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
@@ -79,5 +79,17 @@ public class RobotSuperstructure {
       return speed * (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);
     }
     return speed;
+  }
+
+  public double saturateDriveSpeed(double input, boolean rotation) {
+    double max = getDriveSpeed(rotation);
+    if (Math.abs(input) > max) {
+      if (input < 0.0) {
+        return -max;
+      } else {
+        return max;
+      }
+    }
+    return input;
   }
 }

@@ -31,7 +31,7 @@ public class HoodConstants {
 
   public static final Angle kMinHoodAngle = Degrees.of(25.2);
   public static final Angle kMaxHoodAngle = Degrees.of(43.2);
-  public static final Voltage MANUAL_OVERRIDE = Volts.of(-2.0);
+  public static final Voltage MANUAL_OVERRIDE = Volts.of(-0.5);
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()

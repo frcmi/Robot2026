@@ -62,6 +62,7 @@ public class Transfer extends VirtualSubsystem {
     Logger.recordOutput("Transfer/TargetState", targetState);
     Logger.recordOutput("Transfer/MeasuredState", measuredState);
     Logger.recordOutput("Transfer/Jammed", jammed);
+    Logger.recordOutput("Transfer/ShouldTransfer", targetState == TransferState.kTransferring);
 
     updateJamDetection();
   }

@@ -378,9 +378,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
-            () -> -driverController.getLeftStickX() * superstructure.getDriveSpeed(false),
-            () -> -driverController.getRightStickX() * superstructure.getDriveSpeed(true)));
+            () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
+            () -> superstructure.saturateDriveSpeed(-driverController.getLeftStickX(), false),
+            () -> superstructure.saturateDriveSpeed(-driverController.getRightStickX(), false)));
     if (!sim) {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }
@@ -388,7 +388,7 @@ public class RobotContainer {
         Commands.parallel(
             DriveCommands.joystickDriveThroughTrench(
                 drive,
-                () -> driverController.getLeftStickY() * superstructure.getDriveSpeed(false),
+                () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
                 drive::getPose)));
 
     /* SHOOTER CONTROLS

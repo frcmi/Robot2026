@@ -2,12 +2,12 @@ package frc.robot.constants.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
@@ -39,7 +39,7 @@ public class TurretConstants {
           30); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
   // intake direction
 
-  public static final Voltage OVERRIDE_VOLTAGE = Volts.of(3.0);
+  public static final Voltage OVERRIDE_VOLTAGE = Volts.of(1.5);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
       () -> Rotation2d.kZero;
@@ -52,9 +52,9 @@ public class TurretConstants {
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
           .kP(10.0)
           .kI(0.0)
-          .kD(0.2)
-          .cruiseVelocity(RotationsPerSecond.of(1)) // 420rpm
-          .acceleration(DegreesPerSecondPerSecond.of(10000.0))
+          .kD(0.4)
+          .cruiseVelocity(RotationsPerSecond.of(5)) // 420rpm
+          .acceleration(RotationsPerSecondPerSecond.of(15.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
@@ -70,7 +70,7 @@ public class TurretConstants {
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
-          .statorCurrentLimit(Amps.of(60.0))
+          .statorCurrentLimit(Amps.of(80.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

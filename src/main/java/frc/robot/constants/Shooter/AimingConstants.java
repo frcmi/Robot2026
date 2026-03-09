@@ -18,17 +18,17 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/HoodAngleM_Deg",
           new double[][] {
-            {0, 25.5},
-            {0.9, 25.5},
-            {1, 25.5},
-            {1.5, 26},
-            {2, 26},
-            {2.5, 26},
-            {3, 28},
-            {3.5, 28.5},
-            {4, 29.5},
-            {4.5, 29.5},
-            {5, 33},
+            {0, 28},
+            {0.9, 28},
+            {1, 28},
+            {1.5, 28.5},
+            {2, 28.5},
+            {2.5, 28.5},
+            {3, 30.5},
+            {3.5, 31},
+            {4, 32},
+            {4.5, 32},
+            {5, 35.5},
           });
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(
@@ -36,10 +36,10 @@ public class AimingConstants {
           new double[][] {
             {0, 22},
             {2, 24},
-            {2.5, 25.5},
-            {3, 26.5},
-            {3.5, 31},
-            {4, 35.5},
+            {2.5, 26},
+            {3, 27.5},
+            {3.5, 32},
+            {4, 36.5},
             {4.5, 49},
             {5, 49},
             {6, 52},

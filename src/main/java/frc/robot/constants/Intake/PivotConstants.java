@@ -77,9 +77,9 @@ public class PivotConstants {
           .bus(kSubsystemConfigReal.getBus())
           .positionTolerance(kSubsystemConfigReal.getPositionTolerance())
           .velocityTolerance(kSubsystemConfigReal.getVelocityTolerance())
-          .kP(5.0)
-          .kI(0.0)
-          .kD(0.0)
+          .kP(kSubsystemConfigReal.getKP())
+          .kI(kSubsystemConfigReal.getKI())
+          .kD(kSubsystemConfigReal.getKD())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();

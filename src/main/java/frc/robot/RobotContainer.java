@@ -455,7 +455,9 @@ public class RobotContainer {
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-    driverController.rightTrigger.whileTrue(intake.set(IntakeState.kBump));
+    if (!sim) {
+      driverController.rightTrigger.whileTrue(intake.set(IntakeState.kBump));
+    }
 
     operatorController
         .dPadRight

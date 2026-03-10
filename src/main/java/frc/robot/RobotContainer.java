@@ -387,13 +387,14 @@ public class RobotContainer {
     }
     driverController.rightBumper.whileTrue(
         Commands.parallel(
-            DriveCommands.joystickDriveThroughTrench(
-                drive,
-                () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
-                drive::getPose))
-              .beforeStarting(shooter.setHoodLock(true))
-              .andThen(shooter.setHoodLock(false)) // Should never run, just in case
-              .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
+                DriveCommands.joystickDriveThroughTrench(
+                    drive,
+                    () ->
+                        superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
+                    drive::getPose))
+            .beforeStarting(shooter.setHoodLock(true))
+            .andThen(shooter.setHoodLock(false)) // Should never run, just in case
+            .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed

@@ -10,6 +10,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.either;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
@@ -263,9 +265,16 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   // Trench code
   private boolean isNearTrench() {
+    ChassisSpeeds velDelta = robotVel.get().times(HoodConstants.HOOD_LOWER_TIME.in(Seconds));
     Pose2d currentPose = this.robotPose.get();
+    Pose2d futurePose =
+        currentPose.plus(
+            new Transform2d(
+                velDelta.vxMetersPerSecond, velDelta.vyMetersPerSecond, new Rotation2d()));
     return getNearTrenchFromHub(FieldConstants.kHubPositionBlue, currentPose)
-        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, currentPose);
+        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, currentPose)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionBlue, futurePose)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, futurePose);
   }
 
   private boolean isInAllianceZone() {

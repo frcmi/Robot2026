@@ -121,6 +121,8 @@ public class RobotContainer {
 
   private final BooleanSupplier isAutonomous;
 
+  private final double turboDrive = 1.5;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(BooleanSupplier isAutonomous) {
     this.isAutonomous = isAutonomous;
@@ -390,12 +392,30 @@ public class RobotContainer {
                 DriveCommands.joystickDriveThroughTrench(
                     drive,
                     () ->
-                        superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
+                        driverController.rightTrigger.getAsBoolean()
+                            ? superstructure.saturateDriveSpeed(
+                                driverController.getLeftStickY() * turboDrive, false)
+                            : superstructure.saturateDriveSpeed(
+                                driverController.getLeftStickY(), false),
                     drive::getPose))
             .beforeStarting(shooter.setHoodLock(true))
             .andThen(shooter.setHoodLock(false)) // Should never run, just in case
             .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
-
+    driverController
+        .rightTrigger
+        .and(driverController.rightBumper.negate())
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                drive,
+                () ->
+                    superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false)
+                        * turboDrive,
+                () ->
+                    superstructure.saturateDriveSpeed(-driverController.getLeftStickX(), false)
+                        * turboDrive,
+                () ->
+                    superstructure.saturateDriveSpeed(-driverController.getRightStickX(), false)
+                        * turboDrive));
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
@@ -455,9 +475,6 @@ public class RobotContainer {
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-    if (!sim) {
-      driverController.rightTrigger.whileTrue(intake.set(IntakeState.kBump));
-    }
 
     operatorController
         .dPadRight

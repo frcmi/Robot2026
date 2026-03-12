@@ -14,7 +14,7 @@ public class DriveConstants {
 
   // p gain for the drive x and y controllers (side to side and forward/back)
   public static LoggedTunableNumber TRENCH_TRANSLATION_KP =
-      new LoggedTunableNumber("Drive/Trench/TranslationKp", 2.0);
+      new LoggedTunableNumber("Drive/Trench/TranslationKp", 8.0);
   public static LoggedTunableNumber TRENCH_TRANSLATION_KD =
       new LoggedTunableNumber("Drive/Trench/TranslationKd", 0.0);
   public static LoggedTunableNumber TRENCH_ANGLE_KP =
@@ -44,9 +44,9 @@ public class DriveConstants {
   public static final double INTAKE_MULT = 1.0;
   public static final double INTAKE_MULT_W = 1.0;
 
-  public static final double TRANSFER_MULT = 0.6;
-  public static final double TRANSFER_MULT_W = 0.6;
+  public static final double TRANSFER_MULT = 1.0;
+  public static final double TRANSFER_MULT_W = 1.0;
 
-  public static final double TRANSFER_MULT_NEUTRAL = 0.8;
-  public static final double TRANSFER_MULT_W_NEUTRAL = 0.8;
+  public static final double TRANSFER_MULT_NEUTRAL = 1.0;
+  public static final double TRANSFER_MULT_W_NEUTRAL = 1.0;
 }

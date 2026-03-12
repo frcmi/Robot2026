@@ -14,6 +14,7 @@ import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotSuperstructure {
   private final Intake intake;
@@ -63,7 +64,7 @@ public class RobotSuperstructure {
     boolean intaking = intake.getTargetState() == IntakeState.kIntaking;
     boolean transferring = transfer.getTargetState() == TransferState.kTransferring;
     double speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
-    speed *= 0.9;
+    speed *= 0.5;
 
     if (transferring) {
       if (shooter.inAllianceZone.getAsBoolean()) {
@@ -78,18 +79,12 @@ public class RobotSuperstructure {
     if (intaking) {
       return speed * (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);
     }
+    Logger.recordOutput("Drive/MaxSpeed", speed);
     return speed;
   }
 
   public double saturateDriveSpeed(double input, boolean rotation) {
     double max = getDriveSpeed(rotation);
-    if (Math.abs(input) > max) {
-      if (input < 0.0) {
-        return -max;
-      } else {
-        return max;
-      }
-    }
-    return input;
+    return input * max;
   }
 }

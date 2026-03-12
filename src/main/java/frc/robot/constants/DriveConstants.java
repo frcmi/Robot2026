@@ -44,8 +44,8 @@ public class DriveConstants {
   public static final double INTAKE_MULT = 1.0;
   public static final double INTAKE_MULT_W = 1.0;
 
-  public static final double TRANSFER_SPEED = 0.5;
-  public static final double TRANSFER_SPEED_W = 0.5;
+  public static final double TRANSFER_SPEED = 0.6;
+  public static final double TRANSFER_SPEED_W = 0.6;
 
   public static final double TRANSFER_SPEED_NEUTRAL = 0.7;
   public static final double TRANSFER_SPEED_W_NEUTRAL = 0.7;

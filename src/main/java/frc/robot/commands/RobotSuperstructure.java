@@ -70,7 +70,7 @@ public class RobotSuperstructure {
       speed = rotation ? DriveConstants.TRANSFER_SPEED_W : DriveConstants.TRANSFER_SPEED;
     } else {
       speed =
-          rotation ? DriveConstants.TRANSFER_SPEED_W_NEUTRAL : DriveConstants.TRANSFER_SPEED_NEUTRAL;
+          rotation ? DriveConstants.TRANSFER_SPEED_W_NEUTRAL : DriveConstants.TRANSFER_SPEED_NEUTRAL; 
     }
 
     // If in turbo mode, use max speed (assuming not transferring)

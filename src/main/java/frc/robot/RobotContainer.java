@@ -121,8 +121,6 @@ public class RobotContainer {
 
   private final BooleanSupplier isAutonomous;
 
-  private final double turboDrive = 1.5;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(BooleanSupplier isAutonomous) {
     this.isAutonomous = isAutonomous;
@@ -381,46 +379,43 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false),
-            () -> superstructure.saturateDriveSpeed(-driverController.getLeftStickX(), false),
-            () -> superstructure.saturateDriveSpeed(-driverController.getRightStickX(), false)));
+            () ->
+                driverController.getLeftStickY()
+                    * superstructure.getDriveMultiplier(false, driverController.rightTrigger),
+            () ->
+                -driverController.getLeftStickX()
+                    * superstructure.getDriveMultiplier(false, driverController.rightTrigger),
+            () ->
+                -driverController.getRightStickX()
+                    * superstructure.getDriveMultiplier(false, driverController.rightTrigger)));
     if (!sim) {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }
+
+    // TODO: Make this buttonA, and make buttonA code (below) into right bumper, since right now it
+    // inhibits bump driving
     driverController.rightBumper.whileTrue(
         Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
                     drive,
                     () ->
-                        driverController.rightTrigger.getAsBoolean()
-                            ? superstructure.saturateDriveSpeed(
-                                driverController.getLeftStickY() * turboDrive, false)
-                            : superstructure.saturateDriveSpeed(
-                                driverController.getLeftStickY(), false),
+                        driverController.getLeftStickY()
+                            * superstructure.getDriveMultiplier(
+                                false, driverController.rightTrigger),
                     drive::getPose))
             .beforeStarting(shooter.setHoodLock(true))
             .andThen(shooter.setHoodLock(false)) // Should never run, just in case
             .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
-    driverController
-        .rightTrigger
-        .and(driverController.rightBumper.negate())
-        .whileTrue(
-            DriveCommands.joystickDrive(
-                drive,
-                () ->
-                    superstructure.saturateDriveSpeed(driverController.getLeftStickY(), false)
-                        * turboDrive,
-                () ->
-                    superstructure.saturateDriveSpeed(-driverController.getLeftStickX(), false)
-                        * turboDrive,
-                () ->
-                    superstructure.saturateDriveSpeed(-driverController.getRightStickX(), false)
-                        * turboDrive));
+    driverController.buttonA.whileTrue(intake.set(IntakeState.kBump));
+
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
      */
-    simController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
+    operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
+    if (sim) {
+      simController.buttonB.whileTrue(transfer.set(TransferState.kTransferring));
+    }
     operatorController
         .rightTrigger
         .and(shooter.aimed.negate())

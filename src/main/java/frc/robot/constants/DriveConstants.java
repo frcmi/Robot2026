@@ -38,15 +38,15 @@ public class DriveConstants {
   public static final double LEFT_TRENCH_Y = 7.425;
 
   // DT speed config
-  public static final double MAX_SPEED = 1.0;
-  public static final double MAX_SPEED_W = 1.0;
+  public static final double MAX_SPEED = 0.8;
+  public static final double MAX_SPEED_W = 0.8;
 
   public static final double INTAKE_MULT = 1.0;
   public static final double INTAKE_MULT_W = 1.0;
 
-  public static final double TRANSFER_MULT = 1.0;
-  public static final double TRANSFER_MULT_W = 1.0;
+  public static final double TRANSFER_MULT = 0.5;
+  public static final double TRANSFER_MULT_W = 0.5;
 
-  public static final double TRANSFER_MULT_NEUTRAL = 1.0;
-  public static final double TRANSFER_MULT_W_NEUTRAL = 1.0;
+  public static final double TRANSFER_MULT_NEUTRAL = 0.7;
+  public static final double TRANSFER_MULT_W_NEUTRAL = 0.7;
 }

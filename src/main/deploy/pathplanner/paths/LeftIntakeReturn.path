@@ -32,32 +32,32 @@
     },
     {
       "anchor": {
-        "x": 6.513474826388889,
-        "y": 7.529941840277779
+        "x": 6.4559999999999995,
+        "y": 7.405329545454546
       },
       "prevControl": {
-        "x": 6.929749062437528,
-        "y": 7.529941840277779
+        "x": 6.872274236048638,
+        "y": 7.405329545454546
       },
       "nextControl": {
-        "x": 5.677414726374805,
-        "y": 7.529941840277779
+        "x": 5.619939899985916,
+        "y": 7.405329545454546
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.810678819444445,
-        "y": 7.529941840277779
+        "x": 2.8176931818181816,
+        "y": 7.405329545454546
       },
       "prevControl": {
-        "x": 3.2135341825645063,
-        "y": 7.5443629884855286
+        "x": 3.220548544938243,
+        "y": 7.419750693662295
       },
       "nextControl": {
-        "x": 2.479790848112836,
-        "y": 7.518096932870371
+        "x": 2.4868052104865725,
+        "y": 7.393484638047138
       },
       "isLocked": false,
       "linkedName": "LeftIntakeStart"
@@ -86,21 +86,7 @@
       "rotationDegrees": 0.0
     }
   ],
-  "constraintZones": [
-    {
-      "name": "Trench",
-      "minWaypointRelativePos": 1.524691358024692,
-      "maxWaypointRelativePos": 3.0,
-      "constraints": {
-        "maxVelocity": 1.2,
-        "maxAcceleration": 5.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

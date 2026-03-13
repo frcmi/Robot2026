@@ -193,7 +193,7 @@ public class DriveCommands {
               // PID to trench coordinates
               double yVelocity = yController.calculate(currentPose.getY(), trenchY);
 
-              if (Math.abs(yController.getError()) < 0.1) {
+              if (Math.abs(yController.getError()) < 0.05) {
                 yVelocity = 0;
               }
 

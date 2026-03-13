@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
@@ -59,37 +60,26 @@ public class RobotSuperstructure {
     return parallel(climb.set(ClimbState.kStowed), idle()).withDeadline(climb.waitUntilAtGoal());
   }
 
-  private double getDriveSpeed(boolean rotation) {
+  public double getDriveMultiplier(boolean rotation, Trigger turbo) {
     boolean intaking = intake.getTargetState() == IntakeState.kIntaking;
     boolean transferring = transfer.getTargetState() == TransferState.kTransferring;
-    double speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
-    speed *= 0.9;
 
-    if (transferring) {
-      if (shooter.inAllianceZone.getAsBoolean()) {
-        return speed * (rotation ? DriveConstants.TRANSFER_MULT_W : DriveConstants.TRANSFER_MULT);
-      } else {
-        return speed
-            * (rotation
-                ? DriveConstants.TRANSFER_MULT_W_NEUTRAL
-                : DriveConstants.TRANSFER_MULT_NEUTRAL);
-      }
+    // Default: Shooting speed
+    double speed;
+    if (shooter.inAllianceZone.getAsBoolean()) {
+      speed = rotation ? DriveConstants.TRANSFER_SPEED_W : DriveConstants.TRANSFER_SPEED;
+    } else {
+      speed =
+          rotation ? DriveConstants.TRANSFER_SPEED_W_NEUTRAL : DriveConstants.TRANSFER_SPEED_NEUTRAL; 
     }
-    if (intaking) {
-      return speed * (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);
+
+    // If in turbo mode, use max speed (assuming not transferring)
+    if (turbo.getAsBoolean() && !transferring) {
+      speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
+      if (intaking) { // Intake speed multiplier only applies when full speed
+        speed *= (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);
+      }
     }
     return speed;
-  }
-
-  public double saturateDriveSpeed(double input, boolean rotation) {
-    double max = getDriveSpeed(rotation);
-    if (Math.abs(input) > max) {
-      if (input < 0.0) {
-        return -max;
-      } else {
-        return max;
-      }
-    }
-    return input;
   }
 }

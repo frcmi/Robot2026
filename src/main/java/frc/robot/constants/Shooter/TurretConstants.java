@@ -31,12 +31,12 @@ public class TurretConstants {
       new Translation3d(
           Inches.of(-5.195f).in(Meters), Inches.of(4.995f).in(Meters), Inches.of(5.0f).in(Meters));
 
-  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-174);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =
-      Degrees.of(169); // Positive = CCW from top-down perspective
+      Degrees.of(90); // Positive = CCW from top-down perspective
   public static final Angle kTurretZero =
       Degrees.of(
-          30); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
+          90); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
   // intake direction
 
   public static final Voltage OVERRIDE_VOLTAGE = Volts.of(1.5);

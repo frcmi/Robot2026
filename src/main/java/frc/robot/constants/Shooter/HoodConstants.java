@@ -61,7 +61,7 @@ public class HoodConstants {
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
-          .statorCurrentLimit(Amps.of(60.0))
+          .statorCurrentLimit(Amps.of(15.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

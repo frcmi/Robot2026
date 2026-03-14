@@ -101,6 +101,12 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "ZeroPivot",
+      "waypointRelativePos": 0.29012345679012347,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
       "name": "Intake",
       "waypointRelativePos": 1.080246913580247,
       "endWaypointRelativePos": 3.0,

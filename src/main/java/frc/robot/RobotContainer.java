@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -427,8 +428,11 @@ public class RobotContainer {
     - Operator Y (sim driver): Raise climb
     - Operator X (sim driver): Lower climb
      */
-    simController.buttonY.onTrue(superstructure.climbRaise());
-    simController.buttonX.onTrue(superstructure.climbClimbed());
+    // TODO: Move flywheel override to joystick, use these for climb
+    /*simController.buttonY.onTrue(superstructure.climbRaise());
+    simController.buttonX.onTrue(superstructure.climbClimbed());*/
+    operatorController.buttonY.onTrue(Commands.runOnce(() -> shooter.setFlywheelOffset(shooter.getFlywheelOffset().plus(RotationsPerSecond.of(1.0)))));
+    operatorController.buttonX.onTrue(Commands.runOnce(() -> shooter.setFlywheelOffset(shooter.getFlywheelOffset().plus(RotationsPerSecond.of(-1.0)))));
 
     /* DEBUG/FAILSAFE CONTROLS:
      - Operator A: Toggle turret manual override

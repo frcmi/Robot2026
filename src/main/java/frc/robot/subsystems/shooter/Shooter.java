@@ -55,6 +55,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
+  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -93,7 +94,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     flywheel.setDefaultCommand(
         either(
             flywheel.openLoop(Volts.of(0)).until(() -> !disabled),
-            flywheel.velocity(() -> getTargetState().getFlywheel()).until(() -> disabled),
+            flywheel.velocity(() -> getTargetState().getFlywheel().plus(flywheelOffset)).until(() -> disabled),
             () -> disabled));
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
   }
@@ -107,7 +108,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     // This method will be called once per scheduler run
     measuredState.setTurret(turret.getAngle());
     measuredState.setHood(hood.getAngle());
-    measuredState.setFlywheel(flywheel.getVelocity());
+    measuredState.setFlywheel(flywheel.getVelocity().minus(flywheelOffset));
 
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
@@ -116,6 +117,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
     Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
     Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
+    Logger.recordOutput("Shooter/FlywheelOffsetRPS", flywheelOffset.in(RotationsPerSecond));
 
     // Aim at hub
     Translation2d targetPosition;

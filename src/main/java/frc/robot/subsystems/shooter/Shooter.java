@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.Commands.either;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -63,7 +64,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5, DebounceType.kFalling);
   public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
   /** Creates a new Shooter. */

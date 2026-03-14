@@ -91,31 +91,32 @@ public class RobotSuperstructure {
 
   public Command fullRobotCheck() {
     return sequence(
-        // INIT SHOOTER
-        shooter.forceToggleState().asProxy(),
-        shooter.toggleDisabled().asProxy(),
-        shooter.toggleOverride().asProxy(),
-        shooter
-            .overrideHood(HoodConstants.MANUAL_OVERRIDE)
-            .withTimeout(1.0)
-            .andThen(shooter.zeroHood())
-            .asProxy(),
+            // INIT SHOOTER
+            shooter.forceToggleState().asProxy(),
+            shooter.toggleDisabled().asProxy(),
+            shooter.toggleOverride().asProxy(),
+            shooter
+                .overrideHood(HoodConstants.MANUAL_OVERRIDE)
+                .withTimeout(1.0)
+                .andThen(shooter.zeroHood())
+                .asProxy(),
 
-        // INTAKE TESTS
-        intake.set(IntakeState.kDown).withTimeout(1).asProxy(),
-        intake.zeroPivot(),
-        intake.set(IntakeState.kIntaking).withTimeout(1).asProxy(),
-        intake.set(IntakeState.kBump).withTimeout(1).asProxy(),
+            // INTAKE TESTS
+            intake.set(IntakeState.kDown).withTimeout(1).asProxy(),
+            intake.zeroPivot(),
+            intake.set(IntakeState.kIntaking).withTimeout(1).asProxy(),
+            intake.set(IntakeState.kBump).withTimeout(1).asProxy(),
 
-        // SHOOTER TESTS
-        shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle).withTimeout(1.0).asProxy(),
-        shooter.overrideHoodAngle(HoodConstants.kMinHoodAngle).withTimeout(1.0).asProxy(),
-        shooter.turretAngle(Degrees.of(0.0)).withTimeout(1.0).asProxy(),
-        shooter.turretAngle(Degrees.of(-90.0)).withTimeout(1.0).asProxy(),
-        shooter.turretAngle(Degrees.of(90.0)).withTimeout(1.0).asProxy(),
-        shooter.flywheelVelocity(RotationsPerSecond.of(30.0)).withTimeout(1.0).asProxy(),
+            // SHOOTER TESTS
+            shooter.overrideHoodAngle(HoodConstants.kMaxHoodAngle).withTimeout(1.0).asProxy(),
+            shooter.overrideHoodAngle(HoodConstants.kMinHoodAngle).withTimeout(1.0).asProxy(),
+            shooter.turretAngle(Degrees.of(0.0)).withTimeout(1.0).asProxy(),
+            shooter.turretAngle(Degrees.of(-90.0)).withTimeout(1.0).asProxy(),
+            shooter.turretAngle(Degrees.of(90.0)).withTimeout(1.0).asProxy(),
+            shooter.flywheelVelocity(RotationsPerSecond.of(30.0)).withTimeout(1.0).asProxy(),
 
-        // TRANSFER TESTS
-        transfer.set(TransferState.kTransferring).withTimeout(5).asProxy()).asProxy();
+            // TRANSFER TESTS
+            transfer.set(TransferState.kTransferring).withTimeout(5).asProxy())
+        .asProxy();
   }
 }

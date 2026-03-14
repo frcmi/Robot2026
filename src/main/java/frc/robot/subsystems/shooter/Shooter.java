@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -326,5 +327,13 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   public Command turretPower(Supplier<Voltage> volts) {
     return this.turret.openLoop(volts);
+  }
+
+  public Command turretAngle(Angle angle) {
+    return this.turret.holdAtGoal(() -> angle);
+  }
+
+  public Command flywheelVelocity(AngularVelocity vel) {
+    return this.flywheel.velocity(() -> vel);
   }
 }

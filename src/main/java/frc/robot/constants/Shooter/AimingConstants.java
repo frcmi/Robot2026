@@ -34,15 +34,15 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/FlywheelSpeedM_RPS",
           new double[][] {
-            {0, 19},
-            {2, 21},
-            {2.5, 23.5},
-            {3, 24.8},
-            {3.5, 29},
-            {4, 30.5},
-            {4.5, 33},
-            {5, 33.5},
-            {6, 34.5},
+            {0, 19.5},
+            {2, 21.5},
+            {2.5, 24},
+            {3, 25.3},
+            {3.5, 29.5},
+            {4, 31},
+            {4.5, 33.5},
+            {5, 34},
+            {6, 35},
           });
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(

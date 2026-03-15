@@ -346,7 +346,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Voltage turretFeedforward() {
     double robotOmega = robotVel.get().omegaRadiansPerSecond;
     double ffV = -TurretConstants.kV * robotOmega;
-    Logger.recordOutput("Turret/TurretFF_V", ffV);
+    Logger.recordOutput("Shooter/TurretFF_V", ffV);
     return Volts.of(ffV);
   }
 }

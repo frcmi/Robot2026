@@ -202,8 +202,13 @@ public class Drive extends SubsystemBase {
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
-      // Apply update
-      poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      // Apply update only if we have modules connected
+      if (modules[0].isConnected()
+          && modules[1].isConnected()
+          && modules[2].isConnected()
+          && modules[3].isConnected()) {
+        poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      }
     }
 
     // Update gyro alert

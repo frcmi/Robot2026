@@ -21,6 +21,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,6 +39,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -98,6 +100,15 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  private Trigger haveCAN =
+      new Trigger(
+              () ->
+                  modules[0].isConnected()
+                      && modules[1].isConnected()
+                      && modules[2].isConnected()
+                      && modules[3].isConnected())
+          .debounce(0.06, DebounceType.kRising);
 
   public Drive(
       GyroIO gyroIO,
@@ -203,10 +214,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Apply update only if we have modules connected
-      if (modules[0].isConnected()
-          && modules[1].isConnected()
-          && modules[2].isConnected()
-          && modules[3].isConnected()) {
+      if (haveCAN.getAsBoolean()) {
         poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       }
     }

@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -48,6 +49,7 @@ public class FlywheelConstants {
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
           .kV(kSubsystemConfigReal.getKV())
+          .neutralMode(NeutralModeValue.Coast)
           .build();
 
   public static final AngularSubsystemConfig kSubsystemConfigSim =

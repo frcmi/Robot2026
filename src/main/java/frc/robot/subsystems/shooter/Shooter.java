@@ -90,7 +90,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.robotPose = robotPoseSupplier;
     this.robotVel = robotVelSupplier;
     hood.setDefaultCommand(hood.holdAtGoal(() -> getTargetState().getHood()));
-    turret.setDefaultCommand(turret.holdAtGoal(() -> getTargetState().getTurret()));
+    turret.setDefaultCommand(
+        turret.holdAtGoal(() -> getTargetState().getTurret(), this::turretFeedforward));
     flywheel.setDefaultCommand(
         either(
             flywheel.openLoop(Volts.of(0)).until(() -> !disabled),
@@ -340,5 +341,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   public Command flywheelVelocity(AngularVelocity vel) {
     return this.flywheel.velocity(() -> vel);
+  }
+
+  private Voltage turretFeedforward() {
+    double robotOmega = robotVel.get().omegaRadiansPerSecond;
+    double ffV = -TurretConstants.kV * robotOmega;
+    Logger.recordOutput("Turret/TurretFF_V", ffV);
+    return Volts.of(ffV);
   }
 }

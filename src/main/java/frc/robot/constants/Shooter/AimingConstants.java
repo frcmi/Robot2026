@@ -37,12 +37,12 @@ public class AimingConstants {
             {0, 19},
             {2, 21},
             {2.5, 23.5},
-            {3, 25.8},
-            {3.5, 30},
-            {4, 32.5},
-            {4.5, 35},
-            {5, 35.5},
-            {6, 36.5},
+            {3, 24.8},
+            {3.5, 29},
+            {4, 30.5},
+            {4.5, 33},
+            {5, 33.5},
+            {6, 34.5},
           });
   public static LoggedInterpolatingTable kAirtimeTable =
       new LoggedInterpolatingTable(

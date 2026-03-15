@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.io.IOException;
@@ -60,9 +59,9 @@ public class Robot extends LoggedRobot {
           realLogPath = "/home/lvuser/logs";
         }
         Logger.addDataReceiver(new WPILOGWriter(realLogPath));
-        Logger.addDataReceiver(new NT4Publisher());
-        SignalLogger.enableAutoLogging(false);
-        SignalLogger.start();
+        // Logger.addDataReceiver(new NT4Publisher());
+        // SignalLogger.enableAutoLogging(false);
+        // SignalLogger.start();
         break;
 
       case SIM:

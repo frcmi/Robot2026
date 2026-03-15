@@ -40,5 +40,5 @@ public final class Constants {
   public static boolean ledHardwareExists = false;
 
   // For interplut & tunable double
-  public static boolean kTuningMode = true;
+  public static boolean kTuningMode = false;
 }

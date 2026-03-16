@@ -26,14 +26,11 @@
             "/PathPlanner",
             "/ReplayOutputs",
             "/ReplayOutputs/Odometry",
-            "/RealOutputs/FuelSim",
             "/RealOutputs/Transfer/MeasuredState",
             "/Tuning/Shooter/FlywheelSpeedM_RPS/Entry7",
             "/Tuning/Shooter/FlywheelSpeedM_RPS/Entry8",
             "/Tuning/Shooter/HoodAngleM_Deg/Entry9",
             "/Tuning/Shooter/HoodAngleM_Deg/Entry10",
-            "/RealOutputs/Vision/Camera2",
-            "/RealOutputs/Vision/Camera3",
             "/Tuning/Shooter/FlywheelSpeedM_RPS/Entry1",
             "/Tuning/Shooter/FlywheelSpeedM_RPS/Entry2",
             "/Tuning/Shooter/FlywheelSpeedM_RPS/Entry3",
@@ -56,17 +53,18 @@
             "/AngularSubsystems/Roller/MotorTemperatures",
             "/AngularSubsystems/Transfer/MotorTemperatures",
             "/AngularSubsystems/Turret/MotorTemperatures",
-            "/RealOutputs/Shooter",
-            "/Tuning",
             "/Tuning/AngularSubsystems",
             "/AngularSubsystems/Transfer",
-            "/RealOutputs",
             "/Tuning/ShooterNeutral",
             "/Tuning/ShooterNeutral/FlywheelSpeedM_RPS/Entry3",
-            "/AngularSubsystems",
             "/AngularSubsystems/Flywheel",
             "/Tuning/ShooterNeutral/FlywheelSpeedM_RPS",
-            "/Tuning/AngularSubsystems/Flywheel"
+            "/Tuning/AngularSubsystems/Flywheel",
+            "/RealOutputs",
+            "/RealOutputs/Vision",
+            "/RealOutputs/Vision/Summary",
+            "/RealOutputs/Vision/Summary/TagStdevMultipliers",
+            "/RealOutputs/Vision/Camera4"
           ]
         },
         "tabs": {
@@ -264,6 +262,16 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "/RealOutputs/Vision/Camera4/TagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "gamePiece",
                     "logKey": "/RealOutputs/FuelSim/Fuel",
                     "logType": "Pose3d[]",
@@ -290,14 +298,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -2.7449689991620594,
-                  4.454398740902719,
-                  -1.4948133024711556
+                  -5.402631253825264,
+                  7.192435243552472,
+                  -2.2459581448006407
                 ],
                 "cameraTarget": [
-                  0,
-                  0.5,
-                  0
+                  1.3066894618911098,
+                  1.1520412936913977,
+                  -1.0191643093688358
                 ]
               },
               "controlsHeight": 200

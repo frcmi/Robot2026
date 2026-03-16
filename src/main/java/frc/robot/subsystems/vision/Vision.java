@@ -70,6 +70,7 @@ public class Vision extends SubsystemBase {
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+    List<Double> tagStdevMultipliers = new LinkedList<>();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -82,22 +83,30 @@ public class Vision extends SubsystemBase {
       List<Pose3d> robotPosesAccepted = new LinkedList<>();
       List<Pose3d> robotPosesRejected = new LinkedList<>();
 
-      // Add tag poses
+      // Add tag poses, calculate stdev multiplier
+      double tagStdevMultiplier = Double.POSITIVE_INFINITY;
       for (int tagId : inputs[cameraIndex].tagIds) {
         var tagPose = aprilTagLayout.getTagPose(tagId);
         if (tagPose.isPresent()) {
           tagPoses.add(tagPose.get());
         }
+
+        double tagStdevMultiplierCandidate = getTagStdevMultiplier(tagId);
+        if (tagStdevMultiplierCandidate < tagStdevMultiplier) {
+          tagStdevMultiplier = tagStdevMultiplierCandidate;
+        }
       }
+      tagStdevMultipliers.add(tagStdevMultiplier);
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
             observation.tagCount() == 0 // Must have at least one tag
-                || (observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                || (observation.ambiguity()
+                    > maxAmbiguity.getAsDouble()) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())
-                    > maxZError // Must have realistic Z coordinate
+                    > maxZError.getAsDouble() // Must have realistic Z coordinate
 
                 // Must be within the field boundaries
                 || observation.pose().getX() < 0.0
@@ -120,16 +129,14 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = linearStdDevBaseline * stdDevFactor;
-        double angularStdDev = angularStdDevBaseline * stdDevFactor;
+            Math.pow(observation.averageTagDistance(), 2.0)
+                / observation.tagCount()
+                * tagStdevMultiplier;
+        double linearStdDev = linearStdDevBaseline.getAsDouble() * stdDevFactor;
+        double angularStdDev = angularStdDevBaseline.getAsDouble() * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
+          linearStdDev *= linearStdDevMegatag2Factor.getAsDouble();
           angularStdDev *= angularStdDevMegatag2Factor;
-        }
-        if (cameraIndex < cameraStdDevFactors.length) {
-          linearStdDev *= cameraStdDevFactors[cameraIndex];
-          angularStdDev *= cameraStdDevFactors[cameraIndex];
         }
 
         // Send vision observation
@@ -165,6 +172,9 @@ public class Vision extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+    Logger.recordOutput(
+        "Vision/Summary/TagStdevMultipliers",
+        tagStdevMultipliers.stream().mapToDouble(Double::doubleValue).toArray());
   }
 
   @FunctionalInterface

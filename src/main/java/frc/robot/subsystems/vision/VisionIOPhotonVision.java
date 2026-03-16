@@ -22,7 +22,7 @@ import org.photonvision.PhotonCamera;
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
   protected final PhotonCamera camera;
-  protected final Transform3d robotToCamera;
+  protected Transform3d robotToCamera;
 
   /**
    * Creates a new VisionIOPhotonVision.
@@ -133,5 +133,10 @@ public class VisionIOPhotonVision implements VisionIO {
     for (int id : tagIds) {
       inputs.tagIds[i++] = id;
     }
+  }
+
+  @Override
+  public void setRobotOffset(Transform3d offset) {
+    this.robotToCamera = offset;
   }
 }

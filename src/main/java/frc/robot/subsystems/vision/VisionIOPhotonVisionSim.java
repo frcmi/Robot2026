@@ -63,4 +63,10 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     visionSim.update(poseSupplier.get());
     super.updateInputs(inputs);
   }
+
+  @Override
+  public void setRobotOffset(Transform3d offset) {
+    visionSim.adjustCamera(cameraSim, offset);
+    super.setRobotOffset(offset);
+  }
 }

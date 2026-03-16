@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.LimelightHelpers;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -158,8 +157,13 @@ public class VisionIOLimelight implements VisionIO {
 
   @Override
   public void setRobotOffset(Transform3d offset) {
-    LimelightHelpers.setCameraPose_RobotSpace(name,
-      offset.getX(), offset.getY(), offset.getZ(),
-      Math.toDegrees(offset.getRotation().getX()), Math.toDegrees(offset.getRotation().getY()), Math.toDegrees(offset.getRotation().getZ()));
+    LimelightHelpers.setCameraPose_RobotSpace(
+        name,
+        offset.getX(),
+        offset.getY(),
+        offset.getZ(),
+        Math.toDegrees(offset.getRotation().getX()),
+        Math.toDegrees(offset.getRotation().getY()),
+        Math.toDegrees(offset.getRotation().getZ()));
   }
 }

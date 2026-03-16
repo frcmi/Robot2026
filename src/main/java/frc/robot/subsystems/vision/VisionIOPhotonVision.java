@@ -137,6 +137,6 @@ public class VisionIOPhotonVision implements VisionIO {
 
   @Override
   public void setRobotOffset(Transform3d offset) {
-    this.robotToCamera = offset;
+    this.robotToCamera = fixRobotToCamera(offset);
   }
 }

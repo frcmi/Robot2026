@@ -12,8 +12,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -31,6 +34,7 @@ import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
 import frc.robot.lib.utils.AngleUtils;
+import frc.robot.subsystems.vision.VisionIO;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,6 +72,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   public Trigger aimed = new Trigger(this::isAimed).debounce(0.5, DebounceType.kFalling);
   public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
+  // Vision IO
+  private final VisionIO turretCamera;
+
   /** Creates a new Shooter. */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
     this(
@@ -75,7 +82,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         new AngularSubsystem(new AngularIO() {}, HoodConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, FlywheelConstants.kSubsystemConfigReal),
         robotPose,
-        robotVel);
+        robotVel,
+        new VisionIO() {});
   }
 
   public Shooter(
@@ -83,7 +91,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       AngularSubsystem hood,
       AngularSubsystem flywheel,
       Supplier<Pose2d> robotPoseSupplier,
-      Supplier<ChassisSpeeds> robotVelSupplier) {
+      Supplier<ChassisSpeeds> robotVelSupplier,
+      VisionIO turretCamera) {
     this.turret = turret;
     this.hood = hood;
     this.flywheel = flywheel;
@@ -100,6 +109,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 .until(() -> disabled),
             () -> disabled));
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
+    this.turretCamera = turretCamera;
   }
 
   public void onAllianceFound(Alliance alliance) {
@@ -218,6 +228,21 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             .get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
+
+    // Update turret camera
+    double turretCamYaw = TurretConstants.kTurretZero.plus(turret.getAngle()).in(Radians);
+    Translation3d robotToCamera =
+        TurretConstants.TurretOffset.plus(
+            TurretConstants.TurretCameraOffset.rotateAround(
+                new Translation3d(0, 0, 1), new Rotation3d(0, 0, turretCamYaw)));
+    turretCamera.setRobotOffset(
+        new Transform3d(
+            robotToCamera,
+            new Rotation3d(
+                TurretConstants.TurretCameraRotation.getX(),
+                TurretConstants.TurretCameraRotation.getY(),
+                TurretConstants.TurretCameraRotation.getZ() + turretCamYaw)));
+    Logger.recordOutput("Turret/CameraOffset", robotToCamera);
   }
 
   public Command overrideHood(Voltage volts) {

@@ -14,6 +14,7 @@ import static frc.robot.constants.RobotConstants.kRioBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -32,6 +33,11 @@ public class TurretConstants {
           Inches.of(-5.195f).in(Meters),
           Inches.of(4.995f).in(Meters),
           Inches.of(5.0f).in(Meters)); // Forward, left, up
+
+  // Distance from camera lens to center of turret, 0, height of camera lens above ground
+  public static final Translation3d TurretCameraOffset =
+      new Translation3d(Inches.of(7.005).in(Meters), 0, Inches.of(19.010477).in(Meters));
+  public static final Rotation3d TurretCameraRotation = new Rotation3d(0, Math.toRadians(30), 0);
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =

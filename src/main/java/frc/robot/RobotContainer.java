@@ -12,6 +12,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -126,6 +127,7 @@ public class RobotContainer {
   public RobotContainer(BooleanSupplier isAutonomous) {
     this.isAutonomous = isAutonomous;
 
+    VisionIO turretCamera;
     switch (Constants.currentMode) {
       case REAL:
         if (Constants.driveHardwareExists) {
@@ -147,14 +149,17 @@ public class RobotContainer {
         }
 
         if (Constants.visionHardwareExists) {
+          turretCamera = new VisionIOLimelight(turretCameraName, drive::getRotation);
           vision =
               new Vision(
                   drive::addVisionMeasurement,
                   new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation),
                   new VisionIOLimelight(camera2Name, drive::getRotation),
-                  new VisionIOLimelight(camera3Name, drive::getRotation));
+                  new VisionIOLimelight(camera3Name, drive::getRotation),
+                  turretCamera);
         } else {
+          turretCamera = new VisionIO() {};
           vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
 
@@ -167,14 +172,12 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(HoodConstants.kTalonFXConfig),
                       HoodConstants.kSubsystemConfigReal),
-                  //   new AngularSubsystem(
-                  //       new AngularIOSim(HoodConstants.kSimConfig, currentDrawCalculatorSim),
-                  //       HoodConstants.kSubsystemConfigSim),
                   new AngularSubsystem(
                       new AngularIOTalonFX(FlywheelConstants.kTalonFXConfig),
                       FlywheelConstants.kSubsystemConfigReal),
                   drive::getPose,
-                  drive::getPoseVelocity);
+                  drive::getPoseVelocity,
+                  turretCamera);
         } else {
           shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
         }
@@ -231,13 +234,16 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstants.BackLeft, currentDrawCalculatorSim),
                 new ModuleIOSim(TunerConstants.BackRight, currentDrawCalculatorSim));
+        turretCamera =
+            new VisionIOPhotonVisionSim(turretCameraName, new Transform3d(), drive::getPose);
         vision =
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose),
                 new VisionIOPhotonVisionSim(camera2Name, robotToCamera2, drive::getPose),
-                new VisionIOPhotonVisionSim(camera3Name, robotToCamera3, drive::getPose));
+                new VisionIOPhotonVisionSim(camera3Name, robotToCamera3, drive::getPose),
+                turretCamera);
 
         shooter =
             new Shooter(
@@ -251,7 +257,8 @@ public class RobotContainer {
                     new AngularIOSim(FlywheelConstants.kSimConfig, currentDrawCalculatorSim),
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
-                drive::getPoseVelocity);
+                drive::getPoseVelocity,
+                turretCamera);
 
         transfer =
             new Transfer(

@@ -66,7 +66,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
 
   @Override
   public void setRobotOffset(Transform3d offset) {
-    visionSim.adjustCamera(cameraSim, offset);
+    visionSim.adjustCamera(cameraSim, fixRobotToCamera(offset));
     super.setRobotOffset(offset);
   }
 }

@@ -39,6 +39,9 @@ public class TurretConstants {
           90); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to
   // intake direction
 
+  public static final double kTurretGearRatio = 75.0 / 21.0 * 48.0 / 11.0;
+  public static final double kV = kTurretGearRatio / DCMotor.getKrakenX44(1).KvRadPerSecPerVolt;
+
   public static final Voltage OVERRIDE_VOLTAGE = Volts.of(1.5);
 
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =
@@ -66,7 +69,7 @@ public class TurretConstants {
           .softMinAngle(kTurretPhysicalMinAngle)
           .softMaxAngle(kTurretPhysicalMaxAngle)
           .motorRotationsPerOutputRotations(1) // 1:1 ratio between the two
-          .rotorRotationsPerSensorRotation(75.0 / 21.0 * 48.0 / 11.0)
+          .rotorRotationsPerSensorRotation(kTurretGearRatio)
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40.0))
@@ -75,6 +78,7 @@ public class TurretConstants {
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
+          .kV(kSubsystemConfigReal.getKV())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
@@ -88,6 +92,7 @@ public class TurretConstants {
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
+          .kV(kSubsystemConfigReal.getKV())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
@@ -108,6 +113,7 @@ public class TurretConstants {
           .kP(kSubsystemConfigSim.getKP())
           .kI(kSubsystemConfigSim.getKI())
           .kD(kSubsystemConfigSim.getKD())
+          .kV(kSubsystemConfigSim.getKV())
           .cruiseVelocity(kSubsystemConfigSim.getCruiseVelocity())
           .acceleration(kSubsystemConfigSim.getAcceleration())
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())

@@ -195,6 +195,12 @@ public class AngularSubsystem extends RegisteredSubsystem {
     return parallel(run(() -> io.setAngle(angle.get())), setOutputMode(kClosedLoop));
   }
 
+  public Command angle(Supplier<Angle> angle, Supplier<Voltage> feedforward) {
+    // Set angle every loop, run until canceled.
+    return parallel(
+        run(() -> io.setAngle(angle.get(), feedforward.get())), setOutputMode(kClosedLoop));
+  }
+
   public Command velocity(Supplier<AngularVelocity> angVel) {
     // Set angle every loop, run until canceled.
     return parallel(run(() -> io.setVelocity(angVel.get())), setOutputMode(kVelocity));
@@ -222,6 +228,10 @@ public class AngularSubsystem extends RegisteredSubsystem {
 
   public Command holdAtGoal(Supplier<Angle> goal) {
     return parallel(angle(goal), setOutputMode(kHoldAtGoal));
+  }
+
+  public Command holdAtGoal(Supplier<Angle> goal, Supplier<Voltage> feedforward) {
+    return parallel(angle(goal, feedforward), setOutputMode(kHoldAtGoal));
   }
 
   public Command resetAngle() {

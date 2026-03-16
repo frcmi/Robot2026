@@ -32,6 +32,7 @@ public class AngularIOSim implements AngularIO {
   private Optional<Angle> goalPos = Optional.empty();
   private Optional<AngularVelocity> goalVel = Optional.empty();
   private Optional<Voltage> openLoopVolts = Optional.empty();
+  private Voltage feedforward = Volts.of(0);
 
   private Current supplyCurrent = Amps.of(0.0);
 
@@ -89,7 +90,9 @@ public class AngularIOSim implements AngularIO {
             Volts.of(
                 MathUtil.clamp(
                     posController.calculate(
-                        pivot.getAngleRads(), goalPos.orElse(Radians.of(0.0)).in(Radians)),
+                            pivot.getAngleRads(), goalPos.orElse(Radians.of(0.0)).in(Radians))
+                        + posController.getSetpoint().velocity * deviceConfig.getKV()
+                        + feedforward.in(Volts),
                     -12.0,
                     12.0));
         posSet = Optional.of(Radians.of(posController.getSetpoint().position));
@@ -180,9 +183,15 @@ public class AngularIOSim implements AngularIO {
 
   @Override
   public void setAngle(Angle angle) {
+    setAngle(angle, Volts.of(0.0));
+  }
+
+  @Override
+  public void setAngle(Angle angle, Voltage feedforward) {
     this.goalPos = Optional.of(angle);
     this.goalVel = Optional.empty();
     this.openLoopVolts = Optional.empty();
+    this.feedforward = feedforward;
 
     if (outputMode
         != kClosedLoop) { // If the output mode was already closed loop, then the controller has

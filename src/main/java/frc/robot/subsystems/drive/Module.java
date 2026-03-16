@@ -138,4 +138,8 @@ public class Module {
   public double getFFCharacterizationVelocity() {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
+
+  public boolean isConnected() {
+    return inputs.driveConnected && inputs.turnConnected;
+  }
 }

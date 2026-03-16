@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 0.41153416510402363,
-        "y": 0.8338133494105602
+        "x": 0.4116073147256978,
+        "y": 0.7557459095283923
       },
       "prevControl": {
-        "x": 0.6615329344416098,
-        "y": 0.8330289198774677
+        "x": 0.6616060840632839,
+        "y": 0.7549614799952998
       },
       "nextControl": null,
       "isLocked": false,
@@ -128,7 +128,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 3.0,
+      "waypointRelativePos": 3.25,
       "endWaypointRelativePos": 4.0,
       "command": null
     }

@@ -9,12 +9,14 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static edu.wpi.first.wpilibj2.command.Commands.either;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,6 +55,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
+  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(-1.0);
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -62,7 +65,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5, DebounceType.kFalling);
   public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
   /** Creates a new Shooter. */
@@ -87,11 +90,14 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.robotPose = robotPoseSupplier;
     this.robotVel = robotVelSupplier;
     hood.setDefaultCommand(hood.holdAtGoal(() -> getTargetState().getHood()));
-    turret.setDefaultCommand(turret.holdAtGoal(() -> getTargetState().getTurret()));
+    turret.setDefaultCommand(
+        turret.holdAtGoal(() -> getTargetState().getTurret(), this::turretFeedforward));
     flywheel.setDefaultCommand(
         either(
             flywheel.openLoop(Volts.of(0)).until(() -> !disabled),
-            flywheel.velocity(() -> getTargetState().getFlywheel()).until(() -> disabled),
+            flywheel
+                .velocity(() -> getTargetState().getFlywheel().plus(flywheelOffset))
+                .until(() -> disabled),
             () -> disabled));
     measuredState = new ShooterState(turret.getAngle(), hood.getAngle(), flywheel.getVelocity());
   }
@@ -105,7 +111,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     // This method will be called once per scheduler run
     measuredState.setTurret(turret.getAngle());
     measuredState.setHood(hood.getAngle());
-    measuredState.setFlywheel(flywheel.getVelocity());
+    measuredState.setFlywheel(flywheel.getVelocity().minus(flywheelOffset));
 
     Logger.recordOutput("Shooter/TargetState", targetState);
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
@@ -114,6 +120,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
     Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
     Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
+    Logger.recordOutput("Shooter/FlywheelOffsetRPS", flywheelOffset.in(RotationsPerSecond));
 
     // Aim at hub
     Translation2d targetPosition;
@@ -326,5 +333,20 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   public Command turretPower(Supplier<Voltage> volts) {
     return this.turret.openLoop(volts);
+  }
+
+  public Command turretAngle(Angle angle) {
+    return this.turret.holdAtGoal(() -> angle);
+  }
+
+  public Command flywheelVelocity(AngularVelocity vel) {
+    return this.flywheel.velocity(() -> vel);
+  }
+
+  private Voltage turretFeedforward() {
+    double robotOmega = robotVel.get().omegaRadiansPerSecond;
+    double ffV = -TurretConstants.kV * robotOmega;
+    Logger.recordOutput("Shooter/TurretFF_V", ffV);
+    return Volts.of(ffV);
   }
 }

@@ -38,6 +38,10 @@ public interface AngularIO {
 
   default void setAngle(Angle angle) {}
 
+  default void setAngle(Angle angle, Voltage feedforward) {
+    setAngle(angle);
+  }
+
   default void setOpenLoop(Voltage voltage) {}
 
   default void setVelocity(AngularVelocity velocity) {}

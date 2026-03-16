@@ -29,7 +29,9 @@ import java.util.function.Supplier;
 public class TurretConstants {
   public static final Translation3d TurretOffset =
       new Translation3d(
-          Inches.of(-5.195f).in(Meters), Inches.of(4.995f).in(Meters), Inches.of(5.0f).in(Meters));
+          Inches.of(-5.195f).in(Meters),
+          Inches.of(4.995f).in(Meters),
+          Inches.of(5.0f).in(Meters)); // Forward, left, up
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =

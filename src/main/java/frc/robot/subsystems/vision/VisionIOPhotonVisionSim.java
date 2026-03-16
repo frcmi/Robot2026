@@ -9,6 +9,9 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.function.Supplier;
@@ -40,10 +43,19 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
       visionSim.addAprilTags(aprilTagLayout);
     }
 
-    // Add sim camera
+    // Add sim camera (Limelight 4, in reality we do 1280x800 but it lowk performs like 640x400)
     var cameraProperties = new SimCameraProperties();
+    double cx = 320.0 / 2.0 - 0.5;
+    double cy = 200.0 / 2.0 - 0.5;
+    double fx = cx / Math.tan(Math.toRadians(82.0 / 2.0));
+    double fy = cy / Math.tan(Math.toRadians(56.2 / 2.0));
+    cameraProperties.setCalibration(
+        320,
+        200,
+        MatBuilder.fill(Nat.N3(), Nat.N3(), fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0),
+        VecBuilder.fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
-    visionSim.addCamera(cameraSim, robotToCamera);
+    visionSim.addCamera(cameraSim, fixRobotToCamera(robotToCamera));
   }
 
   @Override

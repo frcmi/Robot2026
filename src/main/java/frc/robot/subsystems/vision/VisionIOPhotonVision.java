@@ -11,6 +11,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,7 +32,18 @@ public class VisionIOPhotonVision implements VisionIO {
    */
   public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
     camera = new PhotonCamera(name);
-    this.robotToCamera = robotToCamera;
+    this.robotToCamera = fixRobotToCamera(robotToCamera);
+  }
+
+  Transform3d fixRobotToCamera(Transform3d robotToCamera) {
+    Rotation3d fixedPitchRotation =
+        new Rotation3d(
+            robotToCamera.getRotation().getX(),
+            -robotToCamera.getRotation().getY(),
+            robotToCamera
+                .getRotation()
+                .getZ()); // For some reason pitch is negative relative to LL / what makes sense
+    return new Transform3d(robotToCamera.getTranslation(), fixedPitchRotation);
   }
 
   @Override

@@ -121,12 +121,8 @@ public class RobotContainer {
   @SuppressWarnings("FieldCanBeLocal")
   private final Optional<FuelSim> fuelSim;
 
-  private final BooleanSupplier isAutonomous;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(BooleanSupplier isAutonomous) {
-    this.isAutonomous = isAutonomous;
-
     VisionIO turretCamera;
     switch (Constants.currentMode) {
       case REAL:
@@ -193,7 +189,7 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
                       KickerConstants.kSubsystemConfigReal),
-                  shooter.aimed.or(new Trigger(isAutonomous)));
+                  shooter.aimed);
           intake =
               new Intake(
                   new AngularSubsystem(
@@ -270,7 +266,7 @@ public class RobotContainer {
                 new AngularSubsystem(
                     new AngularIOSim(KickerConstants.kSimConfig, currentDrawCalculatorSim),
                     KickerConstants.kSubsystemConfigSim),
-                shooter.aimed.or(new Trigger(isAutonomous)));
+                shooter.aimed);
         intake =
             new Intake(
                 new AngularSubsystem(

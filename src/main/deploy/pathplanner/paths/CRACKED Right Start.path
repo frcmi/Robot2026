@@ -211,6 +211,12 @@
     },
     {
       "name": "Shoot",
+      "waypointRelativePos": 1.1532674501424494,
+      "endWaypointRelativePos": 1.699986645299146,
+      "command": null
+    },
+    {
+      "name": "Shoot",
       "waypointRelativePos": 2.907785790598292,
       "endWaypointRelativePos": 3.6432625534188032,
       "command": null

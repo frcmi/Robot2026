@@ -121,7 +121,7 @@
       },
       "nextControl": {
         "x": 2.701518726834606,
-        "y": 7.079879608889529
+        "y": 7.079879608889528
       },
       "isLocked": false,
       "linkedName": null
@@ -316,6 +316,12 @@
     },
     {
       "name": "Shoot",
+      "waypointRelativePos": 1.144631410256412,
+      "endWaypointRelativePos": 1.8425480769230758,
+      "command": null
+    },
+    {
+      "name": "Shoot",
       "waypointRelativePos": 3.041580435982341,
       "endWaypointRelativePos": 4.556300013796908,
       "command": null
@@ -324,6 +330,12 @@
       "name": "Shoot",
       "waypointRelativePos": 7.144764072847684,
       "endWaypointRelativePos": 7.806601821192052,
+      "command": null
+    },
+    {
+      "name": "Intake",
+      "waypointRelativePos": 7.735409768211921,
+      "endWaypointRelativePos": 11.222475165562907,
       "command": null
     },
     {

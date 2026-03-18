@@ -41,7 +41,7 @@ public class TurretConstants {
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =
-      Degrees.of(90); // Positive = CCW from top-down perspective
+      Degrees.of(180); // Positive = CCW from top-down perspective
   public static final Angle kTurretZero =
       Degrees.of(
           90); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to

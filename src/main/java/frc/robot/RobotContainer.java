@@ -57,7 +57,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeState;
-import frc.robot.subsystems.led.CANdleSystem;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.led.io.CANdleIOReal;
 import frc.robot.subsystems.led.io.CANdleIOSim;
 import frc.robot.subsystems.shooter.FuelSim;
@@ -94,7 +94,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Transfer transfer;
   private final Climb climb;
-  private final CANdleSystem led;
+  private final LED led;
 
   private final RobotSuperstructure superstructure;
 
@@ -218,9 +218,9 @@ public class RobotContainer {
           climb = new Climb();
         }
         if (Constants.ledHardwareExists) {
-          led = new CANdleSystem(new CANdleIOReal(), shooter.aimed);
+          led = new LED(new CANdleIOReal(), shooter.aimed);
         } else {
-          led = new CANdleSystem();
+          led = new LED();
         }
         fuelSim = Optional.empty();
         break;
@@ -286,7 +286,7 @@ public class RobotContainer {
                 new LinearSubsystem(
                     new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
                     ClimberConstants.kSubsystemConfigSim));
-        led = new CANdleSystem(new CANdleIOSim(), shooter.aimed);
+        led = new LED(new CANdleIOSim(), shooter.aimed);
         fuelSim =
             Optional.of(
                 new FuelSim(
@@ -312,7 +312,7 @@ public class RobotContainer {
         transfer = new Transfer(shooter.aimed);
         intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         climb = new Climb();
-        led = new CANdleSystem();
+        led = new LED();
         fuelSim =
             Optional.of(
                 new FuelSim(

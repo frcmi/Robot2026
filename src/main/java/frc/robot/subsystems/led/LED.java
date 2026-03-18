@@ -2,35 +2,42 @@ package frc.robot.subsystems.led;
 
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.subsystems.led.io.CANdleIO;
 import frc.robot.subsystems.led.io.CANdleIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
-public class CANdleSystem extends SubsystemBase {
+public class LED extends VirtualSubsystem {
 
   private static final int SlotStartIdx = 8;
-  private static final int SlotEndIdx = 37;
+  private static final int SlotEndIdx = CANdleConstants.k_candleNumLEDs + SlotStartIdx - 1;
 
   private final CANdleIO io;
   private final CANdleIOInputsAutoLogged inputs;
 
-  public CANdleSystem() {
+  public LED() {
     this(new CANdleIO() {}, new Trigger(() -> false));
   }
 
-  public CANdleSystem(CANdleIO io, Trigger aimed) {
+  public LED(CANdleIO io, Trigger aimed) {
     this.io = io;
     this.inputs = new CANdleIOInputsAutoLogged();
-    aimed.whileTrue(setToGreen()).whileFalse(setToRed());
+
+    // LED animations
+    Trigger enabled = new Trigger(DriverStation::isEnabled);
+    enabled.whileFalse(setRainbow());
+    aimed.and(enabled).whileTrue(setToGreen());
+    aimed.negate().and(enabled).whileTrue(setToRed());
   }
 
   @Override
   public void periodic() {
     this.io.updateInputs(inputs);
-
     Logger.processInputs("CANdle", inputs);
   }
 
@@ -61,6 +68,15 @@ public class CANdleSystem extends SubsystemBase {
               new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)
                   .withColor(new RGBWColor(0, 217, 0, 0)));
+        });
+  }
+
+  private Command setRainbow() {
+    return run(
+        () -> {
+          io.setControl(
+              new RainbowAnimation(SlotStartIdx, SlotEndIdx)
+                  .withSlot(0));
         });
   }
 }

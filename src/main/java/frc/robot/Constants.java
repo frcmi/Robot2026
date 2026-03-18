@@ -37,7 +37,7 @@ public final class Constants {
   public static boolean intakeHardwareExists = true;
   public static boolean shooterHardwareExists = true;
   public static boolean visionHardwareExists = true;
-  public static boolean ledHardwareExists = false;
+  public static boolean ledHardwareExists = true;
 
   // For interplut & tunable double
   public static boolean kTuningMode = true;

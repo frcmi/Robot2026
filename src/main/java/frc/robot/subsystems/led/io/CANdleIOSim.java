@@ -12,7 +12,6 @@ public class CANdleIOSim implements CANdleIO {
   public void setControl(ControlRequest request) {
     this.request = request;
   }
-  ;
 
   @Override
   public void updateInputs(CANdleIOInputs inputs) {
@@ -22,5 +21,4 @@ public class CANdleIOSim implements CANdleIO {
     inputs.animationName = request.getName();
     inputs.animation = request.toString();
   }
-  ;
 }

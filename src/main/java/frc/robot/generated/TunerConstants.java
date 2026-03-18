@@ -32,7 +32,7 @@ public class TunerConstants {
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(2.0).withKI(0).withKD(0).withKS(0.68185).withKV(0.13586);
+      new Slot0Configs().withKP(2.0).withKI(0).withKD(0).withKS(0.24745).withKV(0.75624);
   ;
 
   // The closed-loop output type to use for the steer motors;
@@ -55,7 +55,8 @@ public class TunerConstants {
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
-  private static final Current kSlipCurrent = Amps.of(120);
+  private static final Current kSlipCurrent = Amps.of(60);
+  private static final Current kBackRightSlipCurrent = Amps.of(25);
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -79,7 +80,8 @@ public class TunerConstants {
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
-  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.12);
+  public static final LinearVelocity kSpeedAt12Volts =
+      MetersPerSecond.of(4.85); // Theoretical: 5.12m/s
 
   // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
   // This may need to be tuned to your individual robot
@@ -87,7 +89,7 @@ public class TunerConstants {
 
   private static final double kDriveGearRatio = 6.026785714285714;
   private static final double kSteerGearRatio = 26.09090909090909;
-  private static final Distance kWheelRadius = Inches.of(2);
+  private static final Distance kWheelRadius = Inches.of(1.968);
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
@@ -220,15 +222,16 @@ public class TunerConstants {
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
       BackRight =
           ConstantCreator.createModuleConstants(
-              kBackRightSteerMotorId,
-              kBackRightDriveMotorId,
-              kBackRightEncoderId,
-              kBackRightEncoderOffset,
-              kBackRightXPos,
-              kBackRightYPos,
-              kInvertRightSide,
-              kBackRightSteerMotorInverted,
-              kBackRightEncoderInverted);
+                  kBackRightSteerMotorId,
+                  kBackRightDriveMotorId,
+                  kBackRightEncoderId,
+                  kBackRightEncoderOffset,
+                  kBackRightXPos,
+                  kBackRightYPos,
+                  kInvertRightSide,
+                  kBackRightSteerMotorInverted,
+                  kBackRightEncoderInverted)
+              .withSlipCurrent(kBackRightSlipCurrent);
 
   /** Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types. */
   public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {

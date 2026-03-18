@@ -2,10 +2,8 @@ package frc.robot.subsystems.led;
 
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.subsystems.led.io.CANdleIO;
@@ -29,10 +27,8 @@ public class LED extends VirtualSubsystem {
     this.inputs = new CANdleIOInputsAutoLogged();
 
     // LED animations
-    Trigger enabled = new Trigger(DriverStation::isEnabled);
-    enabled.whileFalse(setRainbow());
-    aimed.and(enabled).whileTrue(setToGreen());
-    aimed.negate().and(enabled).whileTrue(setToRed());
+    setDefaultCommand(setRainbow().ignoringDisable(true));
+    aimed.whileTrue(setToGreen()).whileFalse(setToRed());
   }
 
   @Override
@@ -74,9 +70,7 @@ public class LED extends VirtualSubsystem {
   private Command setRainbow() {
     return run(
         () -> {
-          io.setControl(
-              new RainbowAnimation(SlotStartIdx, SlotEndIdx)
-                  .withSlot(0));
+          io.setControl(new RainbowAnimation(SlotStartIdx, SlotEndIdx).withSlot(0));
         });
   }
 }

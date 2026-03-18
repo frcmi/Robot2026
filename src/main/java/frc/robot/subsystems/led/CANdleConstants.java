@@ -3,7 +3,6 @@ package frc.robot.subsystems.led;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
 import com.ctre.phoenix6.CANBus;
-
 import frc.robot.lib.LoggedTunableNumber;
 
 public class CANdleConstants {

@@ -6,12 +6,12 @@ import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
 import com.ctre.phoenix6.signals.StripTypeValue;
-
 import frc.robot.subsystems.led.CANdleConstants;
 
 public class CANdleIOReal implements CANdleIO {
 
-  private final CANdle m_candle = new CANdle(CANdleConstants.m_candleCanId, CANdleConstants.m_candleCanBus);
+  private final CANdle m_candle =
+      new CANdle(CANdleConstants.m_candleCanId, CANdleConstants.m_candleCanBus);
   private ControlRequest request;
   private CANdleConfiguration candleconfig = new CANdleConfiguration();
 
@@ -41,7 +41,9 @@ public class CANdleIOReal implements CANdleIO {
     }
     inputs.animationName = request.getName();
     inputs.animation = request.toString();
-    if (CANdleConstants.m_candleBrightnessScalar.hasChanged(CANdleConstants.m_candleBrightnessScalar.hashCode())) {
+    
+    if (CANdleConstants.m_candleBrightnessScalar.hasChanged(
+        CANdleConstants.m_candleBrightnessScalar.hashCode())) {
       candleconfig.LED.BrightnessScalar = CANdleConstants.m_candleBrightnessScalar.get();
       m_candle.getConfigurator().apply(candleconfig);
     }

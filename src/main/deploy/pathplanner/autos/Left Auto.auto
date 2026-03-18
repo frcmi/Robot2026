@@ -13,13 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftIntakeReturn"
+            "pathName": "Left Depot"
           }
         },
         {

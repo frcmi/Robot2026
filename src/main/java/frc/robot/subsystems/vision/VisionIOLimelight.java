@@ -160,7 +160,7 @@ public class VisionIOLimelight implements VisionIO {
     LimelightHelpers.setCameraPose_RobotSpace(
         name,
         offset.getX(),
-        offset.getY(),
+        -offset.getY(), // LL uses right instead of left
         offset.getZ(),
         Math.toDegrees(offset.getRotation().getX()),
         Math.toDegrees(offset.getRotation().getY()),

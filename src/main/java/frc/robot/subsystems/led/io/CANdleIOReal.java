@@ -41,7 +41,7 @@ public class CANdleIOReal implements CANdleIO {
     }
     inputs.animationName = request.getName();
     inputs.animation = request.toString();
-    
+
     if (CANdleConstants.m_candleBrightnessScalar.hasChanged(
         CANdleConstants.m_candleBrightnessScalar.hashCode())) {
       candleconfig.LED.BrightnessScalar = CANdleConstants.m_candleBrightnessScalar.get();

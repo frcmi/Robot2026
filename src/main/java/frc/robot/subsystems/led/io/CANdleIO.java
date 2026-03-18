@@ -2,7 +2,6 @@ package frc.robot.subsystems.led.io;
 
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.EmptyAnimation;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface CANdleIO {

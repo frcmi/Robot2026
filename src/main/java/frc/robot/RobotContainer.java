@@ -419,15 +419,18 @@ public class RobotContainer {
             .beforeStarting(shooter.setHoodLock(true))
             .andThen(shooter.setHoodLock(false)) // Should never run, just in case
             .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
-    driverController.buttonA.whileTrue(intake.set(IntakeState.kBump));
+    if (!sim) {
+      driverController.buttonA.whileTrue(intake.set(IntakeState.kBump));
+    }
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
+    - Operator button B: Lock down hood
      */
     operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     if (sim) {
-      simController.buttonB.whileTrue(transfer.set(TransferState.kTransferring));
+      simController.buttonA.whileTrue(transfer.set(TransferState.kTransferring));
     }
     operatorController
         .rightTrigger
@@ -435,6 +438,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0)))
         .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
     operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
+    operatorController.buttonB.onTrue(shooter.setHoodLock(true)).onFalse(shooter.setHoodLock(false));
 
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb

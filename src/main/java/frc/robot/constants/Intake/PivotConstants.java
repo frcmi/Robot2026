@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 public class PivotConstants {
   public static final Translation2d IntakeOffset = new Translation2d(Inches.of(16.0).in(Meters), 0);
 
-  public static final Voltage MANUAL_VOLTAGE = Volts.of(-2.0);
+  public static final Voltage MANUAL_VOLTAGE = Volts.of(-0.5);
 
   public static final Distance PivotLength = Inches.of(14.9);
   public static final Supplier<Rotation2d> kRealAngleFromSubsystemAngleZeroSupplier =

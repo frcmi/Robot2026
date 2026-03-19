@@ -7,6 +7,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.DriveConstants;
@@ -25,6 +26,10 @@ public class RobotSuperstructure {
   private final Climb climb;
   private final Shooter shooter;
 
+  // For choreo
+  boolean intakeZoneActive = false;
+  boolean shootingZoneActive = false;
+
   public RobotSuperstructure(Intake intake, Transfer transfer, Climb climb, Shooter shooter) {
     this.intake = intake;
     this.transfer = transfer;
@@ -33,6 +38,7 @@ public class RobotSuperstructure {
   }
 
   public void registerAutoCommands() {
+    // PATH PLANNER
     NamedCommands.registerCommand("ClimbRaise", climbRaise());
     NamedCommands.registerCommand("Climb", climbClimbed());
     NamedCommands.registerCommand(
@@ -55,6 +61,22 @@ public class RobotSuperstructure {
     new EventTrigger("Shoot")
         .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
     new EventTrigger("ZeroPivot").onTrue(intake.zeroPivot().asProxy());
+
+    // CHOREO
+    new EventTrigger("IntakeStart").onTrue(
+      Commands.runOnce(() -> intakeZoneActive = true)
+    );
+    new EventTrigger("IntakeStop").onTrue(
+      Commands.runOnce(() -> intakeZoneActive = false)
+    );
+    new Trigger(() -> intakeZoneActive).whileTrue(intake.set(IntakeState.kIntaking));
+    new EventTrigger("ShootStart").onTrue(
+      Commands.runOnce(() -> shootingZoneActive = true)
+    );
+    new EventTrigger("ShootStop").onTrue(
+      Commands.runOnce(() -> shootingZoneActive = false)
+    );
+    new Trigger(() -> shootingZoneActive).whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
   }
 
   public Command climbRaise() {

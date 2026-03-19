@@ -41,7 +41,7 @@ public class FuelSim extends VirtualSubsystem {
   LoggedTunableNumber kBPS = new LoggedTunableNumber("FuelSim/BPS", 5);
   LoggedTunableNumber kGravity = new LoggedTunableNumber("FuelSim/GravityMS^2", -9.81);
   LoggedTunableNumber kExitVelocity =
-      new LoggedTunableNumber("FuelSim/ExitVelocityMSPerRadS", 0.035);
+      new LoggedTunableNumber("FuelSim/ExitVelocityMSPerRadS", 0.03);
 
   public FuelSim(
       Supplier<ShooterState> shooterState,

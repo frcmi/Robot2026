@@ -3,6 +3,7 @@ package frc.robot.subsystems.led;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -27,14 +28,31 @@ public class LED extends VirtualSubsystem {
     this.inputs = new CANdleIOInputsAutoLogged();
 
     // LED animations
-    setDefaultCommand(setRainbow().ignoringDisable(true));
-    aimed.whileTrue(setToGreen()).whileFalse(setToRed());
+    setDefaultCommand(setOff().ignoringDisable(true));
+    aimed.whileTrue(setToAllianceColor()).whileFalse(setToRed());
   }
 
   @Override
   public void periodic() {
     this.io.updateInputs(inputs);
     Logger.processInputs("CANdle", inputs);
+  }
+
+  private RGBWColor getAllianceColor() {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent() && alliance.get() == Alliance.Blue) {
+      return new RGBWColor(0, 0, 255, 0); // Blue alliance
+    }
+    return new RGBWColor(255, 0, 0, 0); // Red alliance (also fallback)
+  }
+
+  private Command setToAllianceColor() {
+    return run(
+        () ->
+            io.setControl(
+                new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
+                    .withSlot(0)
+                    .withColor(getAllianceColor())));
   }
 
   private Command setToRed() {
@@ -44,6 +62,16 @@ public class LED extends VirtualSubsystem {
               new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)
                   .withColor(new RGBWColor(255, 0, 0, 0)));
+        });
+  }
+
+  private Command setOff() {
+    return run(
+        () -> {
+          io.setControl(
+              new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
+                  .withSlot(0)
+                  .withColor(new RGBWColor(0, 0, 0, 0)));
         });
   }
 
@@ -71,6 +99,13 @@ public class LED extends VirtualSubsystem {
     return run(
         () -> {
           io.setControl(new RainbowAnimation(SlotStartIdx, SlotEndIdx).withSlot(0));
+        });
+  }
+
+  private Command setLarson() {
+    return run(
+        () -> {
+          io.setControl(new LarsonAnimation(SlotStartIdx, SlotEndIdx).withSlot(0));
         });
   }
 }

@@ -438,7 +438,10 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0)))
         .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
     operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
-    operatorController.buttonB.onTrue(shooter.setHoodLock(true)).onFalse(shooter.setHoodLock(false));
+    operatorController
+        .buttonB
+        .onTrue(shooter.setHoodLock(true))
+        .onFalse(shooter.setHoodLock(false));
 
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb

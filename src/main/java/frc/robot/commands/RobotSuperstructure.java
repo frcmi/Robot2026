@@ -63,20 +63,13 @@ public class RobotSuperstructure {
     new EventTrigger("ZeroPivot").onTrue(intake.zeroPivot().asProxy());
 
     // CHOREO
-    new EventTrigger("IntakeStart").onTrue(
-      Commands.runOnce(() -> intakeZoneActive = true)
-    );
-    new EventTrigger("IntakeStop").onTrue(
-      Commands.runOnce(() -> intakeZoneActive = false)
-    );
+    new EventTrigger("IntakeStart").onTrue(Commands.runOnce(() -> intakeZoneActive = true));
+    new EventTrigger("IntakeStop").onTrue(Commands.runOnce(() -> intakeZoneActive = false));
     new Trigger(() -> intakeZoneActive).whileTrue(intake.set(IntakeState.kIntaking));
-    new EventTrigger("ShootStart").onTrue(
-      Commands.runOnce(() -> shootingZoneActive = true)
-    );
-    new EventTrigger("ShootStop").onTrue(
-      Commands.runOnce(() -> shootingZoneActive = false)
-    );
-    new Trigger(() -> shootingZoneActive).whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
+    new EventTrigger("ShootStart").onTrue(Commands.runOnce(() -> shootingZoneActive = true));
+    new EventTrigger("ShootStop").onTrue(Commands.runOnce(() -> shootingZoneActive = false));
+    new Trigger(() -> shootingZoneActive)
+        .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
   }
 
   public Command climbRaise() {

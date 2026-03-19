@@ -318,7 +318,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     }
   }
 
-  private boolean isAimed() {
+  public boolean isAimed() {
     Logger.recordOutput("Shooter/RawTurretTargetDeg", rawTurretTarget.in(Degrees));
     double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
     double errorAtTarget = targetDist * Math.sin(turretErr);
@@ -330,15 +330,18 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     if (inAllianceZone.getAsBoolean()) {
       return errorAtTarget < (FieldConstants.hubWidth)
           && hoodErr < maxHoodErr
-          && flywheel.isAtAngle()
+          && (flywheel.isAtAngle() || disabled)
           && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
       return errorAtTarget < (FieldConstants.bumpWidth * 2)
           && hoodErr < maxHoodErr * 1.8
-          && flywheelErr
-              < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
-                  * 1.8
+          && ((flywheelErr
+                  < FlywheelConstants.kSubsystemConfigReal
+                          .getVelocityTolerance()
+                          .in(RotationsPerSecond)
+                      * 1.8)
+              || disabled)
           && shooterDistInRange;
     }
   }

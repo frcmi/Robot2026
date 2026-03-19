@@ -145,17 +145,8 @@ public class RobotContainer {
 
         if (Constants.visionHardwareExists) {
           turretCamera = new VisionIOLimelight(turretCameraName, drive::getRotation);
-          vision =
-              new Vision(
-                  drive::addVisionMeasurement,
-                  new VisionIOLimelight(camera0Name, drive::getRotation),
-                  new VisionIOLimelight(camera1Name, drive::getRotation),
-                  new VisionIOLimelight(camera2Name, drive::getRotation),
-                  new VisionIOLimelight(camera3Name, drive::getRotation),
-                  turretCamera);
         } else {
           turretCamera = new VisionIO() {};
-          vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         }
 
         if (Constants.shooterHardwareExists) {
@@ -175,6 +166,20 @@ public class RobotContainer {
                   turretCamera);
         } else {
           shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        }
+
+        if (Constants.visionHardwareExists) {
+          vision =
+              new Vision(
+                  drive::addVisionMeasurement,
+                  shooter::isAimed,
+                  new VisionIOLimelight(camera0Name, drive::getRotation),
+                  new VisionIOLimelight(camera1Name, drive::getRotation),
+                  new VisionIOLimelight(camera2Name, drive::getRotation),
+                  new VisionIOLimelight(camera3Name, drive::getRotation),
+                  turretCamera);
+        } else {
+          vision = new Vision(drive::addVisionMeasurement, shooter::isAimed, new VisionIO() {});
         }
 
         if (Constants.intakeHardwareExists) {
@@ -231,15 +236,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight, currentDrawCalculatorSim));
         turretCamera =
             new VisionIOPhotonVisionSim(turretCameraName, new Transform3d(), drive::getPose);
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose),
-                new VisionIOPhotonVisionSim(camera2Name, robotToCamera2, drive::getPose),
-                new VisionIOPhotonVisionSim(camera3Name, robotToCamera3, drive::getPose),
-                turretCamera);
-
         shooter =
             new Shooter(
                 new AngularSubsystem(
@@ -253,6 +249,15 @@ public class RobotContainer {
                     FlywheelConstants.kSubsystemConfigSim),
                 drive::getPose,
                 drive::getPoseVelocity,
+                turretCamera);
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                shooter::isAimed,
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose),
+                new VisionIOPhotonVisionSim(camera2Name, robotToCamera2, drive::getPose),
+                new VisionIOPhotonVisionSim(camera3Name, robotToCamera3, drive::getPose),
                 turretCamera);
 
         transfer =
@@ -301,9 +306,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision =
-            new Vision(drive::addVisionMeasurement, new VisionIO() {}); // , new VisionIO() {});
         shooter = new Shooter(drive::getPose, drive::getPoseVelocity);
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                shooter::isAimed,
+                new VisionIO() {}); // , new VisionIO() {});
         transfer = new Transfer(shooter.aimed);
         intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
         climb = new Climb();

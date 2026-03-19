@@ -44,10 +44,10 @@ public class AimingConstants {
       new LoggedInterpolatingTable(
           "Shooter/AirtimeM_s",
           new double[][] {
-            {2, 1.0},
-            {3, 1.05},
-            {4, 1.1},
-            {5.0, 1.15},
+            {2, 0.76},
+            {3, 1.11},
+            {4.5, 1.15},
+            {6.0, 1.1},
           });
 
   // Neutral zone aiming

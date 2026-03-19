@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.shooter.AimingConstants;
 import frc.robot.constants.shooter.FieldConstants;
@@ -41,6 +42,17 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver {
+  // Constants for aiming tolerances
+  private static final double NEUTRAL_ZONE_TOLERANCE_MULTIPLIER = 1.8;
+  private static final double NEUTRAL_ZONE_ERROR_MULTIPLIER = 2.0;
+  private static final double CONVERGENCE_THRESHOLD = 0.01; // meters
+  private static final int MAX_ITERATIONS = 5;
+
+  // Cached values for performance
+  private final double turretZeroRad = TurretConstants.kTurretZero.in(Radians);
+  private final double maxHoodErr =
+      HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
+
   private final AngularSubsystem turret;
   private final AngularSubsystem hood;
   private final AngularSubsystem flywheel;
@@ -75,7 +87,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Vision IO
   private final VisionIO turretCamera;
 
-  /** Creates a new Shooter. */
+  /**
+   * Creates a new Shooter with default subsystems.
+   *
+   * @param robotPose Supplier for current robot pose
+   * @param robotVel Supplier for current robot velocities
+   */
   public Shooter(Supplier<Pose2d> robotPose, Supplier<ChassisSpeeds> robotVel) {
     this(
         new AngularSubsystem(new AngularIO() {}, TurretConstants.kSubsystemConfigReal),
@@ -86,6 +103,16 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         new VisionIO() {});
   }
 
+  /**
+   * Creates a new Shooter with specified subsystems.
+   *
+   * @param turret Turret angular subsystem
+   * @param hood Hood angular subsystem
+   * @param flywheel Flywheel angular subsystem
+   * @param robotPoseSupplier Supplier for current robot pose
+   * @param robotVelSupplier Supplier for current robot velocities
+   * @param turretCamera Vision IO for turret camera
+   */
   public Shooter(
       AngularSubsystem turret,
       AngularSubsystem hood,
@@ -112,64 +139,50 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     this.turretCamera = turretCamera;
   }
 
+  /**
+   * Called when alliance color is updated.
+   *
+   * @param alliance The new alliance color
+   */
   public void onAllianceFound(Alliance alliance) {
     this.alliance = alliance;
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    measuredState.setTurret(turret.getAngle());
-    measuredState.setHood(hood.getAngle());
-    measuredState.setFlywheel(flywheel.getVelocity().minus(flywheelOffset));
-
-    Logger.recordOutput("Shooter/TargetState", targetState);
-    Logger.recordOutput("Shooter/MeasuredState", measuredState);
-    Logger.recordOutput("Shooter/Disabled", disabled);
-    Logger.recordOutput("Shooter/TurretOverride", isTurretOverride);
-    Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
-    Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
-    Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
-    Logger.recordOutput("Shooter/FlywheelOffsetRPS", flywheelOffset.in(RotationsPerSecond));
-
-    // Aim at hub
-    Translation2d targetPosition;
-    boolean allianceZone = inAllianceZone.getAsBoolean();
-    if (allianceZone) {
-      targetPosition =
-          alliance == Alliance.Blue
-              ? FieldConstants.kHubPositionBlue
-              : FieldConstants.kHubPositionRed;
-    } else {
-      double targetX =
-          alliance == Alliance.Blue
-              ? FieldConstants.allianceZoneXBlue
-              : FieldConstants.allianceZoneXRed;
-      double targetY =
-          robotPose.get().getY() < FieldConstants.kHubPositionBlue.getY()
-              ? FieldConstants.allianceZoneYBottom
-              : FieldConstants.allianceZoneYTop;
-      targetPosition = new Translation2d(targetX, targetY);
-    }
+  /**
+   * Calculates turret angle to target using iterative prediction. Accounts for robot motion and
+   * projectile flight time.
+   *
+   * @return Normalized turret angle within physical limits
+   */
+  private void updateTargeting() {
+    Translation2d targetPosition = calculateTargetPosition();
     Logger.recordOutput("Shooter/Target", targetPosition);
 
     // Calculate turret angle to target
     Pose2d currentPose = this.robotPose.get();
+    if (currentPose == null) {
+      Logger.recordOutput("Shooter/Error", "Null robot pose");
+      return;
+    }
 
     // rotate turret offsets by bot heading to convert to field-centric offsets
     Translation2d turretOffset =
         new Translation2d(TurretConstants.TurretOffset.getX(), TurretConstants.TurretOffset.getY())
             .rotateBy(currentPose.getRotation());
 
-    // Calculate aiming position iteratively
+    // Calculate aiming position iteratively with convergence check
     double dx = targetPosition.getX() - (currentPose.getX() + turretOffset.getX());
     double dy = targetPosition.getY() - (currentPose.getY() + turretOffset.getY());
     targetDist = Math.hypot(dx, dy);
     ChassisSpeeds robotVelocity = robotVel.get();
-    // Found that it converges over 2 iterations, but do 5 to be safe
-    for (int i = 0; i < 5; i++) {
+
+    int iterations = 0;
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      double prevTargetDist = targetDist;
       double airtime =
-          (allianceZone ? AimingConstants.kAirtimeTable : AimingConstants.kAirtimeTableNeutral)
+          (inAllianceZone.getAsBoolean()
+                  ? AimingConstants.kAirtimeTable
+                  : AimingConstants.kAirtimeTableNeutral)
               .get(targetDist);
       dx =
           targetPosition.getX()
@@ -180,16 +193,20 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
               - (currentPose.getY() + turretOffset.getY())
               - robotVelocity.vyMetersPerSecond * airtime;
       targetDist = Math.hypot(dx, dy);
+      iterations = i + 1;
+
+      // Check for convergence
+      if (Math.abs(targetDist - prevTargetDist) < CONVERGENCE_THRESHOLD) {
+        break;
+      }
     }
+    Logger.recordOutput("Shooter/Aiming/ConvergenceIterations", iterations);
 
     Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =
-        Radians.of(
-            angleToTarget
-                - currentPose.getRotation().getRadians()
-                - TurretConstants.kTurretZero.in(Radians));
+        Radians.of(angleToTarget - currentPose.getRotation().getRadians() - turretZeroRad);
 
     // Wrap around to [-180, 180]
     turretTarget = AngleUtils.normalize(turretTarget);
@@ -211,7 +228,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     }
 
     double hoodAngle =
-        (allianceZone ? AimingConstants.kHoodAngleTable : AimingConstants.kHoodAngleTableNeutral)
+        (inAllianceZone.getAsBoolean()
+                ? AimingConstants.kHoodAngleTable
+                : AimingConstants.kHoodAngleTableNeutral)
             .get(targetDist);
     rawHoodTarget = Degrees.of(hoodAngle);
 
@@ -222,14 +241,40 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
             : Degrees.of(hoodAngle));
 
     double flywheelRPS =
-        (allianceZone
+        (inAllianceZone.getAsBoolean()
                 ? AimingConstants.kFlywheelSpeedTable
                 : AimingConstants.kFlywheelSpeedTableNeutral)
             .get(targetDist);
     this.targetState.setFlywheel(
         disabled ? RotationsPerSecond.of(0) : RotationsPerSecond.of(flywheelRPS));
+  }
 
-    // Update turret camera
+  /**
+   * Calculates the target position based on alliance and zone
+   *
+   * @return Target position for shooting
+   */
+  private Translation2d calculateTargetPosition() {
+    boolean allianceZone = inAllianceZone.getAsBoolean();
+    if (allianceZone) {
+      return alliance == Alliance.Blue
+          ? FieldConstants.kHubPositionBlue
+          : FieldConstants.kHubPositionRed;
+    } else {
+      double targetX =
+          alliance == Alliance.Blue
+              ? FieldConstants.allianceZoneXBlue
+              : FieldConstants.allianceZoneXRed;
+      double targetY =
+          robotPose.get().getY() < FieldConstants.kHubPositionBlue.getY()
+              ? FieldConstants.allianceZoneYBottom
+              : FieldConstants.allianceZoneYTop;
+      return new Translation2d(targetX, targetY);
+    }
+  }
+
+  /** Updates the turret camera position based on current turret angle */
+  private void updateTurretCamera() {
     double turretCamYaw = TurretConstants.kTurretZero.plus(turret.getAngle()).in(Radians);
     Translation3d robotToCamera =
         TurretConstants.TurretOffset.plus(
@@ -245,14 +290,62 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Turret/CameraOffset", robotToCamera);
   }
 
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    measuredState.setTurret(turret.getAngle());
+    measuredState.setHood(hood.getAngle());
+    measuredState.setFlywheel(flywheel.getVelocity().minus(flywheelOffset));
+
+    Logger.recordOutput("Shooter/TargetState", targetState);
+    Logger.recordOutput("Shooter/MeasuredState", measuredState);
+    Logger.recordOutput("Shooter/Disabled", disabled);
+    Logger.recordOutput("Shooter/TurretOverride", isTurretOverride);
+    Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
+    Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
+    Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
+    Logger.recordOutput("Shooter/FlywheelOffsetRPS", flywheelOffset.in(RotationsPerSecond));
+
+    // Update targeting calculations
+    updateTargeting();
+
+    // Update turret camera position
+    updateTurretCamera();
+  }
+
+  /**
+   * Overrides hood with specified voltage.
+   *
+   * @param volts Voltage to apply to hood motor
+   * @return Command that applies the voltage
+   */
   public Command overrideHood(Voltage volts) {
+    if (volts == null) {
+      Logger.recordOutput("Shooter/Error", "Null voltage in overrideHood");
+      return Commands.none();
+    }
     return this.hood.openLoop(() -> volts);
   }
 
+  /**
+   * Overrides hood to hold at specified angle.
+   *
+   * @param angle Target angle for hood
+   * @return Command that holds the hood at the angle
+   */
   public Command overrideHoodAngle(Angle angle) {
+    if (angle == null) {
+      Logger.recordOutput("Shooter/Error", "Null angle in overrideHoodAngle");
+      return Commands.none();
+    }
     return this.hood.holdAtGoal(() -> angle);
   }
 
+  /**
+   * Resets hood angle to zero.
+   *
+   * @return Command that resets the hood angle
+   */
   public Command zeroHood() {
     return this.hood.resetAngle();
   }
@@ -265,6 +358,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         });
   }
 
+  /**
+   * Toggles the disabled state of the shooter.
+   *
+   * @return Command that toggles between enabled/disabled
+   */
   public Command toggleDisabled() {
     return either(
         runOnce(
@@ -278,6 +376,12 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         () -> disabled);
   }
 
+  /**
+   * Sets the hood lock state.
+   *
+   * @param lock True to lock hood, false to unlock
+   * @return Command that sets the hood lock state
+   */
   public Command setHoodLock(boolean lock) {
     return runOnce(
         () -> {
@@ -318,15 +422,32 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     }
   }
 
+  /**
+   * Checks if the shooter is aimed at the target within tolerance
+   *
+   * @return True if shooter is aimed and ready to fire
+   */
   private boolean isAimed() {
     Logger.recordOutput("Shooter/RawTurretTargetDeg", rawTurretTarget.in(Degrees));
     double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
-    double errorAtTarget = targetDist * Math.sin(turretErr);
+
+    // Clamp turret error to prevent NaN from sin() with large angles
+    double clampedTurretErr = MathUtil.clamp(turretErr, -Math.PI, Math.PI);
+    double errorAtTarget = targetDist * Math.sin(clampedTurretErr);
+
     double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
     double flywheelErr =
         measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
-    double maxHoodErr = HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
+
+    // Use cached maxHoodErr instead of recalculating
     boolean shooterDistInRange = targetDist > AimingConstants.kFlywheelSpeedTable.getMinKey();
+
+    // Enhanced logging for debugging
+    Logger.recordOutput("Shooter/Aiming/TurretErrorDeg", Math.toDegrees(turretErr));
+    Logger.recordOutput("Shooter/Aiming/ErrorAtTargetM", errorAtTarget);
+    Logger.recordOutput("Shooter/Aiming/HoodErrorDeg", hoodErr);
+    Logger.recordOutput("Shooter/Aiming/FlywheelErrorRPS", flywheelErr);
+
     if (inAllianceZone.getAsBoolean()) {
       return errorAtTarget < (FieldConstants.hubWidth)
           && hoodErr < maxHoodErr
@@ -334,15 +455,21 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
           && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return errorAtTarget < (FieldConstants.bumpWidth * 2)
-          && hoodErr < maxHoodErr * 1.8
+      return errorAtTarget < (FieldConstants.bumpWidth * NEUTRAL_ZONE_ERROR_MULTIPLIER)
+          && hoodErr < (maxHoodErr * NEUTRAL_ZONE_TOLERANCE_MULTIPLIER)
           && flywheelErr
               < FlywheelConstants.kSubsystemConfigReal.getVelocityTolerance().in(RotationsPerSecond)
-                  * 1.8
+                  * NEUTRAL_ZONE_TOLERANCE_MULTIPLIER
           && shooterDistInRange;
     }
   }
 
+  /**
+   * Toggles turret override state. When overridden, turret maintains current position instead of
+   * auto-aiming.
+   *
+   * @return Command that toggles turret override
+   */
   public Command toggleOverride() {
     return either(
         runOnce(
@@ -356,20 +483,61 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         () -> isTurretOverride);
   }
 
+  /**
+   * Applies open-loop voltage control to turret.
+   *
+   * @param volts Supplier for voltage to apply
+   * @return Command that controls turret with voltage
+   */
   public Command turretPower(Supplier<Voltage> volts) {
+    if (volts == null) {
+      Logger.recordOutput("Shooter/Error", "Null voltage supplier in turretPower");
+      return Commands.none();
+    }
     return this.turret.openLoop(volts);
   }
 
+  /**
+   * Sets turret to hold at specified angle.
+   *
+   * @param angle Target angle for turret
+   * @return Command that holds turret at the angle
+   */
   public Command turretAngle(Angle angle) {
+    if (angle == null) {
+      Logger.recordOutput("Shooter/Error", "Null angle in turretAngle");
+      return Commands.none();
+    }
     return this.turret.holdAtGoal(() -> angle);
   }
 
+  /**
+   * Sets flywheel to maintain specified velocity.
+   *
+   * @param vel Target angular velocity for flywheel
+   * @return Command that controls flywheel velocity
+   */
   public Command flywheelVelocity(AngularVelocity vel) {
+    if (vel == null) {
+      Logger.recordOutput("Shooter/Error", "Null velocity in flywheelVelocity");
+      return Commands.none();
+    }
     return this.flywheel.velocity(() -> vel);
   }
 
+  /**
+   * Calculates feedforward voltage for turret to compensate for robot rotation.
+   *
+   * @return Feedforward voltage to apply
+   */
   private Voltage turretFeedforward() {
-    double robotOmega = robotVel.get().omegaRadiansPerSecond;
+    ChassisSpeeds robotVelocity = robotVel.get();
+    if (robotVelocity == null) {
+      Logger.recordOutput("Shooter/Error", "Null robot velocity in turretFeedforward");
+      return Volts.of(0.0);
+    }
+
+    double robotOmega = robotVelocity.omegaRadiansPerSecond;
     double ffV = -TurretConstants.kV * robotOmega;
     Logger.recordOutput("Shooter/TurretFF_V", ffV);
     return Volts.of(ffV);

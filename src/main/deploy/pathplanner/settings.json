@@ -12,7 +12,7 @@
     "Left Auto",
     "Right Auto"
   ],
-  "defaultMaxVel": 4.0,
+  "defaultMaxVel": 3.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 430.0,
   "defaultMaxAngAccel": 320.0,

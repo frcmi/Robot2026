@@ -40,7 +40,7 @@ public class LED extends VirtualSubsystem {
     return run(
         () -> {
           io.setControl(
-              new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
+              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)
                   .withColor(new RGBWColor(255, 0, 0, 0)));
         });
@@ -50,7 +50,7 @@ public class LED extends VirtualSubsystem {
     return run(
         () -> {
           io.setControl(
-              new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
+              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)
                   .withColor(new RGBWColor(0, 255, 0, 0)));
         });

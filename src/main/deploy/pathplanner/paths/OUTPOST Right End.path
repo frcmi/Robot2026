@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5879759111575285,
+        "x": 0.5896830505390014,
         "y": 0.65
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9156631265267293,
-        "y": 0.6679328206377553
+        "x": 0.9173702659082021,
+        "y": 0.667932820637755
       },
       "isLocked": false,
       "linkedName": "RightOutpost"

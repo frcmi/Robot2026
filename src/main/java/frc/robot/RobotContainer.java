@@ -470,7 +470,7 @@ public class RobotContainer {
      - Operator DPad Down: Moves climb down when held, release to zero climb
      - Operator DPad Up: Zero intake pivot (doesn't actually lift it)
     */
-    operatorController.buttonA.onTrue(shooter.toggleOverride());
+    operatorController.rightMidButton.onTrue(shooter.toggleOverride());
     shooter.turretOverride.whileTrue(
         shooter.turretPower(
             () -> TurretConstants.OVERRIDE_VOLTAGE.times(-operatorController.getRightStickX())));

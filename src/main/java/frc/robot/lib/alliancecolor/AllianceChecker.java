@@ -94,19 +94,19 @@ public class AllianceChecker extends VirtualSubsystem {
     } else if (matchTime > 105) {
       // Shift 1
       hubActive = shift1Active;
-      time = matchTime - 80;
+      time = matchTime - 105;
     } else if (matchTime > 80) {
       // Shift 2
       hubActive = !shift1Active;
-      time = matchTime - 55;
+      time = matchTime - 80;
     } else if (matchTime > 55) {
       // Shift 3
       hubActive = shift1Active;
-      time = matchTime - 30;
+      time = matchTime - 55;
     } else if (matchTime > 30) {
       // Shift 4
       hubActive = !shift1Active;
-      time = matchTime;
+      time = matchTime - 30;
     } else {
       hubActive = true;
       time = matchTime;

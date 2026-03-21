@@ -24,11 +24,20 @@ public class AllianceChecker extends VirtualSubsystem {
   public void periodic() {
     alliance = DriverStation.getAlliance();
     alliance.ifPresent(color -> observers.forEach(observer -> observer.onAllianceFound(color)));
+    updateMatchTimer();
+    publishMatchTimer();
   }
 
+  public void publishMatchTimer() {
+    SmartDashboard.putNumber("ShiftTime", time);
+    SmartDashboard.putBoolean("HubActive", hubActive);
+  }
+
+  private boolean hubActive;
+  private double time;
+
   public void updateMatchTimer() {
-    boolean hubActive;
-    double time;
+
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
@@ -102,8 +111,5 @@ public class AllianceChecker extends VirtualSubsystem {
       hubActive = true;
       time = matchTime;
     }
-
-    SmartDashboard.putNumber("ShiftTime", time);
-    SmartDashboard.putBoolean("HubActive", hubActive);
   }
 }

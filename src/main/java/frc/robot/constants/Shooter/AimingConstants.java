@@ -23,9 +23,9 @@ public class AimingConstants {
             {3, 28},
             {3.5, 32},
             {4, 34},
-            {4.5, 37},
-            {5, 38},
-            {6, 41},
+            {4.5, 35},
+            {5, 36.5},
+            {6, 38},
           });
   public static LoggedInterpolatingTable kFlywheelSpeedTable =
       new LoggedInterpolatingTable(

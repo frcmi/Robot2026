@@ -59,7 +59,7 @@ public class Robot extends LoggedRobot {
           realLogPath = "/home/lvuser/logs";
         }
         Logger.addDataReceiver(new WPILOGWriter(realLogPath));
-        //Logger.addDataReceiver(new NT4Publisher()); // TODO: Bring back
+        // Logger.addDataReceiver(new NT4Publisher()); // TODO: Bring back
         break;
 
       case SIM:

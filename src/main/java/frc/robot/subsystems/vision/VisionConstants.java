@@ -67,11 +67,11 @@ public class VisionConstants {
       case 9, 10, 11, 2, 8, 5, 4, 3, 19, 20, 21, 24, 18, 27, 26, 25: // HUB TAGS
         return 1.0;
       case 14, 13, 15, 16, 29, 30, 31, 32: // OUTPOST, TOWER TAGS
-        return 2.5;
+        return 3.5;
       case 1, 6, 22, 17: // TRENCH TAGS SEEN FROM NEUTRAL ZONE
         return 1.0;
       case 12, 7, 28, 23:
-        return 4.0; // TRENCH TAGS SEEN FROM ALLIANCE ZONE
+        return 5.0; // TRENCH TAGS SEEN FROM ALLIANCE ZONE
       default:
         return Double.POSITIVE_INFINITY; // Unknown tag, reject
     }

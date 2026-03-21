@@ -2,7 +2,6 @@ package frc.robot.subsystems.led;
 
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
-
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,7 +29,10 @@ public class LED extends VirtualSubsystem {
 
     // LED animations
     setDefaultCommand(setRainbow().ignoringDisable(true));
-    Trigger browned = new Trigger(RobotController::isBrownedOut).debounce(0.5, DebounceType.kFalling).whileTrue(setToBlue());
+    Trigger browned =
+        new Trigger(RobotController::isBrownedOut)
+            .debounce(0.5, DebounceType.kFalling)
+            .whileTrue(setToBlue());
     aimed.and(browned.negate()).whileTrue(setToGreen()).whileFalse(setToRed());
   }
 

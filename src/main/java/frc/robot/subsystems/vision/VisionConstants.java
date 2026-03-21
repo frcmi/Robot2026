@@ -71,7 +71,7 @@ public class VisionConstants {
       case 1, 6, 22, 17: // TRENCH TAGS SEEN FROM NEUTRAL ZONE
         return 1.0;
       case 12, 7, 28, 23:
-        return 5.0; // TRENCH TAGS SEEN FROM ALLIANCE ZONE
+        return 9.0; // TRENCH TAGS SEEN FROM ALLIANCE ZONE
       default:
         return Double.POSITIVE_INFINITY; // Unknown tag, reject
     }

@@ -45,6 +45,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -231,7 +232,12 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
     // Check if disconnected or estimate is outside the field
-    if (poseEstimator.getEstimatedPosition().getX() < 0 || poseEstimator.getEstimatedPosition().getY() < 0 || !haveCAN.getAsBoolean()) {
+    Pose2d newEstimate = poseEstimator.getEstimatedPosition();
+    if (newEstimate.getX() < 0
+        || newEstimate.getY() < 0
+        || newEstimate.getX() > VisionConstants.aprilTagLayout.getFieldLength()
+        || newEstimate.getY() > VisionConstants.aprilTagLayout.getFieldWidth()
+        || !haveCAN.getAsBoolean()) {
       setPose(prev);
     }
 

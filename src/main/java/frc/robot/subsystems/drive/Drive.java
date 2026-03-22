@@ -110,7 +110,7 @@ public class Drive extends SubsystemBase {
                       && modules[3].isConnected()
                       && (gyroInputs.connected
                           || Constants.simMode
-                              == Constants.Mode.SIM)) // TODO: FIX THIS - IT SCREWS UP AUTO
+                              == Constants.Mode.SIM))
           .debounce(0.12, DebounceType.kRising);
 
   public Drive(

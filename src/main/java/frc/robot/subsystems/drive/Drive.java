@@ -167,6 +167,8 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -245,8 +247,6 @@ public class Drive extends SubsystemBase {
           () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
           this);
     }*/
-
-    Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
   }
 
   /**

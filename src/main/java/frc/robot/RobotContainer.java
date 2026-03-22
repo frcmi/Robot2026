@@ -443,7 +443,7 @@ public class RobotContainer {
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb
     - Operator X (sim driver): Lower climb
-     */
+     *=
     // TODO: Move flywheel override to joystick, use these for climb
     /*simController.buttonY.onTrue(superstructure.climbRaise());
     simController.buttonX.onTrue(superstructure.climbClimbed());*/

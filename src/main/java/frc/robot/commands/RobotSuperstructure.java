@@ -96,7 +96,7 @@ public class RobotSuperstructure {
     }
 
     // If in turbo mode, use max speed (assuming not transferring, or not in neutral zone)
-    if (turbo.getAsBoolean() && !(transferring || !shooter.inAllianceZone.getAsBoolean())) {
+    if (turbo.getAsBoolean() && !(transferring && shooter.inAllianceZone.getAsBoolean())) {
       speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
       if (intaking) { // Intake speed multiplier only applies when full speed
         speed *= (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);

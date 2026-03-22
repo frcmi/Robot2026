@@ -108,7 +108,7 @@ public class Drive extends SubsystemBase {
                       && modules[1].isConnected()
                       && modules[2].isConnected()
                       && modules[3].isConnected()
-                      && gyroInputs.connected)
+                      && gyroInputs.connected) // TODO: FIX THIS - IT SCREWS UP AUTO
           .debounce(0.12, DebounceType.kRising);
 
   public Drive(

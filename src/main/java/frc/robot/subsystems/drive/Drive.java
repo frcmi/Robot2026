@@ -107,8 +107,9 @@ public class Drive extends SubsystemBase {
                   modules[0].isConnected()
                       && modules[1].isConnected()
                       && modules[2].isConnected()
-                      && modules[3].isConnected())
-          .debounce(0.06, DebounceType.kRising);
+                      && modules[3].isConnected()
+                      && gyroInputs.connected)
+          .debounce(0.12, DebounceType.kRising);
 
   public Drive(
       GyroIO gyroIO,
@@ -244,6 +245,8 @@ public class Drive extends SubsystemBase {
           () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
           this);
     }*/
+
+    Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
   }
 
   /**

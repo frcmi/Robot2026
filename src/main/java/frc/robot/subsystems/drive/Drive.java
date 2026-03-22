@@ -190,6 +190,9 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
+    // Save previous data
+    Pose2d prev = poseEstimator.getEstimatedPosition();
+
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
@@ -226,6 +229,11 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // Check if disconnected or estimate is outside the field
+    if (poseEstimator.getEstimatedPosition().getX() < 0 || poseEstimator.getEstimatedPosition().getY() < 0 || !haveCAN.getAsBoolean()) {
+      setPose(prev);
+    }
 
     // Check if PID changed for pathplanner, update automatically
     /*if (Constants.kTuningMode

@@ -233,10 +233,10 @@ public class Drive extends SubsystemBase {
 
     // Check if disconnected or estimate is outside the field
     Pose2d newEstimate = poseEstimator.getEstimatedPosition();
-    if (newEstimate.getX() < 0
-        || newEstimate.getY() < 0
-        || newEstimate.getX() > VisionConstants.aprilTagLayout.getFieldLength()
-        || newEstimate.getY() > VisionConstants.aprilTagLayout.getFieldWidth()
+    if (newEstimate.getX() < -0.4
+        || newEstimate.getY() < -0.4
+        || newEstimate.getX() > (VisionConstants.aprilTagLayout.getFieldLength() + 0.4)
+        || newEstimate.getY() > (VisionConstants.aprilTagLayout.getFieldWidth() + 0.4)
         || !haveCAN.getAsBoolean()) {
       setPose(prev);
     }

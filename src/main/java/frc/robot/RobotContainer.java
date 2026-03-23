@@ -405,9 +405,7 @@ public class RobotContainer {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }
 
-    // TODO: Make this buttonA, and make buttonA code (below) into right bumper, since right now it
-    // inhibits bump driving
-    driverController.rightBumper.whileTrue(
+    driverController.buttonA.whileTrue(
         Commands.parallel(
                 DriveCommands.joystickDriveThroughTrench(
                     drive,
@@ -420,7 +418,7 @@ public class RobotContainer {
             .andThen(shooter.setHoodLock(false)) // Should never run, just in case
             .finallyDo(() -> CommandScheduler.getInstance().schedule(shooter.setHoodLock(false))));
     if (!sim) {
-      driverController.buttonA.whileTrue(intake.set(IntakeState.kBump));
+      driverController.rightBumper.whileTrue(intake.set(IntakeState.kBump));
     }
 
     /* SHOOTER CONTROLS
@@ -430,7 +428,7 @@ public class RobotContainer {
      */
     operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     if (sim) {
-      simController.buttonA.whileTrue(transfer.set(TransferState.kTransferring));
+      simController.buttonB.whileTrue(transfer.set(TransferState.kTransferring));
     }
     operatorController
         .rightTrigger
@@ -471,9 +469,6 @@ public class RobotContainer {
     shooter.turretOverride.whileTrue(
         shooter.turretPower(
             () -> TurretConstants.OVERRIDE_VOLTAGE.times(-operatorController.getRightStickX())));
-
-    // TODO: Fix (intake goes past hard stop rn)
-    // operatorController.buttonB.whileTrue(intake.set(IntakeState.kInit));
     operatorController.dPadUp.onTrue(shooter.toggleDisabled());
     operatorController
         .dPadLeft

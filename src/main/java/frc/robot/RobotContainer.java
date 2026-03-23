@@ -217,7 +217,7 @@ public class RobotContainer {
           climb = new Climb();
         }
         if (Constants.ledHardwareExists) {
-          led = new LED(new CANdleIOReal(), shooter.aimed);
+          led = new LED(new CANdleIOReal(), shooter.aimed, transfer::isAttemptingShooting);
         } else {
           led = new LED();
         }
@@ -285,7 +285,7 @@ public class RobotContainer {
                 new LinearSubsystem(
                     new LinearIOSim(ClimberConstants.kSimConfig, currentDrawCalculatorSim),
                     ClimberConstants.kSubsystemConfigSim));
-        led = new LED(new CANdleIOSim(), shooter.aimed);
+        led = new LED(new CANdleIOSim(), shooter.aimed, transfer::isAttemptingShooting);
         fuelSim =
             Optional.of(
                 new FuelSim(

@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.subsystems.led.io.CANdleIO;
 import frc.robot.subsystems.led.io.CANdleIOInputsAutoLogged;
+
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 public class LED extends VirtualSubsystem {
@@ -20,10 +23,10 @@ public class LED extends VirtualSubsystem {
   private final CANdleIOInputsAutoLogged inputs;
 
   public LED() {
-    this(new CANdleIO() {}, new Trigger(() -> false));
+    this(new CANdleIO() {}, new Trigger(() -> false), new Trigger(() -> false));
   }
 
-  public LED(CANdleIO io, Trigger aimed) {
+  public LED(CANdleIO io, Trigger aimed, BooleanSupplier attemptingShooting) {
     this.io = io;
     this.inputs = new CANdleIOInputsAutoLogged();
 
@@ -32,8 +35,8 @@ public class LED extends VirtualSubsystem {
     Trigger browned =
         new Trigger(RobotController::isBrownedOut)
             .debounce(0.5, DebounceType.kFalling)
-            .whileTrue(setToBlue());
-    aimed.and(browned.negate()).whileTrue(setToGreen()).whileFalse(setToRed());
+            .whileTrue(setColor(new RGBWColor(0, 0, 255), () -> false));
+    aimed.and(browned.negate()).whileTrue(setColor(new RGBWColor(0, 255, 0), attemptingShooting)).whileFalse(setColor(new RGBWColor(255, 0, 0), attemptingShooting));
   }
 
   @Override
@@ -42,43 +45,19 @@ public class LED extends VirtualSubsystem {
     Logger.processInputs("CANdle", inputs);
   }
 
-  private Command setToRed() {
+  private Command setColor(RGBWColor color, BooleanSupplier solid) {
     return run(
         () -> {
-          io.setControl(
-              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
-                  .withSlot(0)
-                  .withColor(new RGBWColor(255, 0, 0, 0)));
-        });
-  }
-
-  private Command setToGreen() {
-    return run(
-        () -> {
-          io.setControl(
-              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
-                  .withSlot(0)
-                  .withColor(new RGBWColor(0, 255, 0, 0)));
-        });
-  }
-
-  private Command setToBlue() {
-    return run(
-        () -> {
-          io.setControl(
-              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
-                  .withSlot(0)
-                  .withColor(new RGBWColor(0, 0, 255, 0)));
-        });
-  }
-
-  private Command setAnimFlow() {
-    return run(
-        () -> {
-          io.setControl(
-              new ColorFlowAnimation(SlotStartIdx, SlotEndIdx)
-                  .withSlot(0)
-                  .withColor(new RGBWColor(0, 217, 0, 0)));
+          if (!solid.getAsBoolean()) {
+            io.setControl(
+                new StrobeAnimation(SlotStartIdx, SlotEndIdx)
+                    .withSlot(0)
+                    .withColor(color));
+          } else {
+            io.setControl(
+                new SolidColor(SlotStartIdx, SlotEndIdx)
+                    .withColor(color));
+          }
         });
   }
 

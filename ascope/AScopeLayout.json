@@ -3,8 +3,8 @@
     {
       "x": 0,
       "y": 33,
-      "width": 1190,
-      "height": 655,
+      "width": 1512,
+      "height": 949,
       "state": {
         "sidebar": {
           "width": 300,
@@ -60,11 +60,16 @@
             "/AngularSubsystems/Flywheel",
             "/Tuning/ShooterNeutral/FlywheelSpeedM_RPS",
             "/Tuning/AngularSubsystems/Flywheel",
-            "/RealOutputs",
             "/RealOutputs/Vision",
             "/RealOutputs/Vision/Summary",
             "/RealOutputs/Vision/Summary/TagStdevMultipliers",
-            "/RealOutputs/Vision/Camera4"
+            "/RealOutputs/Vision/Camera4",
+            "/AngularSubsystems/Roller",
+            "/RealOutputs/Shooter",
+            "/Drive/Gyro",
+            "/CANdle",
+            "/ReplayOutputs/Drive",
+            "/RealOutputs"
           ]
         },
         "tabs": {
@@ -83,39 +88,36 @@
               "title": "Line Graph",
               "controller": {
                 "leftSources": [],
-                "rightSources": [
+                "rightSources": [],
+                "discreteSources": [
                   {
-                    "type": "stepped",
-                    "logKey": "/AngularSubsystems/Flywheel/ReferenceVel",
-                    "logType": "Number",
+                    "type": "stripes",
+                    "logKey": "/Drive/Gyro/Connected",
+                    "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#2b66a2",
-                      "size": "normal"
+                      "color": "#2b66a2"
                     }
                   },
                   {
-                    "type": "stepped",
-                    "logKey": "/AngularSubsystems/Flywheel/Velocity",
-                    "logType": "Number",
+                    "type": "stripes",
+                    "logKey": "/ReplayOutputs/Drive/HaveCAN",
+                    "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#e5b31b",
-                      "size": "normal"
+                      "color": "#e5b31b"
                     }
                   },
                   {
-                    "type": "stepped",
-                    "logKey": "/AngularSubsystems/Flywheel/GoalVel",
-                    "logType": "Number",
+                    "type": "stripes",
+                    "logKey": "/ReplayOutputs/Drive/HaveCAN",
+                    "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
-                      "size": "normal"
+                      "color": "#af2437"
                     }
                   }
                 ],
-                "discreteSources": [],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
@@ -287,6 +289,16 @@
                     "visible": true,
                     "options": {
                       "model": "Crab Bot",
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/RealOutputs/Vision/Summary/RobotPosesAccepted",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "model": "2026 KitBot",
                       "color": "#00ff00"
                     }
                   }
@@ -295,20 +307,20 @@
               },
               "controllerUUID": "w50jx3bbda9a450nyf6lhabhbigrh93v",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -5.402631253825264,
-                  7.192435243552472,
-                  -2.2459581448006407
+                  1.7927284950092692,
+                  5.795605101126311,
+                  -5.289351648533302
                 ],
                 "cameraTarget": [
-                  1.3066894618911098,
-                  1.1520412936913977,
-                  -1.0191643093688358
+                  2.747928246931954,
+                  -0.9175623912600864,
+                  -1.9118107007077738
                 ]
               },
-              "controlsHeight": 200
+              "controlsHeight": 181
             },
             {
               "type": 5,

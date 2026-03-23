@@ -19,16 +19,13 @@ import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.transfer.Transfer;
 import frc.robot.subsystems.transfer.TransferState;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RobotSuperstructure {
   private final Intake intake;
   private final Transfer transfer;
   private final Climb climb;
   private final Shooter shooter;
-
-  // For choreo
-  boolean intakeZoneActive = false;
-  boolean shootingZoneActive = false;
 
   public RobotSuperstructure(Intake intake, Transfer transfer, Climb climb, Shooter shooter) {
     this.intake = intake;
@@ -57,19 +54,12 @@ public class RobotSuperstructure {
             .asProxy());
     NamedCommands.registerCommand("FullRobotCheck", this.fullRobotCheck());
 
-    new EventTrigger("Intake").whileTrue(intake.set(IntakeState.kIntaking));
-    new EventTrigger("Shoot")
-        .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
     new EventTrigger("ZeroPivot").onTrue(intake.zeroPivot().asProxy());
-
-    // CHOREO
-    new EventTrigger("IntakeStart").onTrue(Commands.runOnce(() -> intakeZoneActive = true));
-    new EventTrigger("IntakeStop").onTrue(Commands.runOnce(() -> intakeZoneActive = false));
-    new Trigger(() -> intakeZoneActive).whileTrue(intake.set(IntakeState.kIntaking));
-    new EventTrigger("ShootStart").onTrue(Commands.runOnce(() -> shootingZoneActive = true));
-    new EventTrigger("ShootStop").onTrue(Commands.runOnce(() -> shootingZoneActive = false));
-    new Trigger(() -> shootingZoneActive)
+    zoneTrigger("IntakeStart", "IntakeStop").whileTrue(intake.set(IntakeState.kIntaking));
+    zoneTrigger("ShootStart", "ShootStop")
         .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
+    zoneTrigger("IntakeBumpLift", "IntakeBumpDrop").whileTrue(intake.set(IntakeState.kBump));
+    zoneTrigger("IntakeInit", "IntakeInitEnd").whileTrue(intake.set(IntakeState.kInit));
   }
 
   public Command climbRaise() {
@@ -134,5 +124,13 @@ public class RobotSuperstructure {
             // TRANSFER TESTS
             transfer.set(TransferState.kTransferring).withTimeout(5).asProxy())
         .asProxy();
+  }
+
+  // For choreo
+  private Trigger zoneTrigger(String startEvent, String stopEvent) {
+    AtomicBoolean active = new AtomicBoolean(false);
+    new EventTrigger(startEvent).onTrue(Commands.runOnce(() -> active.set(true)));
+    new EventTrigger(stopEvent).onTrue(Commands.runOnce(() -> active.set(false)));
+    return new Trigger(active::get);
   }
 }

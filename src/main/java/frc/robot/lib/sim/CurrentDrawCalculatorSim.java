@@ -27,8 +27,10 @@ public class CurrentDrawCalculatorSim extends VirtualSubsystem {
   public void periodic() {
     if (!Constants.currentMode.equals(Constants.Mode.SIM)) return;
 
-    double[] draws =
-        subsystemCurrentDraws.stream().mapToDouble(current -> current.get().in(Amps)).toArray();
+    double[] draws = new double[subsystemCurrentDraws.size()];
+    for (int i = 0; i < subsystemCurrentDraws.size(); i++) {
+      draws[i] = subsystemCurrentDraws.get(i).get().in(Amps);
+    }
     double newVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(draws);
     batteryVoltage = batteryVoltage * 0.95 + newVoltage * 0.05; // Simple low-pass filter
 

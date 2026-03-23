@@ -220,8 +220,11 @@ public class AngularIOTalonFX implements AngularIO {
             acceleration.getValueAsDouble()
                 * deviceConfig.getOutputAnglePerOutputRotation().in(Radians));
 
-    inputs.motorTemperatures =
-        motorTemperatures.stream().mapToDouble(signal -> signal.getValue().in(Celsius)).toArray();
+    inputs.motorTemperatures = new double[motorTemperatures.size()];
+    int mIdx = 0;
+    for (var signal : motorTemperatures) {
+      inputs.motorTemperatures[mIdx++] = signal.getValue().in(Celsius);
+    }
 
     int size = followers.size() + 1;
     if (inputs.deviceConnectedStatuses.length != size)

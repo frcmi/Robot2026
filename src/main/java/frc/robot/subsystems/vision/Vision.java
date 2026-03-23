@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -69,11 +69,11 @@ public class Vision extends SubsystemBase {
     }
 
     // Initialize logging values
-    List<Pose3d> allTagPoses = new LinkedList<>();
-    List<Pose3d> allRobotPoses = new LinkedList<>();
-    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
-    List<Double> tagStdevMultipliers = new LinkedList<>();
+    List<Pose3d> allTagPoses = new ArrayList<>();
+    List<Pose3d> allRobotPoses = new ArrayList<>();
+    List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
+    List<Pose3d> allRobotPosesRejected = new ArrayList<>();
+    List<Double> tagStdevMultipliers = new ArrayList<>();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -81,10 +81,10 @@ public class Vision extends SubsystemBase {
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
       // Initialize logging values
-      List<Pose3d> tagPoses = new LinkedList<>();
-      List<Pose3d> robotPoses = new LinkedList<>();
-      List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
+      List<Pose3d> tagPoses = new ArrayList<>();
+      List<Pose3d> robotPoses = new ArrayList<>();
+      List<Pose3d> robotPosesAccepted = new ArrayList<>();
+      List<Pose3d> robotPosesRejected = new ArrayList<>();
 
       // Add tag poses, calculate stdev multiplier
       double tagStdevMultiplier = Double.POSITIVE_INFINITY;
@@ -180,9 +180,11 @@ public class Vision extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/TagStdevMultipliers",
-        tagStdevMultipliers.stream().mapToDouble(Double::doubleValue).toArray());
+    double[] tagStdevMultipliersArray = new double[tagStdevMultipliers.size()];
+    for (int i = 0; i < tagStdevMultipliers.size(); i++) {
+      tagStdevMultipliersArray[i] = tagStdevMultipliers.get(i);
+    }
+    Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
   }
 
   @FunctionalInterface

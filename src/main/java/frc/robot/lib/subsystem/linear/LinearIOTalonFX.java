@@ -187,8 +187,11 @@ public class LinearIOTalonFX implements LinearIO {
             acceleration.getValueAsDouble()
                 * deviceConfig.getOutputDistancePerOutputRotation().in(Meters));
 
-    inputs.motorTemperatures =
-        motorTemperatures.stream().mapToDouble(signal -> signal.getValue().in(Celsius)).toArray();
+    inputs.motorTemperatures = new double[motorTemperatures.size()];
+    int mIdx = 0;
+    for (var signal : motorTemperatures) {
+      inputs.motorTemperatures[mIdx++] = signal.getValue().in(Celsius);
+    }
 
     int size = followers.size() + 1;
     if (inputs.deviceConnectedStatuses.length != size)

@@ -1,7 +1,6 @@
 package frc.robot.lib;
 
 import frc.robot.Constants;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -100,14 +99,32 @@ public class LoggedTunableNumber implements DoubleSupplier {
    */
   public static void ifChanged(
       int id, Consumer<double[]> action, LoggedTunableNumber... tunableNumbers) {
-    if (Arrays.stream(tunableNumbers).anyMatch(tunableNumber -> tunableNumber.hasChanged(id))) {
-      action.accept(Arrays.stream(tunableNumbers).mapToDouble(LoggedTunableNumber::get).toArray());
+    boolean changed = false;
+    for (LoggedTunableNumber tunableNumber : tunableNumbers) {
+      if (tunableNumber.hasChanged(id)) {
+        changed = true;
+      }
+    }
+    if (changed) {
+      double[] values = new double[tunableNumbers.length];
+      for (int i = 0; i < tunableNumbers.length; i++) {
+        values[i] = tunableNumbers[i].get();
+      }
+      action.accept(values);
     }
   }
 
   /** Runs action if any of the tunableNumbers have changed */
   public static void ifChanged(int id, Runnable action, LoggedTunableNumber... tunableNumbers) {
-    ifChanged(id, values -> action.run(), tunableNumbers);
+    boolean changed = false;
+    for (LoggedTunableNumber tunableNumber : tunableNumbers) {
+      if (tunableNumber.hasChanged(id)) {
+        changed = true;
+      }
+    }
+    if (changed) {
+      action.run();
+    }
   }
 
   @Override

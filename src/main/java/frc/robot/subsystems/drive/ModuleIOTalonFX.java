@@ -228,16 +228,24 @@ public class ModuleIOTalonFX implements ModuleIO {
     inputs.turnCurrentAmps = turnCurrent.getValueAsDouble();
 
     // Update odometry inputs
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
-            .toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromRotations(value))
-            .toArray(Rotation2d[]::new);
+    inputs.odometryTimestamps = new double[timestampQueue.size()];
+    int tIdx = 0;
+    for (Double val : timestampQueue) {
+      inputs.odometryTimestamps[tIdx++] = val;
+    }
+
+    inputs.odometryDrivePositionsRad = new double[drivePositionQueue.size()];
+    int dIdx = 0;
+    for (Double val : drivePositionQueue) {
+      inputs.odometryDrivePositionsRad[dIdx++] = Units.rotationsToRadians(val);
+    }
+
+    inputs.odometryTurnPositions = new Rotation2d[turnPositionQueue.size()];
+    int tuIdx = 0;
+    for (Double val : turnPositionQueue) {
+      inputs.odometryTurnPositions[tuIdx++] = Rotation2d.fromRotations(val);
+    }
+
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();

@@ -59,7 +59,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
-  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(-1.0);
+  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -69,7 +69,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.5, DebounceType.kFalling);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.3, DebounceType.kFalling);
   public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
   // Vision IO

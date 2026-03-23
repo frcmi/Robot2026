@@ -438,15 +438,12 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 1.0)))
         .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
     operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
-    operatorController
-        .buttonB
-        .onTrue(shooter.setHoodLock(true))
-        .onFalse(shooter.setHoodLock(false));
+    operatorController.buttonB.whileTrue(shooter.overrideHoodAngle(HoodConstants.kMinHoodAngle));
 
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb
     - Operator X (sim driver): Lower climb
-     */
+     *=
     // TODO: Move flywheel override to joystick, use these for climb
     /*simController.buttonY.onTrue(superstructure.climbRaise());
     simController.buttonX.onTrue(superstructure.climbClimbed());*/

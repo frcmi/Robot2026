@@ -137,7 +137,7 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0)
+            Math.pow(observation.averageTagDistance(), 1.8)
                 / observation.tagCount()
                 * tagStdevMultiplier;
         double linearStdDev = linearStdDevBaseline.getAsDouble() * stdDevFactor;

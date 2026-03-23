@@ -45,6 +45,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -107,8 +108,9 @@ public class Drive extends SubsystemBase {
                   modules[0].isConnected()
                       && modules[1].isConnected()
                       && modules[2].isConnected()
-                      && modules[3].isConnected())
-          .debounce(0.06, DebounceType.kRising);
+                      && modules[3].isConnected()
+                      && (gyroInputs.connected || Constants.simMode == Constants.Mode.SIM))
+          .debounce(0.6, DebounceType.kRising);
 
   public Drive(
       GyroIO gyroIO,
@@ -166,6 +168,8 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -186,6 +190,9 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+
+    // Save previous data
+    Pose2d prev = poseEstimator.getEstimatedPosition();
 
     // Update odometry
     double[] sampleTimestamps =
@@ -223,6 +230,16 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // Check if disconnected or estimate is outside the field
+    Pose2d newEstimate = poseEstimator.getEstimatedPosition();
+    if (newEstimate.getX() < -0.4
+        || newEstimate.getY() < -0.4
+        || newEstimate.getX() > (VisionConstants.aprilTagLayout.getFieldLength() + 0.4)
+        || newEstimate.getY() > (VisionConstants.aprilTagLayout.getFieldWidth() + 0.4)
+        || !haveCAN.getAsBoolean()) {
+      setPose(prev);
+    }
 
     // Check if PID changed for pathplanner, update automatically
     /*if (Constants.kTuningMode

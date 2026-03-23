@@ -37,7 +37,7 @@ public class TurretConstants {
   // Distance from camera lens to center of turret, 0, height of camera lens above ground
   public static final Translation3d TurretCameraOffset =
       new Translation3d(Inches.of(7.005).in(Meters), 0, Inches.of(19.010477).in(Meters));
-  public static final Rotation3d TurretCameraRotation = new Rotation3d(0, Math.toRadians(30), 0);
+  public static final Rotation3d TurretCameraRotation = new Rotation3d(0, Math.toRadians(32), 0);
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-180);
   public static final Angle kTurretPhysicalMaxAngle =

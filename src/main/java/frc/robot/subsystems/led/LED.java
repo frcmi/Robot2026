@@ -2,6 +2,8 @@ package frc.robot.subsystems.led;
 
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -27,7 +29,11 @@ public class LED extends VirtualSubsystem {
 
     // LED animations
     setDefaultCommand(setRainbow().ignoringDisable(true));
-    aimed.whileTrue(setToGreen()).whileFalse(setToRed());
+    Trigger browned =
+        new Trigger(RobotController::isBrownedOut)
+            .debounce(0.5, DebounceType.kFalling)
+            .whileTrue(setToBlue());
+    aimed.and(browned.negate()).whileTrue(setToGreen()).whileFalse(setToRed());
   }
 
   @Override
@@ -53,6 +59,16 @@ public class LED extends VirtualSubsystem {
               new StrobeAnimation(SlotStartIdx, SlotEndIdx)
                   .withSlot(0)
                   .withColor(new RGBWColor(0, 255, 0, 0)));
+        });
+  }
+
+  private Command setToBlue() {
+    return run(
+        () -> {
+          io.setControl(
+              new StrobeAnimation(SlotStartIdx, SlotEndIdx)
+                  .withSlot(0)
+                  .withColor(new RGBWColor(0, 0, 255, 0)));
         });
   }
 

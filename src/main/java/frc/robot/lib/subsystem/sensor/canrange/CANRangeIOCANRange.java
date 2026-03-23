@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.RobotConstants.kMaxTimeoutMS;
 import static frc.robot.lib.utils.PhoenixUtils.tryUntilOk;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
@@ -53,11 +52,12 @@ public class CANRangeIOCANRange implements CANRangeIO {
 
   @Override
   public void updateInputs(CANRangeIOInputs inputs) {
-    BaseStatusSignal.refreshAll(isDetected, distance);
+    isDetected.refresh(false);
+    distance.refresh(false);
 
     inputs.isDetected = isDetected.getValue();
     inputs.distance = distance.getValue();
-    inputs.connected = BaseStatusSignal.isAllGood(isDetected, distance);
+    inputs.connected = isDetected.getStatus().isOK() && distance.getStatus().isOK();
   }
 
   @Override

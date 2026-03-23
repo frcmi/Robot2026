@@ -162,15 +162,14 @@ public class LinearIOTalonFX implements LinearIO {
 
   @Override
   public void updateInputs(LinearIOInputs inputs) {
-    BaseStatusSignal.refreshAll(
-        position,
-        velocity,
-        acceleration,
-        statorCurrent,
-        appliedVolts,
-        supplyCurrent,
-        referencePosition);
-    motorTemperatures.forEach(StatusSignal::refresh);
+    position.refresh(false);
+    velocity.refresh(false);
+    acceleration.refresh(false);
+    statorCurrent.refresh(false);
+    appliedVolts.refresh(false);
+    supplyCurrent.refresh(false);
+    referencePosition.refresh(false);
+    motorTemperatures.forEach(sig -> sig.refresh(false));
 
     inputs.length =
         Meters.of(

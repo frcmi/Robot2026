@@ -501,8 +501,6 @@ public class RobotContainer {
   }
 
   private void logInit() {
-    SmartDashboard.putData("Field", field);
-
     Logger.recordOutput(
         "Poses/AprilTagField", VisionConstants.kAprilTagField.values().toArray(new Pose3d[0]));
     Logger.recordOutput(

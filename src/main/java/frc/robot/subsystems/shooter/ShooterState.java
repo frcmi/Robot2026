@@ -46,7 +46,7 @@ public class ShooterState implements StructSerializable {
 
         @Override
         public int getSize() {
-          return kSizeDouble * 2 + 256;
+          return kSizeDouble * 3;
         }
 
         @Override

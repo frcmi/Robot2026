@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.shooter.AimingConstants;
@@ -183,6 +184,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     }
 
     Logger.recordOutput("Shooter/DistanceToTargetM", targetDist);
+    SmartDashboard.putNumber("DistanceToTargetM", targetDist);
 
     double angleToTarget = Math.atan2(dy, dx);
     Angle turretTarget =

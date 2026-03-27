@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.subsystems.led.io.CANdleIO;
 import frc.robot.subsystems.led.io.CANdleIOInputsAutoLogged;
-
 import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class LED extends VirtualSubsystem {
@@ -36,7 +34,10 @@ public class LED extends VirtualSubsystem {
         new Trigger(RobotController::isBrownedOut)
             .debounce(0.5, DebounceType.kFalling)
             .whileTrue(setColor(new RGBWColor(0, 0, 255), () -> false));
-    aimed.and(browned.negate()).whileTrue(setColor(new RGBWColor(0, 255, 0), attemptingShooting)).whileFalse(setColor(new RGBWColor(255, 0, 0), attemptingShooting));
+    aimed
+        .and(browned.negate())
+        .whileTrue(setColor(new RGBWColor(0, 255, 0), attemptingShooting))
+        .whileFalse(setColor(new RGBWColor(255, 0, 0), attemptingShooting));
   }
 
   @Override
@@ -50,13 +51,9 @@ public class LED extends VirtualSubsystem {
         () -> {
           if (!solid.getAsBoolean()) {
             io.setControl(
-                new StrobeAnimation(SlotStartIdx, SlotEndIdx)
-                    .withSlot(0)
-                    .withColor(color));
+                new StrobeAnimation(SlotStartIdx, SlotEndIdx).withSlot(0).withColor(color));
           } else {
-            io.setControl(
-                new SolidColor(SlotStartIdx, SlotEndIdx)
-                    .withColor(color));
+            io.setControl(new SolidColor(SlotStartIdx, SlotEndIdx).withColor(color));
           }
         });
   }

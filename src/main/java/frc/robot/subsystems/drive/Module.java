@@ -52,8 +52,11 @@ public class Module {
             AlertType.kError);
   }
 
-  public void periodic() {
+  public void updateInputs() {
     io.updateInputs(inputs);
+  }
+
+  public void periodicAfterInputs() {
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Calculate positions for odometry

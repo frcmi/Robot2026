@@ -89,9 +89,10 @@ public class AngularIOSim implements AngularIO {
     switch (outputMode) {
       case kClosedLoop -> {
         double currentAngle = pivot.getAngleRads();
-        double gravityFF = deviceConfig.isKgArm()
-            ? deviceConfig.getKG() * Math.cos(currentAngle)
-            : deviceConfig.getKG();
+        double gravityFF =
+            deviceConfig.isKgArm()
+                ? deviceConfig.getKG() * Math.cos(currentAngle)
+                : deviceConfig.getKG();
 
         inputs.appliedVolts =
             Volts.of(

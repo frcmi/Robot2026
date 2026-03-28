@@ -116,6 +116,7 @@ public class PivotConstants {
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .numMotors(2)
           .kgArm(true)
-          .realAngleFromSubsystemAngleZeroSupplier(Optional.of(kRealAngleFromSubsystemAngleZeroSupplier))
+          .realAngleFromSubsystemAngleZeroSupplier(
+              Optional.of(kRealAngleFromSubsystemAngleZeroSupplier))
           .build();
 }

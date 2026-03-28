@@ -20,7 +20,6 @@ import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
 import frc.robot.subsystems.intake.IntakeState;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 

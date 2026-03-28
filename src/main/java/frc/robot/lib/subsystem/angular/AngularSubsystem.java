@@ -103,7 +103,8 @@ public class AngularSubsystem extends RegisteredSubsystem {
           config.setKD(kDTunable.get());
           config.setKV(kVTunable.get());
           config.setKG(kGTunable.get());
-          io.setPIDVG(kPTunable.get(), kITunable.get(), kDTunable.get(), kVTunable.get(), kGTunable.get());
+          io.setPIDVG(
+              kPTunable.get(), kITunable.get(), kDTunable.get(), kVTunable.get(), kGTunable.get());
         },
         kPTunable,
         kITunable,

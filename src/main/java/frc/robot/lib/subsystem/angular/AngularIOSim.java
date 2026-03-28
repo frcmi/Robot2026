@@ -233,7 +233,7 @@ public class AngularIOSim implements AngularIO {
     deviceConfig.setKD(kD);
     deviceConfig.setKV(kV);
     deviceConfig.setKG(kG);
-    
+
     posController.setPID(kP, kI, kD);
     velController.setPID(kP, kI, kD);
   }

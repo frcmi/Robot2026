@@ -126,7 +126,10 @@ public class AngularIOTalonFX implements AngularIO {
         referenceVelocity);
 
     // Update status frame rate
-    master.getMotorVoltage().setUpdateFrequency(config.getStatusFrameUpdateRate()); // So that the followers update at a higher rate
+    master
+        .getMotorVoltage()
+        .setUpdateFrequency(
+            config.getStatusFrameUpdateRate()); // So that the followers update at a higher rate
   }
 
   private TalonFXConfiguration getMasterConfig() {
@@ -362,7 +365,7 @@ public class AngularIOTalonFX implements AngularIO {
     deviceConfig.setKD(kD);
     deviceConfig.setKV(kV);
     deviceConfig.setKG(kG);
-    
+
     masterConfig.Slot0.kP = kP * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     masterConfig.Slot0.kI = kI * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     masterConfig.Slot0.kD = kD * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);

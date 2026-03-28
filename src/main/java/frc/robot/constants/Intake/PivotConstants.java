@@ -41,7 +41,7 @@ public class PivotConstants {
           .kP(20)
           .kI(0.0)
           .kD(0.1)
-          .kG(0.0)
+          .kG(0.08)
           .cruiseVelocity(RotationsPerSecond.of(1.2))
           .acceleration(RotationsPerSecondPerSecond.of(2.4))
           .build();
@@ -59,7 +59,7 @@ public class PivotConstants {
           .motorRotationsPerOutputRotations(1) // Sensor is 1:1 with intake
           .rotorRotationsPerSensorRotation(5.0 * 4.0) // The reductions on the intake
           .outputAnglePerOutputRotation(Rotations.of(1.0))
-          .inverted(InvertedValue.CounterClockwise_Positive)
+          .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
           .statorCurrentLimit(Amps.of(90.0))
           .neutralMode(NeutralModeValue.Brake)

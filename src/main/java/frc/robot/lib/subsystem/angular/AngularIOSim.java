@@ -45,6 +45,8 @@ public class AngularIOSim implements AngularIO {
       AngularIOSimConfig config, CurrentDrawCalculatorSim currentDrawCalculatorSim) {
     this.deviceConfig = config;
 
+    this.realAngleFromSubsystemAngleZero = config.getRealAngleFromSubsystemAngleZeroSupplier();
+
     // Hardware
     DCMotor motor = config.getMotor();
     pivot =
@@ -86,12 +88,18 @@ public class AngularIOSim implements AngularIO {
     Optional<AngularVelocity> velSet = Optional.empty();
     switch (outputMode) {
       case kClosedLoop -> {
+        double currentAngle = pivot.getAngleRads();
+        double gravityFF = deviceConfig.isKgArm()
+            ? deviceConfig.getKG() * Math.cos(currentAngle)
+            : deviceConfig.getKG();
+
         inputs.appliedVolts =
             Volts.of(
                 MathUtil.clamp(
                     posController.calculate(
-                            pivot.getAngleRads(), goalPos.orElse(Radians.of(0.0)).in(Radians))
+                            currentAngle, goalPos.orElse(Radians.of(0.0)).in(Radians))
                         + posController.getSetpoint().velocity * deviceConfig.getKV()
+                        + gravityFF
                         + feedforward.in(Volts),
                     -12.0,
                     12.0));

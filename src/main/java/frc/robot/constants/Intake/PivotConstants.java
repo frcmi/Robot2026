@@ -98,7 +98,7 @@ public class PivotConstants {
   // in^2 to kg m^2
   public static final AngularIOSimConfig kSimConfig =
       AngularIOSimConfig.builder()
-          .motor(DCMotor.getKrakenX60(2))
+          .motor(DCMotor.getKrakenX44(2))
           .moi(kMOI)
           .resetAngle(kTalonFXConfig.getResetAngle())
           .physicalMinAngle(IntakeState.kIntaking.getPivot())
@@ -116,5 +116,6 @@ public class PivotConstants {
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .numMotors(2)
           .kgArm(true)
+          .realAngleFromSubsystemAngleZeroSupplier(Optional.of(kRealAngleFromSubsystemAngleZeroSupplier))
           .build();
 }

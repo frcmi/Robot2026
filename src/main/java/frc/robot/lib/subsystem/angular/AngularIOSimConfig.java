@@ -3,8 +3,11 @@ package frc.robot.lib.subsystem.angular;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.*;
+import java.util.function.Supplier;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +32,7 @@ public class AngularIOSimConfig {
   @Builder.Default @Setter private double kV = 0.0;
   @Builder.Default @Setter private double kG = 0.0;
   @Builder.Default @Setter private boolean kgArm = false;
+  @Builder.Default private final Optional<Supplier<Rotation2d>> realAngleFromSubsystemAngleZeroSupplier = Optional.empty();
   @Builder.Default @Setter private AngularVelocity cruiseVelocity = RotationsPerSecond.of(0.0);
 
   @Builder.Default @Setter

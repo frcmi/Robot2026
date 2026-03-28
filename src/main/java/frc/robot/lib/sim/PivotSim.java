@@ -260,8 +260,7 @@ public class PivotSim extends LinearSystemSim<N2, N1, N2> {
                         * -9.8
                         * Math.cos(
                             x.get(0, 0)
-                                + (m_realAngleFromSubsystemAngleZero.get().get().getRadians()
-                                    - Math.PI / 2.0))
+                                + (m_realAngleFromSubsystemAngleZero.get().get().getRadians()))
                         / m_armLenMeters;
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }

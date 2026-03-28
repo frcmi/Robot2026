@@ -124,6 +124,9 @@ public class AngularIOTalonFX implements AngularIO {
         statorCurrent,
         referencePosition,
         referenceVelocity);
+
+    // Update status frame rate
+    master.getMotorVoltage().setUpdateFrequency(config.getStatusFrameUpdateRate()); // So that the followers update at a higher rate
   }
 
   private TalonFXConfiguration getMasterConfig() {

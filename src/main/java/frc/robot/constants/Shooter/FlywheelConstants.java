@@ -1,6 +1,7 @@
 package frc.robot.constants.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -50,6 +51,7 @@ public class FlywheelConstants {
           .kD(kSubsystemConfigReal.getKD())
           .kV(kSubsystemConfigReal.getKV())
           .neutralMode(NeutralModeValue.Coast)
+          .statusFrameUpdateRate(Hertz.of(250.0)) // Make followers react fast
           .build();
 
   public static final AngularSubsystemConfig kSubsystemConfigSim =

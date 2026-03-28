@@ -50,7 +50,7 @@ public interface AngularIO {
 
   default void resetAngle(Angle angle) {}
 
-  default void setPIDV(double kP, double kI, double kD, double kV) {}
+  default void setPIDVG(double kP, double kI, double kD, double kV, double kG) {}
 
   default void setConstraints(AngularVelocity cruiseVelocity, AngularAcceleration acceleration) {}
 

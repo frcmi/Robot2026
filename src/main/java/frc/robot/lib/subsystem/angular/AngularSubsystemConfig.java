@@ -26,6 +26,7 @@ public class AngularSubsystemConfig {
   @Builder.Default @Setter private double kS = 0.0;
   @Builder.Default @Setter private double kV = 0.0;
   @Builder.Default @Setter private double kA = 0.0;
+  @Builder.Default @Setter private double kG = 0.0;
   @Builder.Default @Setter private AngularVelocity cruiseVelocity = RadiansPerSecond.of(0.0);
 
   @Builder.Default @Setter

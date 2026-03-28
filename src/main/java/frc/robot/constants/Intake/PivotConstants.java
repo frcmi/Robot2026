@@ -7,6 +7,7 @@ package frc.robot.constants.intake;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.constants.RobotConstants.kRioBus;
 
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,6 +20,8 @@ import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
 import frc.robot.subsystems.intake.IntakeState;
+
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class PivotConstants {
@@ -39,9 +42,7 @@ public class PivotConstants {
           .kP(20)
           .kI(0.0)
           .kD(0.1)
-          .kS(0.14)
-          .kV(0.32)
-          .kA(0.05)
+          .kG(0.0)
           .cruiseVelocity(RotationsPerSecond.of(1.2))
           .acceleration(RotationsPerSecondPerSecond.of(2.4))
           .build();
@@ -50,12 +51,14 @@ public class PivotConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(32)
           .followerId(33)
+          .sensorId(Optional.of(43))
           .opposeMaster(true)
           .bus(kRioBus)
           .resetAngle(IntakeState.kInit.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kInit.getPivot())
-          .motorRotationsPerOutputRotations(5.0 * 4.0) // The reductions on the intake
+          .motorRotationsPerOutputRotations(1) // Sensor is 1:1 with intake
+          .rotorRotationsPerSensorRotation(5.0 * 4.0) // The reductions on the intake
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
@@ -67,6 +70,8 @@ public class PivotConstants {
           .kS(kSubsystemConfigReal.getKS())
           .kV(kSubsystemConfigReal.getKV())
           .kA(kSubsystemConfigReal.getKA())
+          .kG(kSubsystemConfigReal.getKG())
+          .gravityType(Optional.of(GravityTypeValue.Arm_Cosine))
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
@@ -80,6 +85,10 @@ public class PivotConstants {
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
+          .kS(kSubsystemConfigReal.getKS())
+          .kV(kSubsystemConfigReal.getKV())
+          .kA(kSubsystemConfigReal.getKA())
+          .kG(kSubsystemConfigReal.getKG())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
@@ -100,10 +109,13 @@ public class PivotConstants {
           .kP(kSubsystemConfigSim.getKP())
           .kI(kSubsystemConfigSim.getKI())
           .kD(kSubsystemConfigSim.getKD())
+          .kV(kSubsystemConfigSim.getKV())
+          .kG(kSubsystemConfigSim.getKG())
           .cruiseVelocity(kSubsystemConfigSim.getCruiseVelocity())
           .acceleration(kSubsystemConfigSim.getAcceleration())
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .numMotors(2)
+          .kgArm(true)
           .build();
 }

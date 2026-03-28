@@ -3,6 +3,7 @@ package frc.robot.lib.subsystem.angular;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.*;
@@ -46,6 +47,8 @@ public class AngularIOTalonFXConfig {
   @Builder.Default @Setter private double kS = 0.0;
   @Builder.Default @Setter private double kV = 0.0;
   @Builder.Default @Setter private double kA = 0.0;
+  @Builder.Default @Setter private double kG = 0.0;
+  @Builder.Default @Setter private Optional<GravityTypeValue> gravityType = Optional.empty();
   @Builder.Default @Setter private AngularVelocity cruiseVelocity = RotationsPerSecond.of(0.0);
 
   @Builder.Default @Setter

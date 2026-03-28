@@ -138,12 +138,15 @@ public class AngularIOTalonFX implements AngularIO {
         deviceConfig.getKI() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     configuration.Slot0.kD =
         deviceConfig.getKD() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
-    configuration.Slot0.kS =
-        deviceConfig.getKS() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+    configuration.Slot0.kS = deviceConfig.getKS();
     configuration.Slot0.kV =
         deviceConfig.getKV() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     configuration.Slot0.kA =
         deviceConfig.getKA() * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+    if (deviceConfig.getGravityType().isPresent()) {
+      configuration.Slot0.GravityType = deviceConfig.getGravityType().get();
+      configuration.Slot0.kG = deviceConfig.getKG();
+    }
 
     configuration.MotionMagic.MotionMagicCruiseVelocity =
         deviceConfig.getCruiseVelocity().in(RadiansPerSecond)
@@ -353,16 +356,18 @@ public class AngularIOTalonFX implements AngularIO {
   }
 
   @Override
-  public void setPIDV(double kP, double kI, double kD, double kV) {
+  public void setPIDVG(double kP, double kI, double kD, double kV, double kG) {
     deviceConfig.setKP(kP);
     deviceConfig.setKI(kI);
     deviceConfig.setKD(kD);
     deviceConfig.setKV(kV);
-
+    deviceConfig.setKG(kG);
+    
     masterConfig.Slot0.kP = kP * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     masterConfig.Slot0.kI = kI * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     masterConfig.Slot0.kD = kD * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     masterConfig.Slot0.kV = kV * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
+    masterConfig.Slot0.kG = kG * deviceConfig.getOutputAnglePerOutputRotation().in(Radians);
     master.getConfigurator().apply(masterConfig, 0.0);
   }
 

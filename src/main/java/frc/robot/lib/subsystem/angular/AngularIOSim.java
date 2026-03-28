@@ -227,12 +227,13 @@ public class AngularIOSim implements AngularIO {
   }
 
   @Override
-  public void setPIDV(double kP, double kI, double kD, double kV) {
+  public void setPIDVG(double kP, double kI, double kD, double kV, double kG) {
     deviceConfig.setKP(kP);
     deviceConfig.setKI(kI);
     deviceConfig.setKD(kD);
     deviceConfig.setKV(kV);
-
+    deviceConfig.setKG(kG);
+    
     posController.setPID(kP, kI, kD);
     velController.setPID(kP, kI, kD);
   }

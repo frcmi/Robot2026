@@ -492,11 +492,6 @@ public class RobotContainer {
      */
     driverController.leftTrigger.whileTrue(intake.set(IntakeState.kIntaking));
     driverController.leftBumper.whileTrue(intake.set(IntakeState.kReversing));
-
-    operatorController
-        .dPadRight
-        .whileTrue(intake.openLoopPivot(PivotConstants.MANUAL_VOLTAGE))
-        .onFalse(intake.zeroPivot());
   }
 
   private void logInit() {

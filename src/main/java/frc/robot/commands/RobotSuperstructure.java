@@ -54,7 +54,6 @@ public class RobotSuperstructure {
             .asProxy());
     NamedCommands.registerCommand("FullRobotCheck", this.fullRobotCheck());
 
-    new EventTrigger("ZeroPivot").onTrue(intake.zeroPivot().asProxy());
     zoneTrigger("IntakeStart", "IntakeStop").whileTrue(intake.set(IntakeState.kIntaking));
     zoneTrigger("ShootStart", "ShootStop")
         .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
@@ -109,7 +108,6 @@ public class RobotSuperstructure {
 
             // INTAKE TESTS
             intake.set(IntakeState.kDown).withTimeout(1).asProxy(),
-            intake.zeroPivot(),
             intake.set(IntakeState.kIntaking).withTimeout(1).asProxy(),
             intake.set(IntakeState.kBump).withTimeout(1).asProxy(),
 

@@ -131,10 +131,6 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     return Commands.run(() -> this.targetState = state.get(), this);
   }
 
-  public Command zeroPivot() {
-    return pivot.resetAngle(IntakeState.kDown.getPivot());
-  }
-
   public Command openLoopPivot(Voltage volts) {
     return this.pivot.openLoop(() -> volts);
   }

@@ -103,7 +103,9 @@ public class PivotConstants {
           .resetAngle(kTalonFXConfig.getResetAngle())
           .physicalMinAngle(IntakeState.kIntaking.getPivot())
           .physicalMaxAngle(IntakeState.kInit.getPivot())
-          .motorRotationsPerOutputRotations(kTalonFXConfig.getMotorRotationsPerOutputRotations())
+          .motorRotationsPerOutputRotations(
+              kTalonFXConfig.getMotorRotationsPerOutputRotations()
+                  * kTalonFXConfig.getRotorRotationsPerSensorRotation())
           .neutralMode(kTalonFXConfig.getNeutralMode())
           .kP(kSubsystemConfigSim.getKP())
           .kI(kSubsystemConfigSim.getKI())
@@ -118,5 +120,6 @@ public class PivotConstants {
           .kgArm(true)
           .realAngleFromSubsystemAngleZeroSupplier(
               Optional.of(kRealAngleFromSubsystemAngleZeroSupplier))
+          .armLengthSupplier(Optional.of(() -> PivotLength))
           .build();
 }

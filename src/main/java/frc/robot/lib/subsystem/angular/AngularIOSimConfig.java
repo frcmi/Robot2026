@@ -37,6 +37,8 @@ public class AngularIOSimConfig {
   private final Optional<Supplier<Rotation2d>> realAngleFromSubsystemAngleZeroSupplier =
       Optional.empty();
 
+  @Builder.Default private final Optional<Supplier<Distance>> armLengthSupplier = Optional.empty();
+
   @Builder.Default @Setter private AngularVelocity cruiseVelocity = RotationsPerSecond.of(0.0);
 
   @Builder.Default @Setter

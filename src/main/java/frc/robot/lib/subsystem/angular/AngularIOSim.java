@@ -46,6 +46,7 @@ public class AngularIOSim implements AngularIO {
     this.deviceConfig = config;
 
     this.realAngleFromSubsystemAngleZero = config.getRealAngleFromSubsystemAngleZeroSupplier();
+    this.armLength = config.getArmLengthSupplier();
 
     // Hardware
     DCMotor motor = config.getMotor();

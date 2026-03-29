@@ -24,17 +24,16 @@ public class KickerConstants {
       AngularSubsystemConfig.builder()
           .logKey("Kicker")
           .bus(kRioBus)
-          .kP(0.2)
+          .kP(0.13)
           .kI(0.0)
           .kD(0.0)
           .kV(
               12.0
-                  / ((7530.0 / 5.0)
+                  / ((7530.0 / 3.0)
                       * (2 * Math.PI
-                          / 60.0))) // 12V per 1200rpm output (7530rpm motor with 5:1 gearing)
+                          / 60.0))) // 12V per 1200rpm output (7530rpm motor with 3:1 gearing)
           .velocityTolerance(RotationsPerSecond.of(1.6))
-          .acceleration(
-              RotationsPerSecondPerSecond.of(200.0)) // 0.25 second spinup to 1200rpm output
+          .acceleration(RotationsPerSecondPerSecond.of(350.0))
           .build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
@@ -42,7 +41,7 @@ public class KickerConstants {
           .masterId(23)
           .bus(kRioBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
-          .motorRotationsPerOutputRotations(5)
+          .motorRotationsPerOutputRotations(3)
           .supplyCurrentLimit(Amps.of(40.0))
           .supplyCurrentLowerTime(Seconds.of(0.5))
           .supplyCurrentLower(Amps.of(20.0))
@@ -67,7 +66,7 @@ public class KickerConstants {
       AngularIOSimConfig.builder()
           .motor(DCMotor.getKrakenX44(1))
           .moi(kMOI)
-          .motorRotationsPerOutputRotations(5)
+          .motorRotationsPerOutputRotations(3)
           .supplyCurrentLimit(kTalonFXConfig.getSupplyCurrentLimit())
           .statorCurrentLimit(kTalonFXConfig.getStatorCurrentLimit())
           .kP(kSubsystemConfigSim.getKP())

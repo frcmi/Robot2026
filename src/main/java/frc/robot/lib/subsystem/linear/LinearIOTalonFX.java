@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
+import frc.robot.lib.subsystem.angular.SignalIOManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public class LinearIOTalonFX implements LinearIO {
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
   private final StatusSignal<Double> referencePosition;
-  private final List<StatusSignal<Temperature>> motorTemperatures;
+  private final List<BaseStatusSignal> motorTemperatures;
 
   private final MotionMagicVoltage motionMagic;
   private final VoltageOut voltageOut;
@@ -107,6 +108,7 @@ public class LinearIOTalonFX implements LinearIO {
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
+    String busName = config.getBus().getName();
 
     // Set update frequency
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -118,6 +120,16 @@ public class LinearIOTalonFX implements LinearIO {
         supplyCurrent,
         statorCurrent,
         referencePosition);
+    SignalIOManager.addSignals(
+        busName,
+        position,
+        velocity,
+        acceleration,
+        appliedVolts,
+        supplyCurrent,
+        statorCurrent,
+        referencePosition);
+    SignalIOManager.addSignals(busName, motorTemperatures);
   }
 
   private TalonFXConfiguration getMasterConfig() {
@@ -162,15 +174,6 @@ public class LinearIOTalonFX implements LinearIO {
 
   @Override
   public void updateInputs(LinearIOInputs inputs) {
-    position.refresh(false);
-    velocity.refresh(false);
-    acceleration.refresh(false);
-    statorCurrent.refresh(false);
-    appliedVolts.refresh(false);
-    supplyCurrent.refresh(false);
-    referencePosition.refresh(false);
-    motorTemperatures.forEach(sig -> sig.refresh(false));
-
     inputs.length =
         Meters.of(
             position.getValueAsDouble()
@@ -190,7 +193,7 @@ public class LinearIOTalonFX implements LinearIO {
     inputs.motorTemperatures = new double[motorTemperatures.size()];
     int mIdx = 0;
     for (var signal : motorTemperatures) {
-      inputs.motorTemperatures[mIdx++] = signal.getValue().in(Celsius);
+      inputs.motorTemperatures[mIdx++] = signal.getValueAsDouble();
     }
 
     int size = followers.size() + 1;

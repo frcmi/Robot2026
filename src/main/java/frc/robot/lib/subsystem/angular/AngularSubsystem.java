@@ -16,7 +16,6 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
 import frc.robot.lib.subsystem.RegisteredSubsystem;
 import frc.robot.subsystems.TimingUtil;
-
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -101,6 +100,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
 
+    double startLogStuff = Timer.getFPGATimestamp();
     LoggedTunableNumber.ifChanged(
         hashCode(),
         () -> {
@@ -174,6 +174,9 @@ public class AngularSubsystem extends RegisteredSubsystem {
         String.format("AngularSubsystems/%s/StatorCurrentAmps", logKey),
         getStatorCurrent().in(Amps));
 
+    double endLogStuff = Timer.getFPGATimestamp();
+    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
+
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {
       Stream<String> disconnectedDevicesIds =
@@ -191,7 +194,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
 
     // Timing
     double endTime = Timer.getFPGATimestamp();
-    TimingUtil.addTime(endTime - startTime);
+    TimingUtil.addTimeAngular(endTime - startTime);
   }
 
   public Command angle(Angle angle) {

@@ -35,6 +35,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.subsystem.angular.SignalIOManager;
 import java.util.Queue;
 
 /**
@@ -182,23 +183,23 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnAppliedVolts,
         turnCurrent);
     ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon);
+
+    // Add to IO manager
+    SignalIOManager.addSignals(
+        TunerConstants.kCANBus.getName(),
+        drivePosition,
+        driveVelocity,
+        driveAppliedVolts,
+        driveCurrent,
+        turnPosition,
+        turnVelocity,
+        turnAppliedVolts,
+        turnCurrent,
+        turnAbsolutePosition);
   }
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    // Rely on background thread updates directly from the JNI cache without blocking
-    drivePosition.refresh(false);
-    driveVelocity.refresh(false);
-    driveAppliedVolts.refresh(false);
-    driveCurrent.refresh(false);
-
-    turnPosition.refresh(false);
-    turnVelocity.refresh(false);
-    turnAppliedVolts.refresh(false);
-    turnCurrent.refresh(false);
-
-    turnAbsolutePosition.refresh(false);
-
     boolean driveIsOK =
         drivePosition.getStatus().isOK()
             && driveVelocity.getStatus().isOK()

@@ -10,8 +10,8 @@ package frc.robot;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.subsystem.angular.SignalIOManager;
 import frc.robot.subsystems.TimingUtil;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -96,6 +96,7 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     TimingUtil.resetTime();
+    SignalIOManager.update();
     CommandScheduler.getInstance().run();
     TimingUtil.logTime();
   }

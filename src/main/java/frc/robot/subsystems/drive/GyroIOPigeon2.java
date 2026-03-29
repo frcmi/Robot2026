@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.subsystem.angular.SignalIOManager;
 import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
@@ -39,13 +40,12 @@ public class GyroIOPigeon2 implements GyroIO {
     pigeon.optimizeBusUtilization();
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(yaw.clone());
+
+    SignalIOManager.addSignals(TunerConstants.kCANBus.getName(), yaw, yawVelocity);
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    yaw.refresh(false);
-    yawVelocity.refresh(false);
-
     inputs.connected = yaw.getStatus().isOK() && yawVelocity.getStatus().isOK();
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());

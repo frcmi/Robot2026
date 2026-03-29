@@ -40,7 +40,7 @@ public class AngularIOTalonFX implements AngularIO {
   private final StatusSignal<AngularAcceleration> acceleration;
   private final StatusSignal<Double> referencePosition;
   private final StatusSignal<Double> referenceVelocity;
-  private final List<StatusSignal<Temperature>> motorTemperatures;
+  private final List<BaseStatusSignal> motorTemperatures;
 
   private final MotionMagicVoltage motionMagicPos;
   private final MotionMagicVelocityVoltage motionMagicVel;
@@ -112,6 +112,20 @@ public class AngularIOTalonFX implements AngularIO {
     motorTemperatures = new ArrayList<>();
     motorTemperatures.add(master.getDeviceTemp());
     motorTemperatures.addAll(followers.stream().map(CoreTalonFX::getDeviceTemp).toList());
+    String busName = config.getBus().getName();
+
+    // Add to io manager
+    SignalIOManager.addSignals(
+        busName,
+        position,
+        appliedVolts,
+        statorCurrent,
+        supplyCurrent,
+        velocity,
+        acceleration,
+        referencePosition,
+        referenceVelocity);
+    SignalIOManager.addSignals(busName, motorTemperatures);
 
     // Update logging frequency
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -202,17 +216,6 @@ public class AngularIOTalonFX implements AngularIO {
 
   @Override
   public void updateInputs(AngularIOInputs inputs) {
-    position.refresh(false);
-    velocity.refresh(false);
-    acceleration.refresh(false);
-    statorCurrent.refresh(false);
-    appliedVolts.refresh(false);
-    supplyCurrent.refresh(false);
-    referencePosition.refresh(false);
-    referenceVelocity.refresh(false);
-
-    motorTemperatures.forEach(sig -> sig.refresh(false));
-
     inputs.angle =
         Radians.of(
             position.getValueAsDouble()
@@ -232,7 +235,7 @@ public class AngularIOTalonFX implements AngularIO {
     inputs.motorTemperatures = new double[motorTemperatures.size()];
     int mIdx = 0;
     for (var signal : motorTemperatures) {
-      inputs.motorTemperatures[mIdx++] = signal.getValue().in(Celsius);
+      inputs.motorTemperatures[mIdx++] = signal.getValueAsDouble();
     }
 
     int size = followers.size() + 1;

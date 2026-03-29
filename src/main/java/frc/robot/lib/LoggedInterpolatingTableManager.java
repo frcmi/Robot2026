@@ -1,8 +1,6 @@
 package frc.robot.lib;
 
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.lib.subsystem.VirtualSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Virtual subsystem that automatically updates all LoggedInterpolatingTable instances. Instantiate
@@ -21,13 +19,8 @@ public class LoggedInterpolatingTableManager extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    double startTime = Timer.getFPGATimestamp();
-
     // Update all registered tables
     LoggedInterpolatingTable.periodicAll();
-
-    double endTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/LoggedInterpolatingTableManagerMS", (endTime - startTime) * 1e3);
   }
 
   public static LoggedInterpolatingTableManager getInstance() {

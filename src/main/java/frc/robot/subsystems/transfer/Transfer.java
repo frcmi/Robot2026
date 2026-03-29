@@ -55,9 +55,6 @@ public class Transfer extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    // Timing
-    double startTime = Timer.getFPGATimestamp();
-
     // This method will be called once per scheduler run
     measuredState.setTransfer(targetStateAimed().getTransfer());
     measuredState.setKicker(targetStateAimed().getKicker());
@@ -68,10 +65,6 @@ public class Transfer extends VirtualSubsystem {
     Logger.recordOutput("Transfer/ShouldTransfer", targetState == TransferState.kTransferring);
 
     updateJamDetection();
-
-    // Timing
-    double endTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/TransferMS", (endTime - startTime) * 1e3);
   }
 
   private TransferState targetStateAimed() {

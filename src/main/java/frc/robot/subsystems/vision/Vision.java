@@ -18,7 +18,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.ArrayList;
@@ -70,16 +69,10 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Timing
-    double startTime = Timer.getFPGATimestamp();
-
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
     }
-
-    double endInputs = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/VisionInputUpdate", (endInputs - startTime) * 1e3);
 
     // Initialize logging values
     List<Pose3d> allTagPoses = new ArrayList<>();
@@ -188,7 +181,6 @@ public class Vision extends SubsystemBase {
       allRobotPosesRejected.addAll(robotPosesRejected);
     }
 
-    double visionMathStartTime = Timer.getFPGATimestamp();
     pendingVisionEstimates.sort(
         Comparator.comparingDouble(VisionEstimate::timestampSeconds).reversed());
     pendingVisionEstimates.stream()
@@ -199,8 +191,6 @@ public class Vision extends SubsystemBase {
                     estimate.visionRobotPoseMeters(),
                     estimate.timestampSeconds(),
                     estimate.visionMeasurementStdDevs()));
-    double visionMathEndTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/VisionMathMS", (visionMathEndTime - visionMathStartTime) * 1e3);
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
@@ -214,10 +204,6 @@ public class Vision extends SubsystemBase {
       tagStdevMultipliersArray[i] = tagStdevMultipliers.get(i);
     }
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
-
-    // Timing
-    double endTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/VisionMS", (endTime - startTime) * 1e3);
   }
 
   @FunctionalInterface

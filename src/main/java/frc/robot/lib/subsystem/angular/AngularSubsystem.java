@@ -8,14 +8,12 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
 import frc.robot.lib.subsystem.RegisteredSubsystem;
-import frc.robot.subsystems.TimingUtil;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -94,14 +92,8 @@ public class AngularSubsystem extends RegisteredSubsystem {
 
   @Override
   public void periodic() {
-    // Timing
-    double startTime = Timer.getFPGATimestamp();
-
     io.updateInputs(inputs);
-    double startLogStuff = Timer.getFPGATimestamp();
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
-    double endLogStuff = Timer.getFPGATimestamp();
-    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -190,10 +182,6 @@ public class AngularSubsystem extends RegisteredSubsystem {
     } else {
       motorDisconectedAlert.set(false);
     }
-
-    // Timing
-    double endTime = Timer.getFPGATimestamp();
-    TimingUtil.addTimeAngular(endTime - startTime);
   }
 
   public Command angle(Angle angle) {

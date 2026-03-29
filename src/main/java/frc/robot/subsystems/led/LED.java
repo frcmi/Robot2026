@@ -4,7 +4,6 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -43,15 +42,8 @@ public class LED extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    // Timing
-    double startTime = Timer.getFPGATimestamp();
-
     this.io.updateInputs(inputs);
     Logger.processInputs("CANdle", inputs);
-
-    // Timing
-    double endTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/LEDMS", (endTime - startTime) * 1e3);
   }
 
   private Command setColor(RGBWColor color, BooleanSupplier solid) {

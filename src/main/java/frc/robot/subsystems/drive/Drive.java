@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -170,9 +169,6 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Timing
-    double startTime = Timer.getFPGATimestamp();
-
     Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -274,9 +270,6 @@ public class Drive extends SubsystemBase {
           this);
     }*/
 
-    // Timing
-    double endTime = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/DriveMS", (endTime - startTime) * 1e3);
   }
 
   /**

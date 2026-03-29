@@ -100,7 +100,6 @@ public class AngularSubsystem extends RegisteredSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
 
-    double startLogStuff = Timer.getFPGATimestamp();
     LoggedTunableNumber.ifChanged(
         hashCode(),
         () -> {
@@ -157,6 +156,8 @@ public class AngularSubsystem extends RegisteredSubsystem {
                   config.getVelocityTolerance().in(RadiansPerSecond));
     }
 
+    double startLogStuff = Timer.getFPGATimestamp();
+
     Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), atAngle);
     Logger.recordOutput(
         String.format("AngularSubsystems/%s/AngleDeg", logKey), getAngle().in(Degrees));
@@ -174,9 +175,6 @@ public class AngularSubsystem extends RegisteredSubsystem {
         String.format("AngularSubsystems/%s/StatorCurrentAmps", logKey),
         getStatorCurrent().in(Amps));
 
-    double endLogStuff = Timer.getFPGATimestamp();
-    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
-
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {
       Stream<String> disconnectedDevicesIds =
@@ -191,6 +189,9 @@ public class AngularSubsystem extends RegisteredSubsystem {
     } else {
       motorDisconectedAlert.set(false);
     }
+
+    double endLogStuff = Timer.getFPGATimestamp();
+    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
 
     // Timing
     double endTime = Timer.getFPGATimestamp();

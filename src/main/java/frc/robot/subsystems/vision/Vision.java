@@ -22,11 +22,17 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+  private static record VisionEstimate(
+      Pose2d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {}
+
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
@@ -72,12 +78,16 @@ public class Vision extends SubsystemBase {
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
     }
 
+    double endInputs = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/VisionInputUpdate", (endInputs - startTime) * 1e3);
+
     // Initialize logging values
     List<Pose3d> allTagPoses = new ArrayList<>();
     List<Pose3d> allRobotPoses = new ArrayList<>();
     List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
     List<Pose3d> allRobotPosesRejected = new ArrayList<>();
     List<Double> tagStdevMultipliers = new ArrayList<>();
+    List<VisionEstimate> pendingVisionEstimates = new ArrayList<>();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -151,11 +161,12 @@ public class Vision extends SubsystemBase {
           angularStdDev *= angularStdDevMegatag2Factor;
         }
 
-        // Send vision observation
-        consumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        // Queue vision observation
+        pendingVisionEstimates.add(
+            new VisionEstimate(
+                observation.pose().toPose2d(),
+                observation.timestamp(),
+                VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)));
       }
 
       // Log camera metadata
@@ -176,6 +187,20 @@ public class Vision extends SubsystemBase {
       allRobotPosesAccepted.addAll(robotPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
     }
+
+    double visionMathStartTime = Timer.getFPGATimestamp();
+    pendingVisionEstimates.sort(
+        Comparator.comparingDouble(VisionEstimate::timestampSeconds).reversed());
+    pendingVisionEstimates.stream()
+        .limit(5)
+        .forEach(
+            estimate ->
+                consumer.accept(
+                    estimate.visionRobotPoseMeters(),
+                    estimate.timestampSeconds(),
+                    estimate.visionMeasurementStdDevs()));
+    double visionMathEndTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/VisionMathMS", (visionMathEndTime - visionMathStartTime) * 1e3);
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));

@@ -22,6 +22,7 @@ import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
+import frc.robot.lib.command.CachedTrigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -35,7 +36,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final AngularSubsystem pivot;
   private final Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
-  private final Trigger nearBump = new Trigger(this::isNearBump).debounce(0.05);
+  private final Trigger nearBump = new CachedTrigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
   private final BooleanSupplier isAutonomous;
 

@@ -32,6 +32,7 @@ import frc.robot.constants.shooter.FlywheelConstants;
 import frc.robot.constants.shooter.HoodConstants;
 import frc.robot.constants.shooter.TurretConstants;
 import frc.robot.lib.alliancecolor.AllianceUpdatedObserver;
+import frc.robot.lib.command.CachedTrigger;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import frc.robot.lib.subsystem.angular.AngularIO;
 import frc.robot.lib.subsystem.angular.AngularSubsystem;
@@ -69,10 +70,14 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   private Angle rawHoodTarget = ShooterState.kStowed.getHood();
 
   // Triggers
-  public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
-  public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.2, DebounceType.kFalling);
-  public Trigger turretOverride = new Trigger(() -> isTurretOverride);
+  public Trigger nearTrench = new CachedTrigger(this::isNearTrench).debounce(0.05);
+  public Trigger inAllianceZone = new CachedTrigger(this::isInAllianceZone).debounce(0.2);
+  public Trigger aimed = new CachedTrigger(this::isAimed).debounce(0.2, DebounceType.kFalling);
+  public Trigger turretOverride = new CachedTrigger(() -> isTurretOverride);
+
+  // Diagnostics for expensive trigger/predicate evaluation outside periodic timing.
+  private int isAimedCallCount = 0;
+  private double isAimedCallSec = 0.0;
 
   // Vision IO
   private final VisionIO turretCamera;
@@ -132,10 +137,15 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/MeasuredState", measuredState);
     Logger.recordOutput("Shooter/Disabled", disabled);
     Logger.recordOutput("Shooter/TurretOverride", isTurretOverride);
+    Logger.recordOutput("Shooter/RawTurretTargetDeg", rawTurretTarget.in(Degrees));
     Logger.recordOutput("Shooter/NearTrench", nearTrench.getAsBoolean());
     Logger.recordOutput("Shooter/InAllianceZone", inAllianceZone.getAsBoolean());
     Logger.recordOutput("Shooter/Aimed", aimed.getAsBoolean());
     Logger.recordOutput("Shooter/FlywheelOffsetRPS", flywheelOffset.in(RotationsPerSecond));
+    Logger.recordOutput("Timing/Shooter/IsAimedCallCount", isAimedCallCount);
+    Logger.recordOutput("Timing/Shooter/IsAimedMS", isAimedCallSec * 1e3);
+    isAimedCallCount = 0;
+    isAimedCallSec = 0.0;
 
     // Aim at hub
     Translation2d targetPosition;
@@ -329,30 +339,35 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   }
 
   public boolean isAimed() {
-    Logger.recordOutput("Shooter/RawTurretTargetDeg", rawTurretTarget.in(Degrees));
-    double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
-    double errorAtTarget = targetDist * Math.sin(turretErr);
-    double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
-    double flywheelErr =
-        measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
-    double maxHoodErr = HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
-    boolean shooterDistInRange = targetDist > AimingConstants.kFlywheelSpeedTable.getMinKey();
-    if (inAllianceZone.getAsBoolean()) {
-      return errorAtTarget < (FieldConstants.hubWidth)
-          && hoodErr < maxHoodErr
-          && (flywheel.isAtAngle() || disabled)
-          && shooterDistInRange;
-    } else {
-      // In neutral zone, more lenient since just tryna get into the alliance zone
-      return errorAtTarget < (FieldConstants.bumpWidth * 2)
-          && hoodErr < maxHoodErr * 1.8
-          && ((flywheelErr
-                  < FlywheelConstants.kSubsystemConfigReal
-                          .getVelocityTolerance()
-                          .in(RotationsPerSecond)
-                      * 1.8)
-              || disabled)
-          && shooterDistInRange;
+    double startTime = Timer.getFPGATimestamp();
+    try {
+      double turretErr = rawTurretTarget.minus(measuredState.getTurret()).abs(Radians);
+      double errorAtTarget = targetDist * Math.sin(turretErr);
+      double hoodErr = rawHoodTarget.minus(measuredState.getHood()).abs(Degrees);
+      double flywheelErr =
+          measuredState.getFlywheel().minus(targetState.getFlywheel()).abs(RotationsPerSecond);
+      double maxHoodErr = HoodConstants.kSubsystemConfigReal.getPositionTolerance().in(Degrees);
+      boolean shooterDistInRange = targetDist > AimingConstants.kFlywheelSpeedTable.getMinKey();
+      if (inAllianceZone.getAsBoolean()) {
+        return errorAtTarget < (FieldConstants.hubWidth)
+            && hoodErr < maxHoodErr
+            && (flywheel.isAtAngle() || disabled)
+            && shooterDistInRange;
+      } else {
+        // In neutral zone, more lenient since just tryna get into the alliance zone
+        return errorAtTarget < (FieldConstants.bumpWidth * 2)
+            && hoodErr < maxHoodErr * 1.8
+            && ((flywheelErr
+                    < FlywheelConstants.kSubsystemConfigReal
+                            .getVelocityTolerance()
+                            .in(RotationsPerSecond)
+                        * 1.8)
+                || disabled)
+            && shooterDistInRange;
+      }
+    } finally {
+      isAimedCallCount++;
+      isAimedCallSec += Timer.getFPGATimestamp() - startTime;
     }
   }
 

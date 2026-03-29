@@ -2,12 +2,14 @@ package frc.robot.lib.alliancecolor;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.lib.subsystem.VirtualSubsystem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class AllianceChecker extends VirtualSubsystem {
   private final List<AllianceUpdatedObserver> observers = new ArrayList<>();
@@ -22,10 +24,15 @@ public class AllianceChecker extends VirtualSubsystem {
   }
 
   public void periodic() {
+    double startTime = Timer.getFPGATimestamp();
+
     alliance = DriverStation.getAlliance();
     alliance.ifPresent(color -> observers.forEach(observer -> observer.onAllianceFound(color)));
     updateMatchTimer();
     publishMatchTimer();
+
+    double endTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/AllianceCheckerMS", (endTime - startTime) * 1e3);
   }
 
   public void publishMatchTimer() {

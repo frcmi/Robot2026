@@ -46,6 +46,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.command.CachedTrigger;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -104,7 +105,7 @@ public class Drive extends SubsystemBase {
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
   private Trigger haveCAN =
-      new Trigger(
+      new CachedTrigger(
               () ->
                   modules[0].isConnected()
                       && modules[1].isConnected()
@@ -367,7 +368,7 @@ public class Drive extends SubsystemBase {
   }
 
   public ChassisSpeeds getPoseVelocity() {
-    ChassisSpeeds robotSpeeds = getChassisSpeeds(); // your method
+    ChassisSpeeds robotSpeeds = getChassisSpeeds();
     Rotation2d heading = getRotation();
 
     return ChassisSpeeds.fromRobotRelativeSpeeds(

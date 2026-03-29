@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.command.CachedTrigger;
 import frc.robot.lib.subsystem.angular.SignalIOManager;
 import frc.robot.subsystems.TimingUtil;
 import java.io.IOException;
@@ -95,10 +96,56 @@ public class Robot extends LoggedRobot {
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
+    // Fine-grained timing to help diagnose occasional userCodeMS spikes.
+    double loopStart = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
     TimingUtil.resetTime();
+    double afterReset = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
     SignalIOManager.update();
+    double afterSignal = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
+    CachedTrigger.refreshAll();
+    double afterCachedRefresh = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
     CommandScheduler.getInstance().run();
+    double afterScheduler = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
     TimingUtil.logTime();
+    double afterLog = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+
+    // Record per-section timings (ms). These are lightweight doubles; logging
+    // them helps identify which section spikes without changing behavior.
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Timing/Robot/SignalIOMS", (afterSignal - afterReset) * 1e3);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Timing/Robot/SchedulerMS", (afterScheduler - afterSignal) * 1e3);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Timing/Robot/LoggingMS", (afterLog - afterScheduler) * 1e3);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Timing/Robot/CachedTriggerRefreshMS", (afterCachedRefresh - afterSignal) * 1e3);
+
+    // If total loop is unusually long, emit a spike marker with the segment times.
+    double totalMS = (afterLog - loopStart) * 1e3;
+    double schedulerMS = (afterScheduler - afterSignal) * 1e3;
+    org.littletonrobotics.junction.Logger.recordOutput("Timing/Robot/TotalMS", totalMS);
+    if (totalMS > 20.0) {
+      // Keep this conditional logging to avoid excessive overhead in the common case.
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Timing/Robot/Spike/SignalIOMS", (afterSignal - afterReset) * 1e3);
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Timing/Robot/Spike/SchedulerMS", (afterScheduler - afterSignal) * 1e3);
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Timing/Robot/Spike/LoggingMS", (afterLog - afterScheduler) * 1e3);
+      org.littletonrobotics.junction.Logger.recordOutput(
+          "Timing/Robot/Spike/CachedTriggerRefreshMS", (afterCachedRefresh - afterSignal) * 1e3);
+    }
+
+    // Print scheduler watchdog epochs only on large scheduler spikes to identify
+    // the exact section (buttons/commands/subsystems) consuming time.
+    if (schedulerMS > 30.0) {
+      CommandScheduler.getInstance().printWatchdogEpochs();
+    }
   }
 
   /** This function is called once when the robot is disabled. */

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.shooter.HoodConstants;
+import frc.robot.lib.command.CachedTrigger;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbState;
 import frc.robot.subsystems.intake.Intake;
@@ -129,6 +130,6 @@ public class RobotSuperstructure {
     AtomicBoolean active = new AtomicBoolean(false);
     new EventTrigger(startEvent).onTrue(Commands.runOnce(() -> active.set(true)));
     new EventTrigger(stopEvent).onTrue(Commands.runOnce(() -> active.set(false)));
-    return new Trigger(active::get);
+    return new CachedTrigger(active::get);
   }
 }

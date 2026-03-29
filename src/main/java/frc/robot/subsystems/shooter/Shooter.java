@@ -71,7 +71,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Triggers
   public Trigger nearTrench = new Trigger(this::isNearTrench).debounce(0.05);
   public Trigger inAllianceZone = new Trigger(this::isInAllianceZone).debounce(0.2);
-  public Trigger aimed = new Trigger(this::isAimed).debounce(0.3, DebounceType.kFalling);
+  public Trigger aimed = new Trigger(this::isAimed).debounce(0.2, DebounceType.kFalling);
   public Trigger turretOverride = new Trigger(() -> isTurretOverride);
 
   // Vision IO

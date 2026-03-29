@@ -98,7 +98,10 @@ public class AngularSubsystem extends RegisteredSubsystem {
     double startTime = Timer.getFPGATimestamp();
 
     io.updateInputs(inputs);
+    double startLogStuff = Timer.getFPGATimestamp();
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
+    double endLogStuff = Timer.getFPGATimestamp();
+    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -156,8 +159,6 @@ public class AngularSubsystem extends RegisteredSubsystem {
                   config.getVelocityTolerance().in(RadiansPerSecond));
     }
 
-    double startLogStuff = Timer.getFPGATimestamp();
-
     Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), atAngle);
     Logger.recordOutput(
         String.format("AngularSubsystems/%s/AngleDeg", logKey), getAngle().in(Degrees));
@@ -189,9 +190,6 @@ public class AngularSubsystem extends RegisteredSubsystem {
     } else {
       motorDisconectedAlert.set(false);
     }
-
-    double endLogStuff = Timer.getFPGATimestamp();
-    TimingUtil.addTimeAngularLogging(endLogStuff - startLogStuff);
 
     // Timing
     double endTime = Timer.getFPGATimestamp();

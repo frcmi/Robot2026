@@ -399,7 +399,7 @@ public class RobotContainer {
                     * superstructure.getDriveMultiplier(false, driverController.rightTrigger),
             () ->
                 -driverController.getRightStickX()
-                    * superstructure.getDriveMultiplier(false, driverController.rightTrigger)));
+                    * superstructure.getDriveMultiplier(true, driverController.rightTrigger)));
     if (!sim) {
       driverController.buttonX.whileTrue(Commands.runOnce(drive::stopWithX, drive));
     }

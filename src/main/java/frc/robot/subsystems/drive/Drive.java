@@ -168,6 +168,9 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -268,6 +271,11 @@ public class Drive extends SubsystemBase {
           () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
           this);
     }*/
+
+
+    // Timing
+    long endTime = System.nanoTime();
+    Logger.recordOutput("Timing/DriveMS", (endTime - startTime) / 1e6);
   }
 
   /**

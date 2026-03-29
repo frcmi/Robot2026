@@ -119,6 +119,9 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     // This method will be called once per scheduler run
     measuredState.setTurret(turret.getAngle());
     measuredState.setHood(hood.getAngle());
@@ -245,6 +248,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 TurretConstants.TurretCameraRotation.getY(),
                 TurretConstants.TurretCameraRotation.getZ() + turretCamYaw)));
     Logger.recordOutput("Turret/CameraOffset", robotToCamera);
+
+    // Timing
+    long endTime = System.nanoTime();
+    Logger.recordOutput("Timing/ShooterMS", (endTime - startTime) / 1e6);
   }
 
   public Command overrideHood(Voltage volts) {

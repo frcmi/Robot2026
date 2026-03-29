@@ -42,8 +42,15 @@ public class LED extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     this.io.updateInputs(inputs);
     Logger.processInputs("CANdle", inputs);
+
+    // Timing
+    long endTime = System.nanoTime();
+    Logger.recordOutput("Timing/LEDMS", (endTime - startTime) / 1e6);
   }
 
   private Command setColor(RGBWColor color, BooleanSupplier solid) {

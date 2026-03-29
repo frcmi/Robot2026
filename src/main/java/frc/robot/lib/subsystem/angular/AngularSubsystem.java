@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
 import frc.robot.lib.subsystem.RegisteredSubsystem;
+import frc.robot.subsystems.TimingUtil;
+
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -92,6 +94,9 @@ public class AngularSubsystem extends RegisteredSubsystem {
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     io.updateInputs(inputs);
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
 
@@ -182,6 +187,10 @@ public class AngularSubsystem extends RegisteredSubsystem {
     } else {
       motorDisconectedAlert.set(false);
     }
+
+    // Timing
+    long endTime = System.nanoTime();
+    TimingUtil.addTime(endTime - startTime);
   }
 
   public Command angle(Angle angle) {

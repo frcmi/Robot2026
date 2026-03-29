@@ -112,11 +112,18 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);
+
+    // Timing
+    long endTime = System.nanoTime();
+    Logger.recordOutput("Timing/IntakeMS", (endTime - startTime) / 1e6);
   }
 
   public Command waitUntilAtGoal() {

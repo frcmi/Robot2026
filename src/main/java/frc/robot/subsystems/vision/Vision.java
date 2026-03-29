@@ -63,6 +63,9 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Timing
+    long startTime = System.nanoTime();
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
@@ -185,6 +188,10 @@ public class Vision extends SubsystemBase {
       tagStdevMultipliersArray[i] = tagStdevMultipliers.get(i);
     }
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
+
+    // Timing
+    long endTime = System.nanoTime();
+    Logger.recordOutput("Timing/VisionMS", (endTime - startTime) / 1e6);
   }
 
   @FunctionalInterface

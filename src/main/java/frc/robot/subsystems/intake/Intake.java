@@ -113,7 +113,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   @Override
   public void periodic() {
     // Timing
-    long startTime = System.nanoTime();
+    double startTime = Timer.getFPGATimestamp();
 
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
@@ -122,8 +122,8 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     Logger.recordOutput("Intake/MeasuredState", measuredState);
 
     // Timing
-    long endTime = System.nanoTime();
-    Logger.recordOutput("Timing/IntakeMS", (endTime - startTime) / 1e6);
+    double endTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/IntakeMS", (endTime - startTime) * 1e3);
   }
 
   public Command waitUntilAtGoal() {

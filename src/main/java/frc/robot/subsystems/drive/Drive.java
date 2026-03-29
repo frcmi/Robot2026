@@ -36,6 +36,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -169,7 +170,7 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     // Timing
-    long startTime = System.nanoTime();
+    double startTime = Timer.getFPGATimestamp();
 
     Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
 
@@ -274,8 +275,8 @@ public class Drive extends SubsystemBase {
 
 
     // Timing
-    long endTime = System.nanoTime();
-    Logger.recordOutput("Timing/DriveMS", (endTime - startTime) / 1e6);
+    double endTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/DriveMS", (endTime - startTime) * 1e3);
   }
 
   /**

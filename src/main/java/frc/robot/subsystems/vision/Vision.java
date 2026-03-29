@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
@@ -64,7 +65,7 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // Timing
-    long startTime = System.nanoTime();
+    double startTime = Timer.getFPGATimestamp();
 
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
@@ -190,8 +191,8 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
 
     // Timing
-    long endTime = System.nanoTime();
-    Logger.recordOutput("Timing/VisionMS", (endTime - startTime) / 1e6);
+    double endTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/VisionMS", (endTime - startTime) * 1e3);
   }
 
   @FunctionalInterface

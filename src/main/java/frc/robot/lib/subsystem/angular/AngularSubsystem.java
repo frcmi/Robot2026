@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -95,7 +96,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
   @Override
   public void periodic() {
     // Timing
-    long startTime = System.nanoTime();
+    double startTime = Timer.getFPGATimestamp();
 
     io.updateInputs(inputs);
     Logger.processInputs(String.format("AngularSubsystems/%s", logKey), inputs);
@@ -189,7 +190,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
     }
 
     // Timing
-    long endTime = System.nanoTime();
+    double endTime = Timer.getFPGATimestamp();
     TimingUtil.addTime(endTime - startTime);
   }
 

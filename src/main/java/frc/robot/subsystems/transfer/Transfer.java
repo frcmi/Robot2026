@@ -56,7 +56,7 @@ public class Transfer extends VirtualSubsystem {
   @Override
   public void periodic() {
     // Timing
-    long startTime = System.nanoTime();
+    double startTime = Timer.getFPGATimestamp();
 
     // This method will be called once per scheduler run
     measuredState.setTransfer(targetStateAimed().getTransfer());
@@ -70,8 +70,8 @@ public class Transfer extends VirtualSubsystem {
     updateJamDetection();
 
     // Timing
-    long endTime = System.nanoTime();
-    Logger.recordOutput("Timing/TransferMS", (endTime - startTime) / 1e6);
+    double endTime = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/TransferMS", (endTime - startTime) * 1e3);
   }
 
   private TransferState targetStateAimed() {

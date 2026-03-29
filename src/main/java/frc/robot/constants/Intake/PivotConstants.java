@@ -61,7 +61,7 @@ public class PivotConstants {
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.Clockwise_Positive)
           .supplyCurrentLimit(Amps.of(30.0))
-          .statorCurrentLimit(Amps.of(90.0))
+          .statorCurrentLimit(Amps.of(120.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())
           .kI(kSubsystemConfigReal.getKI())

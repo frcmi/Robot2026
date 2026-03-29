@@ -98,6 +98,7 @@ public class Robot extends LoggedRobot {
     SignalIOManager.update();
     CachedTrigger.refreshAll();
     CommandScheduler.getInstance().run();
+    robotContainer.periodic();
   }
 
   /** This function is called once when the robot is disabled. */

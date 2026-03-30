@@ -105,7 +105,8 @@ public class Transfer extends VirtualSubsystem {
       unJamTimer.stop();
       unJamTimer.reset();
     }
-    if (transfer.getVelocity().abs(RotationsPerSecond) < 0.5
+    if ((transfer.getVelocity().abs(RotationsPerSecond) < 0.5
+            || kicker.getVelocity().abs(RotationsPerSecond) < 0.5)
         && targetState == TransferState.kTransferring
         && aimed.getAsBoolean()
         && !jammed) {

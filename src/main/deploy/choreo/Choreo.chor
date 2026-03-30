@@ -18,6 +18,20 @@
      "exp":"0 deg",
      "val":0.0
     }
+   },
+   "RightSweepEnd":{
+    "x":{
+     "exp":"3 m",
+     "val":3.0
+    },
+    "y":{
+     "exp":"0.59 m",
+     "val":0.59
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
    }
   }
  },

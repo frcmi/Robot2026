@@ -123,6 +123,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(BooleanSupplier isAutonomous) {
     VisionIO turretCamera;
+    BooleanSupplier isManuallyOscillating = driverController.buttonA::getAsBoolean;
+
     switch (Constants.currentMode) {
       case REAL:
         if (Constants.driveHardwareExists) {
@@ -202,10 +204,12 @@ public class RobotContainer {
                       PivotConstants.kSubsystemConfigReal),
                   drive::getPose,
                   transfer::isAttemptingShooting,
+                  isManuallyOscillating,
                   isAutonomous);
         } else {
           transfer = new Transfer(shooter.aimed);
-          intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
+          intake =
+              new Intake(drive::getPose, transfer::isAttemptingShooting, isManuallyOscillating);
         }
 
         if (Constants.climbHardwareExists) {
@@ -279,6 +283,7 @@ public class RobotContainer {
                     PivotConstants.kSubsystemConfigSim),
                 drive::getPose,
                 transfer::isAttemptingShooting,
+                isManuallyOscillating,
                 isAutonomous);
 
         climb =
@@ -313,7 +318,7 @@ public class RobotContainer {
                 shooter::isAimed,
                 new VisionIO() {}); // , new VisionIO() {});
         transfer = new Transfer(shooter.aimed);
-        intake = new Intake(drive::getPose, transfer::isAttemptingShooting);
+        intake = new Intake(drive::getPose, transfer::isAttemptingShooting, isManuallyOscillating);
         climb = new Climb();
         led = new LED();
         fuelSim =

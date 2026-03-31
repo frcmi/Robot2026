@@ -38,6 +38,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private Alliance alliance = Alliance.Red;
   private final Trigger nearBump = new CachedTrigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
+  private final BooleanSupplier manualOscillate;
   private final BooleanSupplier isAutonomous;
 
   private final Timer oscillationTimer = new Timer();
@@ -53,12 +54,14 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   @Getter private IntakeState measuredState;
 
   /** Creates a new Intake. */
-  public Intake(Supplier<Pose2d> robotPose, BooleanSupplier shooting) {
+  public Intake(
+      Supplier<Pose2d> robotPose, BooleanSupplier shooting, BooleanSupplier manualOscillate) {
     this(
         new AngularSubsystem(new AngularIO() {}, RollerConstants.kSubsystemConfigReal),
         new AngularSubsystem(new AngularIO() {}, PivotConstants.kSubsystemConfigReal),
         robotPose,
         shooting,
+        manualOscillate,
         () -> false);
   }
 
@@ -67,11 +70,13 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
       AngularSubsystem pivot,
       Supplier<Pose2d> robotPoseSupplier,
       BooleanSupplier shooting,
+      BooleanSupplier manualOscillate,
       BooleanSupplier isAutonomous) {
     this.rollers = rollers;
     this.pivot = pivot;
     this.robotPose = robotPoseSupplier;
     this.shooting = shooting;
+    this.manualOscillate = manualOscillate;
     this.isAutonomous =
         isAutonomous; // Unused, but may be useful at some point so just leaving it in
 
@@ -89,7 +94,8 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
       prevOscillating = false;
       return IntakeState.kBump;
     }
-    if (shooting.getAsBoolean() && this.targetState == IntakeState.kDown) {
+    if ((shooting.getAsBoolean() || manualOscillate.getAsBoolean())
+        && this.targetState == IntakeState.kDown) {
       if (!prevOscillating) {
         oscillationTimer.restart();
         prevOscillating = true;

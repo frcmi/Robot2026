@@ -37,7 +37,7 @@
             "properties": {
               "topic": "/SmartDashboard/Field",
               "period": 0.06,
-              "field_game": "Reefscape",
+              "field_game": "Rebuilt (No Fuel)",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
@@ -79,6 +79,24 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "DistanceToTargetM",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/SmartDashboard/DistanceToTargetM",
+              "period": 0.033,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 6.5,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           }
         ]

@@ -199,11 +199,24 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     turretTarget = AngleUtils.normalize(turretTarget);
     rawTurretTarget = turretTarget.copy();
 
-    // Constrain to turret limits
+    // Constrain to turret limits, with hysteresis
+    double turretTargetVal = turretTarget.in(Radians);
+    double[] possibleTurretAngles = {
+      turretTargetVal, turretTargetVal + 2 * Math.PI, turretTargetVal - 2 * Math.PI
+    };
+    double optimizedTurretTarget = possibleTurretAngles[0];
+    for (int i = 0; i < possibleTurretAngles.length; i++) {
+      double dist = Math.abs(possibleTurretAngles[i] - measuredState.getTurret().in(Radians));
+      if (dist < Math.abs(optimizedTurretTarget - measuredState.getTurret().in(Radians))
+          && possibleTurretAngles[i] >= TurretConstants.kTurretPhysicalMinAngle.in(Radians)
+          && possibleTurretAngles[i] <= TurretConstants.kTurretPhysicalMaxAngle.in(Radians)) {
+        optimizedTurretTarget = possibleTurretAngles[i];
+      }
+    }
     turretTarget =
         Radians.of(
             MathUtil.clamp(
-                turretTarget.in(Radians),
+                optimizedTurretTarget,
                 Degrees.of(AimingConstants.kTurretMinAngle.getAsDouble()).in(Radians),
                 Degrees.of(AimingConstants.kTurretMaxAngle.getAsDouble()).in(Radians)));
 

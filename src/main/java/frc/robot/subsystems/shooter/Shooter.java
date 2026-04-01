@@ -177,11 +177,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       dx =
           targetPosition.getX()
               - (currentPose.getX() + turretOffset.getX())
-              - robotVelocity.vxMetersPerSecond * airtime;
+              - robotVelocity.vxMetersPerSecond * airtime * 1.2;
       dy =
           targetPosition.getY()
               - (currentPose.getY() + turretOffset.getY())
-              - robotVelocity.vyMetersPerSecond * airtime;
+              - robotVelocity.vyMetersPerSecond * airtime * 1.2;
       targetDist = Math.hypot(dx, dy);
     }
 

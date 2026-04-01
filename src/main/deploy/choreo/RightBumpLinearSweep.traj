@@ -1,5 +1,5 @@
 {
- "name":"RightLinearSweep",
+ "name":"RightBumpLinearSweep",
  "version":3,
  "snapshot":{
   "waypoints":[

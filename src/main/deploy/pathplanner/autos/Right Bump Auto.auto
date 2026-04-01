@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftLinearSweep"
+            "pathName": "RightBumpLinearSweep"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftHubSweep"
+            "pathName": "RightHubSweep"
           }
         },
         {
@@ -51,6 +51,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Left Auto",
+  "folder": "Right Auto",
   "choreoAuto": true
 }

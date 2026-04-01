@@ -38,15 +38,17 @@ public class DriveConstants {
   public static final double LEFT_TRENCH_Y = 7.425;
 
   // DT speed config
-  public static final double MAX_SPEED = 1.0;
-  public static final double MAX_SPEED_W = 1.0;
 
   public static final double INTAKE_MULT = 1.0;
   public static final double INTAKE_MULT_W = 1.0;
 
-  public static final double TRANSFER_SPEED = 0.6;
-  public static final double TRANSFER_SPEED_W = 0.35;
+  public static LoggedTunableNumber TRANSFER_SPEED = new LoggedTunableNumber("Drive/SOTM", 0.6);
+  public static final double TRANSFER_SPEED_W = 0.55 * TRANSFER_SPEED.get();
 
-  public static final double TRANSFER_SPEED_NEUTRAL = 0.8;
-  public static final double TRANSFER_SPEED_W_NEUTRAL = 0.6;
+  public static LoggedTunableNumber TRANSFER_SPEED_NEUTRAL =
+      new LoggedTunableNumber("Drive/SOTM_NEUTRAL", 0.8);
+  public static final double TRANSFER_SPEED_W_NEUTRAL = 0.55 * TRANSFER_SPEED_NEUTRAL.get();
+
+  public static LoggedTunableNumber MAX_SPEED = new LoggedTunableNumber("Drive/MAX", 1);
+  public static final double MAX_SPEED_W = 1;
 }

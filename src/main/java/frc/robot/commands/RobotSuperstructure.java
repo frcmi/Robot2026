@@ -77,17 +77,17 @@ public class RobotSuperstructure {
     // Default: Shooting speed
     double speed;
     if (shooter.inAllianceZone.getAsBoolean()) {
-      speed = rotation ? DriveConstants.TRANSFER_SPEED_W : DriveConstants.TRANSFER_SPEED;
+      speed = rotation ? DriveConstants.TRANSFER_SPEED_W : DriveConstants.TRANSFER_SPEED.get();
     } else {
       speed =
           rotation
               ? DriveConstants.TRANSFER_SPEED_W_NEUTRAL
-              : DriveConstants.TRANSFER_SPEED_NEUTRAL;
+              : DriveConstants.TRANSFER_SPEED_NEUTRAL.get();
     }
 
     // If in turbo mode, use max speed (assuming not transferring, or not in neutral zone)
     if (turbo.getAsBoolean() && !(transferring && shooter.inAllianceZone.getAsBoolean())) {
-      speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED;
+      speed = rotation ? DriveConstants.MAX_SPEED_W : DriveConstants.MAX_SPEED.get();
       if (intaking) { // Intake speed multiplier only applies when full speed
         speed *= (rotation ? DriveConstants.INTAKE_MULT_W : DriveConstants.INTAKE_MULT);
       }

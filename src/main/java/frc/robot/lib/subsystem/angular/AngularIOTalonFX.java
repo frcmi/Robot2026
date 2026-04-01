@@ -9,6 +9,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreTalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -26,6 +27,7 @@ public class AngularIOTalonFX implements AngularIO {
   // Hardware
   private final TalonFX master;
   private final List<TalonFX> followers;
+  private Optional<CANcoder> cancoder;
 
   // Config
   private final TalonFXConfiguration masterConfig;
@@ -196,6 +198,9 @@ public class AngularIOTalonFX implements AngularIO {
       configuration.Feedback.FeedbackRemoteSensorID = deviceConfig.getSensorId().get();
       configuration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
       configuration.Feedback.RotorToSensorRatio = deviceConfig.getRotorRotationsPerSensorRotation();
+      cancoder = Optional.of(new CANcoder(deviceConfig.getSensorId().get(), deviceConfig.getBus()));
+    } else {
+      cancoder = Optional.empty();
     }
 
     configuration.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
@@ -353,7 +358,8 @@ public class AngularIOTalonFX implements AngularIO {
   @Override
   public void resetAngle(Angle angle) {
     if (masterConfig.Feedback.FeedbackSensorSource == FeedbackSensorSourceValue.RemoteCANcoder) {
-      // Don't reset if using remote sensor
+      // Reset to the absolute position
+      cancoder.get().setPosition(cancoder.get().getAbsolutePosition().getValueAsDouble());
       return;
     }
     master.setPosition(

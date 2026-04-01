@@ -393,4 +393,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     Logger.recordOutput("Shooter/TurretFF_V", ffV);
     return Volts.of(ffV);
   }
+
+  public Command resetTurret() {
+    return this.turret.resetAngle();
+  }
 }

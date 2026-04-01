@@ -430,6 +430,7 @@ public class RobotContainer {
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
     - Operator right bumper: Reverse transfer (why is this useful?)
     - Operator button B: Lock down hood
+    - Operator button A: Reset turret
      */
     operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     if (sim) {
@@ -442,6 +443,7 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> operatorController.rumble(RumbleType.kBothRumble, 0.0)));
     operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
     operatorController.buttonB.whileTrue(shooter.overrideHoodAngle(HoodConstants.kMinHoodAngle));
+    operatorController.buttonA.onTrue(shooter.resetTurret());
 
     /* CLIMBER CONTROLS
     - Operator Y (sim driver): Raise climb

@@ -151,22 +151,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
                   config.getVelocityTolerance().in(RadiansPerSecond));
     }
 
-    Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), atAngle);
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/AngleDeg", logKey), getAngle().in(Degrees));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/GoalAngleDeg", logKey), getGoalPos().in(Degrees));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/VelDegS", logKey), getVelocity().in(DegreesPerSecond));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/GoalVelDegS", logKey),
-        getGoalVelocity().in(DegreesPerSecond));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/SupplyCurrentAmps", logKey),
-        getSupplyCurrent().in(Amps));
-    Logger.recordOutput(
-        String.format("AngularSubsystems/%s/StatorCurrentAmps", logKey),
-        getStatorCurrent().in(Amps));
+    Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), isAtAngle);
 
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {

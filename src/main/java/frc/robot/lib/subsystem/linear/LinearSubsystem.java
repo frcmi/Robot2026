@@ -136,13 +136,7 @@ public class LinearSubsystem extends RegisteredSubsystem {
                 inputs.velocity.in(MetersPerSecond),
                 config.getVelocityTolerance().in(MetersPerSecond));
 
-    Logger.recordOutput(String.format("LinearSubsystems/%s/AtLength", logKey), atLength);
-    Logger.recordOutput(
-        String.format("LinearSubsystems/%s/SubsystemOutputMode", logKey), outputMode);
-    Logger.recordOutput(
-        String.format("LinearSubsystems/%s/LengthInches", logKey), getLength().in(Inches));
-    Logger.recordOutput(
-        String.format("LinearSubsystems/%s/GoalInches", logKey), getGoal().in(Inches));
+    Logger.recordOutput(String.format("LinearSubsystems/%s/AtLength", logKey), isAtLength);
 
     if (!Arrays.stream(inputs.deviceConnectedStatuses)
         .allMatch(DeviceConnectedStatus::isConnected)) {

@@ -86,13 +86,13 @@ public class TransferState implements StructSerializable {
 
         @Override
         public int getSize() {
-          return kSizeDouble * 2 + 256;
+          return kSizeDouble * 2 + 32;
         }
 
         @Override
         public String getSchema() {
           // spotless:off
-                    return "double transferVoltageVolts;double kickerVelocityRPS;char Type[256]";
+                    return "double transferVoltageVolts;double kickerVelocityRPS;char Type[32]";
                     // spotless:on
         }
 
@@ -100,7 +100,7 @@ public class TransferState implements StructSerializable {
         public TransferState unpack(ByteBuffer bb) {
           Voltage transfer = Volts.of(bb.getDouble());
           AngularVelocity kicker = RotationsPerSecond.of(bb.getDouble());
-          String type = StructUtils.readString(bb, 256);
+          String type = StructUtils.readString(bb, 32);
 
           return new TransferState(transfer, kicker, type);
         }
@@ -109,7 +109,7 @@ public class TransferState implements StructSerializable {
         public void pack(ByteBuffer bb, TransferState value) {
           bb.putDouble(value.getTransfer().in(Volts));
           bb.putDouble(value.getKicker().in(RotationsPerSecond));
-          StructUtils.writeString(bb, value.type, 256);
+          StructUtils.writeString(bb, value.type, 32);
         }
 
         @Override

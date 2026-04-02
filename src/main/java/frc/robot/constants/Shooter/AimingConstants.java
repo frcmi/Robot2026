@@ -13,7 +13,7 @@ public class AimingConstants {
       new LoggedTunableNumber(
           "Shooter/Turret/MaxAngleDeg", TurretConstants.kTurretPhysicalMaxAngle.in(Degrees));
 
-  public static LoggedTunableNumber kAirtimeMultiplier = 
+  public static LoggedTunableNumber kAirtimeMultiplier =
       new LoggedTunableNumber("Shooter/AirtimeMultiplier", 1.2);
 
   // Regular aiming

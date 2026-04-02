@@ -65,20 +65,20 @@ public class ClimbState implements StructSerializable {
 
         @Override
         public int getSize() {
-          return kSizeDouble + 256;
+          return kSizeDouble + 32;
         }
 
         @Override
         public String getSchema() {
           // spotless:off
-          return "double climberPositionInches;char Type[256]";
+          return "double climberPositionInches;char Type[32]";
           // spotless:on
         }
 
         @Override
         public ClimbState unpack(ByteBuffer bb) {
           Distance climber = Inches.of(bb.getDouble());
-          String type = StructUtils.readString(bb, 256);
+          String type = StructUtils.readString(bb, 32);
 
           return new ClimbState(climber);
         }
@@ -86,7 +86,7 @@ public class ClimbState implements StructSerializable {
         @Override
         public void pack(ByteBuffer bb, ClimbState value) {
           bb.putDouble(value.getClimber().in(Inches));
-          StructUtils.writeString(bb, value.type, 256);
+          StructUtils.writeString(bb, value.type, 32);
         }
 
         @Override

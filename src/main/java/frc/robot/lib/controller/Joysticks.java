@@ -31,37 +31,16 @@ public class Joysticks {
   public final Trigger dPadRight;
   public final Trigger dPadUp;
 
-  @AutoLogOutput(key = "Joystick{port}/rightStickMoved")
   public final Trigger rightStickMoved;
-
-  @AutoLogOutput(key = "Joystick{port}/leftStickMoved")
   public final Trigger leftStickMoved;
-
-  @AutoLogOutput(key = "Joystick{port}/leftStickHeldUp")
   public final Trigger leftStickHeldUp;
-
-  @AutoLogOutput(key = "Joystick{port}/leftStickHeldDown")
   public final Trigger leftStickHeldDown;
-
-  @AutoLogOutput(key = "Joystick{port}/leftStickHeldRight")
   public final Trigger leftStickHeldRight;
-
-  @AutoLogOutput(key = "Joystick{port}/leftStickHeldLeft")
   public final Trigger leftStickHeldLeft;
-
-  @AutoLogOutput(key = "Joystick{port}/rightStickHeldUp")
   public final Trigger rightStickHeldUp;
-
-  @AutoLogOutput(key = "Joystick{port}/rightStickHeldDown")
   public final Trigger rightStickHeldDown;
-
-  @AutoLogOutput(key = "Joystick{port}/rightStickHeldRight")
   public final Trigger rightStickHeldRight;
-
-  @AutoLogOutput(key = "Joystick{port}/rightStickHeldLeft")
   public final Trigger rightStickHeldLeft;
-
-  @AutoLogOutput(key = "Joystick{port}/povPressed")
   public final Trigger povPressed;
 
   public final RumbleControl rumble = new RumbleControl(this::rumble);

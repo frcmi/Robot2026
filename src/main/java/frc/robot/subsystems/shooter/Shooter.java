@@ -173,7 +173,8 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     for (int i = 0; i < 5; i++) {
       double airtime =
           (allianceZone ? AimingConstants.kAirtimeTable : AimingConstants.kAirtimeTableNeutral)
-              .get(targetDist) * AimingConstants.kAirtimeMultiplier.get();
+                  .get(targetDist)
+              * AimingConstants.kAirtimeMultiplier.get();
       dx =
           targetPosition.getX()
               - (currentPose.getX() + turretOffset.getX())

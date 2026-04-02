@@ -90,13 +90,13 @@ public class IntakeState implements StructSerializable {
 
         @Override
         public int getSize() {
-          return kSizeDouble * 2 + 256;
+          return kSizeDouble * 2 + 32;
         }
 
         @Override
         public String getSchema() {
           // spotless:off
-                    return "double pivotAngleDegrees;double rollerVoltageVolts;char Type[256]";
+                    return "double pivotAngleDegrees;double rollerVoltageVolts;char Type[32]";
                     // spotless:on
         }
 
@@ -104,7 +104,7 @@ public class IntakeState implements StructSerializable {
         public IntakeState unpack(ByteBuffer bb) {
           Angle pivot = Degrees.of(bb.getDouble());
           Voltage rollers = Volts.of(bb.getDouble());
-          String type = StructUtils.readString(bb, 256);
+          String type = StructUtils.readString(bb, 32);
 
           return new IntakeState(pivot, rollers, type);
         }
@@ -113,7 +113,7 @@ public class IntakeState implements StructSerializable {
         public void pack(ByteBuffer bb, IntakeState value) {
           bb.putDouble(value.getPivot().in(Degrees));
           bb.putDouble(value.getRollers().in(Volts));
-          StructUtils.writeString(bb, value.type, 256);
+          StructUtils.writeString(bb, value.type, 32);
         }
 
         @Override

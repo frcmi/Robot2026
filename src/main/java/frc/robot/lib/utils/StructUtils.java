@@ -15,8 +15,10 @@ public class StructUtils {
 
   public static void writeString(ByteBuffer bb, String str, int length) {
     byte[] arr = str.getBytes(UTF_8);
-    for (int i = 0; i < length; i++) {
-      bb.put(i < arr.length ? arr[i] : 0);
+    int bytesToWrite = Math.min(arr.length, length);
+    bb.put(arr, 0, bytesToWrite);
+    for (int i = bytesToWrite; i < length; i++) {
+      bb.put((byte) 0);
     }
   }
 }

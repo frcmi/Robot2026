@@ -48,9 +48,9 @@ public class AimingConstants {
           "Shooter/AirtimeM_s",
           new double[][] {
             {2, 0.912},
-            {3, 1.332},
+            {3, 1.33},
             {4.5, 1.3},
-            {6.0, 1.1},
+            {6.0, 1.3},
           });
 
   // Neutral zone aiming

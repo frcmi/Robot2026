@@ -59,7 +59,8 @@ public class RobotSuperstructure {
     zoneTrigger("ShootStart", "ShootStop")
         .whileTrue(transfer.set(TransferState.kTransferring).alongWith(shooter.forceToggleState()));
     zoneTrigger("IntakeBumpLift", "IntakeBumpDrop").whileTrue(intake.set(IntakeState.kBump));
-    zoneTrigger("IntakeInit", "IntakeInitEnd").whileTrue(intake.set(IntakeState.kInit));
+    zoneTrigger("IntakeReverseStart", "IntakeReverseEnd")
+        .whileTrue(intake.set(IntakeState.kReversing));
   }
 
   public Command climbRaise() {

@@ -8,7 +8,6 @@ import frc.robot.Constants;
 import frc.robot.lib.RumbleControl;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Joysticks wrapper to provide easier access to buttons, triggers and sticks. */
 public class Joysticks {

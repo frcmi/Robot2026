@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.ArrayList;
@@ -69,10 +70,12 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double start = Timer.getFPGATimestamp();
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
     }
+    double afterIO = Timer.getFPGATimestamp();
 
     // Initialize logging values
     List<Pose3d> allTagPoses = new ArrayList<>();
@@ -203,6 +206,10 @@ public class Vision extends SubsystemBase {
       tagStdevMultipliersArray[i] = tagStdevMultipliers.get(i);
     }
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
+
+    double end = Timer.getFPGATimestamp();
+    Logger.recordOutput("Timing/VisionInputUpdateMS", (afterIO - start) * 1000);
+    Logger.recordOutput("Timing/VisionTimeMathMS", (end - afterIO) * 1000);
   }
 
   @FunctionalInterface

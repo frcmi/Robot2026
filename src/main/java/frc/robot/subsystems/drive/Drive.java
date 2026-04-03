@@ -14,7 +14,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -47,7 +46,8 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.command.CachedTrigger;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.util.LocalADStarAK;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -145,10 +145,17 @@ public class Drive extends SubsystemBase {
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
-          Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
+          if (activePath.size() > 5) {
+            List<Pose2d> decimatedPath = new ArrayList<>();
+            for (int i = 0; i < activePath.size(); i += 5) {
+              decimatedPath.add(activePath.get(i));
+            }
+            Logger.recordOutput("Odometry/Trajectory", decimatedPath.toArray(new Pose2d[0]));
+          } else {
+            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
+          }
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {

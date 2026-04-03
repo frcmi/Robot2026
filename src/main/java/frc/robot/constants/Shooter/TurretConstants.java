@@ -40,9 +40,9 @@ public class TurretConstants {
   public static final Rotation3d TurretCameraRotation =
       new Rotation3d(0, Math.toRadians(150), Math.toRadians(180));
 
-  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-360);
+  public static final Angle kTurretPhysicalMinAngle = Degrees.of(-235);
   public static final Angle kTurretPhysicalMaxAngle =
-      Degrees.of(360); // Positive = CCW from top-down perspective
+      Degrees.of(245); // Positive = CCW from top-down perspective
   public static final Angle kTurretZero =
       Degrees.of(
           90); // CCW from intake angle, e.g. 180 means that the zero of the turret is opposite to

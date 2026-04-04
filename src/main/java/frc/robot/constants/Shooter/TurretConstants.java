@@ -65,6 +65,7 @@ public class TurretConstants {
           .kP(10.0)
           .kI(0.0)
           .kD(0.4)
+          .kS(0.4)
           .kV(TurretConstants.kV)
           .cruiseVelocity(RotationsPerSecond.of(5)) // 420rpm
           .acceleration(RotationsPerSecondPerSecond.of(15.0))
@@ -89,6 +90,7 @@ public class TurretConstants {
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
           .kV(kSubsystemConfigReal.getKV())
+          .kS(kSubsystemConfigReal.getKS())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();
@@ -103,6 +105,7 @@ public class TurretConstants {
           .kI(kSubsystemConfigReal.getKI())
           .kD(kSubsystemConfigReal.getKD())
           .kV(kSubsystemConfigReal.getKV())
+          .kS(kSubsystemConfigReal.getKS())
           .cruiseVelocity(kSubsystemConfigReal.getCruiseVelocity())
           .acceleration(kSubsystemConfigReal.getAcceleration())
           .build();

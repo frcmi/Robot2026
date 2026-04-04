@@ -32,6 +32,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
   private LoggedTunableNumber kDTunable;
   private LoggedTunableNumber kVTunable;
   private LoggedTunableNumber kGTunable;
+  private LoggedTunableNumber kSTunable;
   private LoggedTunableNumber cruiseVelocityTunable;
   private LoggedTunableNumber accelerationTunable;
   private LoggedTunableNumber positionToleranceTunable;
@@ -72,6 +73,8 @@ public class AngularSubsystem extends RegisteredSubsystem {
         new LoggedTunableNumber(String.format("AngularSubsystems/%s/KV", logKey), config.getKV());
     kGTunable =
         new LoggedTunableNumber(String.format("AngularSubsystems/%s/KG", logKey), config.getKG());
+    kSTunable =
+        new LoggedTunableNumber(String.format("AngularSubsystems/%s/KS", logKey), config.getKS());
     cruiseVelocityTunable =
         new LoggedTunableNumber(
             String.format("AngularSubsystems/%s/CruiseVelocityRadiansPerSecond", logKey),
@@ -103,6 +106,7 @@ public class AngularSubsystem extends RegisteredSubsystem {
           config.setKD(kDTunable.get());
           config.setKV(kVTunable.get());
           config.setKG(kGTunable.get());
+          config.setKS(kSTunable.get());
           io.setPIDVG(
               kPTunable.get(), kITunable.get(), kDTunable.get(), kVTunable.get(), kGTunable.get());
         },

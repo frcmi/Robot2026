@@ -31,6 +31,7 @@ public class AngularIOSimConfig {
   @Builder.Default @Setter private double kD = 0.0;
   @Builder.Default @Setter private double kV = 0.0;
   @Builder.Default @Setter private double kG = 0.0;
+  @Builder.Default @Setter private double kS = 0.0;
   @Builder.Default @Setter private boolean kgArm = false;
 
   @Builder.Default

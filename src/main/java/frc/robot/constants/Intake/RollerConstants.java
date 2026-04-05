@@ -28,8 +28,10 @@ public class RollerConstants {
           .masterId(15)
           .bus(kSubsystemConfigReal.getBus())
           .inverted(InvertedValue.Clockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40))
-          .statorCurrentLimit(Amps.of(120))
+          .supplyCurrentLimit(Amps.of(60)) // Allow 60A for 1 second
+          .supplyCurrentLower(Amps.of(40))
+          .statorCurrentLimit(Amps.of(150))
+          .supplyCurrentLowerTime(Seconds.of(1.0))
           .outputAnglePerOutputRotation(Rotations.of(3.0))
           .build();
 

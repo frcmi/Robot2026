@@ -39,6 +39,23 @@ public class Vision extends SubsystemBase {
   private final Alert[] disconnectedAlerts;
   private final BooleanSupplier aimed;
 
+  // Pre-allocated collections, reused each periodic() call to avoid GC pressure
+  private final List<Pose3d> allTagPoses = new ArrayList<>();
+  private final List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
+  private final List<Pose3d> allRobotPosesRejected = new ArrayList<>();
+  private final List<VisionEstimate> pendingVisionEstimates = new ArrayList<>();
+  private final List<Pose3d>[] tagPosesPerCamera;
+  private final List<Pose3d>[] robotPosesAcceptedPerCamera;
+  private final List<Pose3d>[] robotPosesRejectedPerCamera;
+  private final double[] tagStdevMultipliersArray;
+
+  // Pre-computed logger keys
+  private final String[] logKeyProcessInputs;
+  private final String[] logKeyTagPoses;
+  private final String[] logKeyRobotPosesAccepted;
+  private final String[] logKeyRobotPosesRejected;
+
+  @SuppressWarnings("unchecked")
   public Vision(VisionConsumer consumer, BooleanSupplier aimed, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
@@ -57,6 +74,25 @@ public class Vision extends SubsystemBase {
           new Alert(
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+
+    // Initialize per-camera lists, stdev array, and pre-compute logger keys
+    tagPosesPerCamera = new List[io.length];
+    robotPosesAcceptedPerCamera = new List[io.length];
+    robotPosesRejectedPerCamera = new List[io.length];
+    tagStdevMultipliersArray = new double[io.length];
+    logKeyProcessInputs = new String[io.length];
+    logKeyTagPoses = new String[io.length];
+    logKeyRobotPosesAccepted = new String[io.length];
+    logKeyRobotPosesRejected = new String[io.length];
+    for (int i = 0; i < io.length; i++) {
+      tagPosesPerCamera[i] = new ArrayList<>();
+      robotPosesAcceptedPerCamera[i] = new ArrayList<>();
+      robotPosesRejectedPerCamera[i] = new ArrayList<>();
+      logKeyProcessInputs[i] = "Vision/Camera" + i;
+      logKeyTagPoses[i] = "Vision/Camera" + i + "/TagPoses";
+      logKeyRobotPosesAccepted[i] = "Vision/Camera" + i + "/RobotPosesAccepted";
+      logKeyRobotPosesRejected[i] = "Vision/Camera" + i + "/RobotPosesRejected";
+    }
   }
 
   /**
@@ -73,27 +109,28 @@ public class Vision extends SubsystemBase {
     double start = Timer.getFPGATimestamp();
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+      Logger.processInputs(logKeyProcessInputs[i], inputs[i]);
     }
     double afterIO = Timer.getFPGATimestamp();
 
-    // Initialize logging values
-    List<Pose3d> allTagPoses = new ArrayList<>();
-    List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
-    List<Pose3d> allRobotPosesRejected = new ArrayList<>();
-    List<Double> tagStdevMultipliers = new ArrayList<>();
-    List<VisionEstimate> pendingVisionEstimates = new ArrayList<>();
+    // Clear reusable collections
+    allTagPoses.clear();
+    allRobotPosesAccepted.clear();
+    allRobotPosesRejected.clear();
+    pendingVisionEstimates.clear();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-      // Initialize logging values
-      List<Pose3d> tagPoses = new ArrayList<>();
-      List<Pose3d> robotPoses = new ArrayList<>();
-      List<Pose3d> robotPosesAccepted = new ArrayList<>();
-      List<Pose3d> robotPosesRejected = new ArrayList<>();
+      // Reuse per-camera lists
+      List<Pose3d> tagPoses = tagPosesPerCamera[cameraIndex];
+      List<Pose3d> robotPosesAccepted = robotPosesAcceptedPerCamera[cameraIndex];
+      List<Pose3d> robotPosesRejected = robotPosesRejectedPerCamera[cameraIndex];
+      tagPoses.clear();
+      robotPosesAccepted.clear();
+      robotPosesRejected.clear();
 
       // Add tag poses, calculate stdev multiplier
       double tagStdevMultiplier = Double.POSITIVE_INFINITY;
@@ -108,7 +145,7 @@ public class Vision extends SubsystemBase {
           tagStdevMultiplier = tagStdevMultiplierCandidate;
         }
       }
-      tagStdevMultipliers.add(tagStdevMultiplier);
+      tagStdevMultipliersArray[cameraIndex] = tagStdevMultiplier;
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
@@ -132,7 +169,6 @@ public class Vision extends SubsystemBase {
         }
 
         // Add pose to log
-        robotPoses.add(observation.pose());
         if (rejectPose) {
           robotPosesRejected.add(observation.pose());
         } else {
@@ -146,7 +182,7 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 1.8)
+            Math.pow(observation.averageTagDistance(), 2.0)
                 / observation.tagCount()
                 * tagStdevMultiplier;
         double linearStdDev = linearStdDevBaseline.getAsDouble() * stdDevFactor;
@@ -167,14 +203,13 @@ public class Vision extends SubsystemBase {
       // Log camera metadata
       if (!tagPoses.isEmpty()) {
         Logger.recordOutput(
-            "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-            tagPoses.toArray(new Pose3d[0]));
+            logKeyTagPoses[cameraIndex], tagPoses.toArray(new Pose3d[tagPoses.size()]));
         Logger.recordOutput(
-            "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-            robotPosesAccepted.toArray(new Pose3d[0]));
+            logKeyRobotPosesAccepted[cameraIndex],
+            robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
         Logger.recordOutput(
-            "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-            robotPosesRejected.toArray(new Pose3d[0]));
+            logKeyRobotPosesRejected[cameraIndex],
+            robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
       }
 
       allTagPoses.addAll(tagPoses);
@@ -195,15 +230,14 @@ public class Vision extends SubsystemBase {
 
     // Log summary data
     if (!allTagPoses.isEmpty()) {
-      Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
       Logger.recordOutput(
-          "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
+          "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
       Logger.recordOutput(
-          "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
-    }
-    double[] tagStdevMultipliersArray = new double[tagStdevMultipliers.size()];
-    for (int i = 0; i < tagStdevMultipliers.size(); i++) {
-      tagStdevMultipliersArray[i] = tagStdevMultipliers.get(i);
+          "Vision/Summary/RobotPosesAccepted",
+          allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
+      Logger.recordOutput(
+          "Vision/Summary/RobotPosesRejected",
+          allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
     }
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
 

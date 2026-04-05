@@ -5,7 +5,7 @@
 package frc.robot.constants.intake;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -35,7 +35,7 @@ public class PivotConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Pivot")
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .positionTolerance(Degrees.of(2.0))
           .velocityTolerance(DegreesPerSecond.of(4.58))
           .kP(40)
@@ -52,7 +52,7 @@ public class PivotConstants {
           .followerId(33)
           .sensorId(Optional.of(43))
           .opposeMaster(true)
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .resetAngle(IntakeState.kInit.getPivot())
           .softMinAngle(IntakeState.kIntaking.getPivot())
           .softMaxAngle(IntakeState.kInit.getPivot())

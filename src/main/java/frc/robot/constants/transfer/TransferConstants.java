@@ -5,7 +5,7 @@
 package frc.robot.constants.transfer;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,12 +21,12 @@ public class TransferConstants {
       () -> Rotation2d.kZero;
 
   public static final AngularSubsystemConfig kSubsystemConfigReal =
-      AngularSubsystemConfig.builder().logKey("Transfer").bus(kRioBus).build();
+      AngularSubsystemConfig.builder().logKey("Transfer").bus(kCanivoreBus).build();
 
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(24)
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
           .supplyCurrentLimit(Amps.of(40))
           .statorCurrentLimit(Amps.of(60))

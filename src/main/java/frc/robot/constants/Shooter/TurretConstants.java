@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -59,7 +59,7 @@ public class TurretConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Turret")
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .positionTolerance(Degrees.of(10.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
           .kP(10.0)
@@ -75,7 +75,7 @@ public class TurretConstants {
       AngularIOTalonFXConfig.builder()
           .masterId(22)
           .sensorId(Optional.of(42))
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .resetAngle(ShooterState.kStowed.getTurret())
           .softMinAngle(kTurretPhysicalMinAngle)
           .softMaxAngle(kTurretPhysicalMaxAngle)

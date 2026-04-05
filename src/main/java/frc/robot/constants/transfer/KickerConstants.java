@@ -5,7 +5,7 @@
 package frc.robot.constants.transfer;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.constants.RobotConstants.kRioBus;
+import static frc.robot.constants.RobotConstants.kCanivoreBus;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +23,7 @@ public class KickerConstants {
   public static final AngularSubsystemConfig kSubsystemConfigReal =
       AngularSubsystemConfig.builder()
           .logKey("Kicker")
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .kP(0.13)
           .kI(0.0)
           .kD(0.0)
@@ -39,7 +39,7 @@ public class KickerConstants {
   public static final AngularIOTalonFXConfig kTalonFXConfig =
       AngularIOTalonFXConfig.builder()
           .masterId(23)
-          .bus(kRioBus)
+          .bus(kCanivoreBus)
           .inverted(InvertedValue.CounterClockwise_Positive)
           .motorRotationsPerOutputRotations(3)
           .supplyCurrentLimit(Amps.of(40.0))

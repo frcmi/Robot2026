@@ -43,9 +43,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.DriveConstants;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.command.CachedTrigger;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +98,8 @@ public class Drive extends SubsystemBase {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
+  private double lastPeriodicTimestamp = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+  private double periodicDt = 0.02;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -189,6 +191,10 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double now = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+    periodicDt = now - lastPeriodicTimestamp;
+    lastPeriodicTimestamp = now;
+
     Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -316,7 +322,7 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("SwerveStates/Speeds", speeds);
 
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, periodicDt);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 

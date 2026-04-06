@@ -142,32 +142,30 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     return this.pivot.openLoop(() -> volts);
   }
 
-  public static boolean isNearBump(Translation2d pos, Alliance alliance) {
-    Translation2d hubPosition =
-        alliance == Alliance.Blue
-            ? FieldConstants.kHubPositionBlue
-            : FieldConstants.kHubPositionRed;
-
-    boolean nearX =
-        Math.abs(pos.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
-    boolean nearY =
-        (pos.getY() > FieldConstants.trenchWidthY
-                && pos.getY() < (FieldConstants.bumpWidthY + FieldConstants.trenchWidthY))
-            || (pos.getY()
-                    > FieldConstants.trenchWidthY
-                        + FieldConstants.bumpWidthY
-                        + FieldConstants.hubWidthY
-                && pos.getY() < (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY));
-    return nearX && nearY;
-  }
-
   private boolean isNearBump() {
     Pose2d currentPose = this.robotPose.get();
     Translation2d currentPos =
         currentPose
             .getTranslation()
             .plus(PivotConstants.IntakeOffset.rotateBy(currentPose.getRotation()));
-    return isNearBump(currentPos, alliance);
+
+    Translation2d hubPosition =
+        alliance == Alliance.Blue
+            ? FieldConstants.kHubPositionBlue
+            : FieldConstants.kHubPositionRed;
+
+    // Check X
+    boolean nearX =
+        Math.abs(currentPos.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
+    boolean nearY =
+        (currentPos.getY() > FieldConstants.trenchWidthY
+                && currentPos.getY() < (FieldConstants.bumpWidthY + FieldConstants.trenchWidthY))
+            || (currentPos.getY()
+                    > FieldConstants.trenchWidthY
+                        + FieldConstants.bumpWidthY
+                        + FieldConstants.hubWidthY
+                && currentPos.getY() < (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY));
+    return nearX && nearY;
   }
 
   public void onAllianceFound(Alliance alliance) {

@@ -60,6 +60,26 @@ public class LED extends VirtualSubsystem {
             .withColor(new RGBWColor(0, 0, 255));
     solidBlueRequest = new SolidColor(SlotStartIdx, SlotEndIdx).withColor(new RGBWColor(0, 0, 255));
 
+    // Warm up all request types up-front so first-use/JIT/native costs happen before auto logic.
+    io.setControl(rainbowRequest);
+    io.setControl(strobeRedRequest);
+    io.setControl(solidRedRequest);
+    io.setControl(strobeGreenRequest);
+    io.setControl(solidGreenRequest);
+    io.setControl(strobeBlueRequest);
+    io.setControl(solidBlueRequest);
+    lastControlRequest = null;
+
+    // Also precompute string representations so request.toString() cost is
+    // paid during initialization rather than during autonomous transitions.
+    rainbowRequest.toString();
+    strobeRedRequest.toString();
+    solidRedRequest.toString();
+    strobeGreenRequest.toString();
+    solidGreenRequest.toString();
+    strobeBlueRequest.toString();
+    solidBlueRequest.toString();
+
     // LED animations
     setDefaultCommand(setRainbow().ignoringDisable(true));
     Trigger browned =

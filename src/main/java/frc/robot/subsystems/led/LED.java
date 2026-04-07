@@ -21,6 +21,16 @@ public class LED extends VirtualSubsystem {
 
   private final CANdleIO io;
   private final CANdleIOInputsAutoLogged inputs;
+  private ControlRequest lastControlRequest = null;
+
+  // Pre-generated control requests to avoid allocations during periodic
+  private final ControlRequest rainbowRequest;
+  private final ControlRequest strobeRedRequest;
+  private final ControlRequest solidRedRequest;
+  private final ControlRequest strobeGreenRequest;
+  private final ControlRequest solidGreenRequest;
+  private final ControlRequest strobeBlueRequest;
+  private final ControlRequest solidBlueRequest;
 
   public LED() {
     this(new CANdleIO() {}, new Trigger(() -> false), new Trigger(() -> false));
@@ -30,16 +40,36 @@ public class LED extends VirtualSubsystem {
     this.io = io;
     this.inputs = new CANdleIOInputsAutoLogged();
 
+    // Pre-generate all ControlRequest objects so we don't allocate or build
+    // animation strings while the scheduler is running.
+    rainbowRequest = new RainbowAnimation(SlotStartIdx, SlotEndIdx).withSlot(0);
+    strobeRedRequest =
+        new StrobeAnimation(SlotStartIdx, SlotEndIdx)
+            .withSlot(0)
+            .withColor(new RGBWColor(255, 0, 0));
+    solidRedRequest = new SolidColor(SlotStartIdx, SlotEndIdx).withColor(new RGBWColor(255, 0, 0));
+    strobeGreenRequest =
+        new StrobeAnimation(SlotStartIdx, SlotEndIdx)
+            .withSlot(0)
+            .withColor(new RGBWColor(0, 255, 0));
+    solidGreenRequest =
+        new SolidColor(SlotStartIdx, SlotEndIdx).withColor(new RGBWColor(0, 255, 0));
+    strobeBlueRequest =
+        new StrobeAnimation(SlotStartIdx, SlotEndIdx)
+            .withSlot(0)
+            .withColor(new RGBWColor(0, 0, 255));
+    solidBlueRequest = new SolidColor(SlotStartIdx, SlotEndIdx).withColor(new RGBWColor(0, 0, 255));
+
     // LED animations
     setDefaultCommand(setRainbow().ignoringDisable(true));
     Trigger browned =
         new Trigger(RobotController::isBrownedOut)
             .debounce(0.5, DebounceType.kFalling)
-            .whileTrue(setColor(new RGBWColor(0, 0, 255), () -> false));
+            .whileTrue(setBlue(() -> false));
     aimed
         .and(browned.negate())
-        .whileTrue(setColor(new RGBWColor(0, 255, 0), attemptingShooting))
-        .whileFalse(setColor(new RGBWColor(255, 0, 0), attemptingShooting));
+        .whileTrue(setGreen(attemptingShooting))
+        .whileFalse(setRed(attemptingShooting));
   }
 
   @Override
@@ -57,22 +87,50 @@ public class LED extends VirtualSubsystem {
     }
   }
 
-  private Command setColor(RGBWColor color, BooleanSupplier solid) {
+  private void setControlIfChanged(ControlRequest request) {
+    if (request == null) {
+      return;
+    }
+    if (lastControlRequest != request) {
+      io.setControl(request);
+      lastControlRequest = request;
+    }
+  }
+
+  private Command setRed(BooleanSupplier solid) {
     return run(
         () -> {
           if (!solid.getAsBoolean()) {
-            io.setControl(
-                new StrobeAnimation(SlotStartIdx, SlotEndIdx).withSlot(0).withColor(color));
+            setControlIfChanged(strobeRedRequest);
           } else {
-            io.setControl(new SolidColor(SlotStartIdx, SlotEndIdx).withColor(color));
+            setControlIfChanged(solidRedRequest);
+          }
+        });
+  }
+
+  private Command setGreen(BooleanSupplier solid) {
+    return run(
+        () -> {
+          if (!solid.getAsBoolean()) {
+            setControlIfChanged(strobeGreenRequest);
+          } else {
+            setControlIfChanged(solidGreenRequest);
+          }
+        });
+  }
+
+  private Command setBlue(BooleanSupplier solid) {
+    return run(
+        () -> {
+          if (!solid.getAsBoolean()) {
+            setControlIfChanged(strobeBlueRequest);
+          } else {
+            setControlIfChanged(solidBlueRequest);
           }
         });
   }
 
   private Command setRainbow() {
-    return run(
-        () -> {
-          io.setControl(new RainbowAnimation(SlotStartIdx, SlotEndIdx).withSlot(0));
-        });
+    return run(() -> setControlIfChanged(rainbowRequest));
   }
 }

@@ -11,6 +11,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,6 +50,9 @@ public class Vision extends SubsystemBase {
   private final List<Pose3d>[] robotPosesAcceptedPerCamera;
   private final List<Pose3d>[] robotPosesRejectedPerCamera;
   private final double[] tagStdevMultipliersArray;
+  private boolean hasMinTagMultiplierRaw = false;
+  private final Trigger haveMinTagMultiplier =
+      new Trigger(() -> hasMinTagMultiplierRaw).debounce(0.75, DebounceType.kFalling);
 
   // Pre-computed logger keys
   private final String[] logKeyProcessInputs;
@@ -119,6 +124,29 @@ public class Vision extends SubsystemBase {
     allRobotPosesRejected.clear();
     pendingVisionEstimates.clear();
 
+    // Compute global minimum-multiplier state across all cameras
+    double lowestTagStdevMultiplierOverall = Double.POSITIVE_INFINITY;
+    boolean hasMinTagMultiplierRawOverall = false;
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      double lowestTagStdevMultiplierForCamera = Double.POSITIVE_INFINITY;
+      for (int tagId : inputs[cameraIndex].tagIds) {
+        double tagStdevMultiplierCandidate = getTagStdevMultiplier(tagId);
+        if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierForCamera) {
+          lowestTagStdevMultiplierForCamera = tagStdevMultiplierCandidate;
+        }
+        if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierOverall) {
+          lowestTagStdevMultiplierOverall = tagStdevMultiplierCandidate;
+        }
+        if (tagStdevMultiplierCandidate == 1.0) {
+          hasMinTagMultiplierRawOverall = true;
+        }
+      }
+      tagStdevMultipliersArray[cameraIndex] = lowestTagStdevMultiplierForCamera;
+    }
+    hasMinTagMultiplierRaw = hasMinTagMultiplierRawOverall;
+    boolean haveMinTagMultiplierOverall = haveMinTagMultiplier.getAsBoolean();
+    Logger.recordOutput("Vision/HaveMinTagMultiplier", haveMinTagMultiplierOverall);
+
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
@@ -132,18 +160,20 @@ public class Vision extends SubsystemBase {
       robotPosesAccepted.clear();
       robotPosesRejected.clear();
 
-      // Add tag poses, calculate stdev multiplier
-      double tagStdevMultiplier = Double.POSITIVE_INFINITY;
+      // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
         var tagPose = aprilTagLayout.getTagPose(tagId);
         if (tagPose.isPresent()) {
           tagPoses.add(tagPose.get());
         }
+      }
 
-        double tagStdevMultiplierCandidate = getTagStdevMultiplier(tagId);
-        if (tagStdevMultiplierCandidate < tagStdevMultiplier) {
-          tagStdevMultiplier = tagStdevMultiplierCandidate;
-        }
+      // Calculate stdev multiplier from precomputed camera minimum
+      double tagStdevMultiplier = tagStdevMultipliersArray[cameraIndex];
+      if (!haveMinTagMultiplierOverall
+          && Double.isFinite(lowestTagStdevMultiplierOverall)
+          && Double.isFinite(tagStdevMultiplier)) {
+        tagStdevMultiplier /= lowestTagStdevMultiplierOverall;
       }
       tagStdevMultipliersArray[cameraIndex] = tagStdevMultiplier;
 

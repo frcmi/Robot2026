@@ -51,11 +51,9 @@ public class LED extends VirtualSubsystem {
     this.io.updateInputs(inputs);
     Logger.processInputs("CANdle", inputs);
     if (Constants.kEnableLoopTimingLogs) {
-      double afterIO = Timer.getFPGATimestamp();
       double end = Timer.getFPGATimestamp();
 
-      Logger.recordOutput("Timing/LED/InputUpdateMS", (afterIO - start) * 1000);
-      Logger.recordOutput("Timing/LED/SubsystemCodeMS", (end - afterIO) * 1000);
+      Logger.recordOutput("Timing/CANDleMS", (end - start) * 1000);
     }
   }
 

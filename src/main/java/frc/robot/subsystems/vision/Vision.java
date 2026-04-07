@@ -227,16 +227,14 @@ public class Vision extends SubsystemBase {
                     estimate.visionMeasurementStdDevs()));
 
     // Log summary data
-    if (!allTagPoses.isEmpty()) {
-      Logger.recordOutput(
-          "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
-      Logger.recordOutput(
-          "Vision/Summary/RobotPosesAccepted",
-          allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
-      Logger.recordOutput(
-          "Vision/Summary/RobotPosesRejected",
-          allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
-    }
+    Logger.recordOutput(
+        "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesAccepted",
+        allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesRejected",
+        allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
 
     double end = Timer.getFPGATimestamp();

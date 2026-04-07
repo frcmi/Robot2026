@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.DriveConstants;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.command.CachedTrigger;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -84,10 +83,6 @@ public class Drive extends SubsystemBase {
               1),
           getModuleTranslations());
 
-  // When crossing the bump (15° up + 15° down = 30° total), wheels travel more arc length than
-  // the robot translates in 2D. Scale wheel deltas by cos(30°) to correct odometry.
-  private static final double BUMP_COSINE_CORRECTION = Math.cos(Math.toRadians(30.0));
-
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -99,14 +94,6 @@ public class Drive extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
-      new SwerveModulePosition[] {
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition()
-      };
-  // Bump-corrected positions fed to the pose estimator (accumulated scaled deltas)
-  private SwerveModulePosition[] correctedModulePositions =
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
@@ -222,13 +209,6 @@ public class Drive extends SubsystemBase {
     // Save previous data
     Pose2d prev = poseEstimator.getEstimatedPosition();
 
-    // Determine if the robot is on a bump using the pre-update pose estimate.
-    // Check both alliances since both bumps are always present on the field.
-    boolean onBump =
-        Intake.isNearBump(prev.getTranslation(), Alliance.Blue)
-            || Intake.isNearBump(prev.getTranslation(), Alliance.Red);
-    Logger.recordOutput("Drive/OnBump", onBump);
-
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
@@ -239,22 +219,15 @@ public class Drive extends SubsystemBase {
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
-        double rawDelta =
-            modulePositions[moduleIndex].distanceMeters
-                - lastModulePositions[moduleIndex].distanceMeters;
         moduleDeltas[moduleIndex] =
-            new SwerveModulePosition(rawDelta, modulePositions[moduleIndex].angle);
+            new SwerveModulePosition(
+                modulePositions[moduleIndex].distanceMeters
+                    - lastModulePositions[moduleIndex].distanceMeters,
+                modulePositions[moduleIndex].angle);
         lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
-
-        // Accumulate bump-corrected distance for the pose estimator.
-        // On the bump the wheel travels along a 15° incline (up then down = 30° total),
-        // so 2D displacement = wheel arc * cos(30°).
-        double correctedDelta = onBump ? rawDelta * BUMP_COSINE_CORRECTION : rawDelta;
-        correctedModulePositions[moduleIndex].distanceMeters += correctedDelta;
-        correctedModulePositions[moduleIndex].angle = modulePositions[moduleIndex].angle;
       }
 
-      // Update gyro angle (always use raw deltas — rotation is unaffected by the incline)
+      // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
@@ -266,8 +239,7 @@ public class Drive extends SubsystemBase {
 
       // Apply update only if we have modules connected
       if (haveCAN.getAsBoolean()) {
-        poseEstimator.updateWithTime(
-            sampleTimestamps[i], rawGyroRotation, correctedModulePositions);
+        poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       }
     }
 

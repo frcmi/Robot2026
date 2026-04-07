@@ -8,9 +8,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.DeviceConnectedStatus;
 import frc.robot.lib.subsystem.RegisteredSubsystem;
@@ -22,6 +24,9 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class LinearSubsystem extends RegisteredSubsystem {
+  private static double accumulatedInputUpdateMS = 0.0;
+  private static double accumulatedSubsystemCodeMS = 0.0;
+
   private final LinearIO io;
   private final LinearIOInputsAutoLogged inputs = new LinearIOInputsAutoLogged();
 
@@ -89,8 +94,16 @@ public class LinearSubsystem extends RegisteredSubsystem {
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
     io.updateInputs(inputs);
     Logger.processInputs(String.format("LinearSubsystems/%s", logKey), inputs);
+    double afterIO = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      afterIO = Timer.getFPGATimestamp();
+    }
 
     LoggedTunableNumber.ifChanged(
         hashCode(),
@@ -152,6 +165,21 @@ public class LinearSubsystem extends RegisteredSubsystem {
     } else {
       motorDisconectedAlert.set(false);
     }
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      accumulatedInputUpdateMS += (afterIO - start) * 1000.0;
+      accumulatedSubsystemCodeMS += (end - afterIO) * 1000.0;
+    }
+  }
+
+  public static void recordAndResetTiming() {
+    if (Constants.kEnableLoopTimingLogs) {
+      Logger.recordOutput("Timing/LinearSubsystems/InputUpdateMS", accumulatedInputUpdateMS);
+      Logger.recordOutput("Timing/LinearSubsystems/SubsystemCodeMS", accumulatedSubsystemCodeMS);
+    }
+    accumulatedInputUpdateMS = 0.0;
+    accumulatedSubsystemCodeMS = 0.0;
   }
 
   public Command length(Distance length) {

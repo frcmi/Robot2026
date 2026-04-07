@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
@@ -119,11 +120,21 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
+
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/IntakeMS", (end - start) * 1000);
+    }
   }
 
   public Command waitUntilAtGoal() {

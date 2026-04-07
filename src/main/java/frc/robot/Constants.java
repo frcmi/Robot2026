@@ -41,4 +41,7 @@ public final class Constants {
 
   // For interplut & tunable double
   public static boolean kTuningMode = true;
+
+  // Timing instrumentation gate. Keep false in normal operation to avoid loop-time overhead.
+  public static final boolean kEnableLoopTimingLogs = true;
 }

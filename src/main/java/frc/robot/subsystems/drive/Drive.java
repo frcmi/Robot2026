@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -176,6 +177,10 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
     Logger.recordOutput("Drive/HaveCAN", haveCAN.getAsBoolean());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -186,6 +191,10 @@ public class Drive extends SubsystemBase {
       }
     } finally {
       odometryLock.unlock();
+    }
+    double afterIO = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      afterIO = Timer.getFPGATimestamp();
     }
 
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -277,6 +286,11 @@ public class Drive extends SubsystemBase {
           this);
     }*/
 
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/Drive/InputUpdateMS", (afterIO - start) * 1000);
+      Logger.recordOutput("Timing/Drive/SubsystemCodeMS", (end - afterIO) * 1000);
+    }
   }
 
   /**

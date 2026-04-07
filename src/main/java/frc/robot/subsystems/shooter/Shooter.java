@@ -22,9 +22,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.constants.shooter.AimingConstants;
 import frc.robot.constants.shooter.FieldConstants;
 import frc.robot.constants.shooter.FlywheelConstants;
@@ -120,6 +122,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
+
     // This method will be called once per scheduler run
     measuredState.setTurret(turret.getAngle());
     measuredState.setHood(hood.getAngle());
@@ -261,6 +268,11 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
                 TurretConstants.TurretCameraRotation.getY(),
                 TurretConstants.TurretCameraRotation.getZ() + turretCamYaw)));
     Logger.recordOutput("Turret/CameraOffset", robotToCamera);
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/ShooterMS", (end - start) * 1000);
+    }
   }
 
   public Command overrideHood(Voltage volts) {

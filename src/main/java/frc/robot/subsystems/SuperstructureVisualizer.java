@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.constants.intake.PivotConstants;
@@ -133,6 +135,11 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
+
     intakePivot.setAngle(intakeState.get().getPivot().in(Degrees));
     hood.setAngle(90 + shooterState.get().getHood().in(Degrees));
     climberExtension.setLength(climbState.get().getClimber().in(Meters));
@@ -152,5 +159,10 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                             + TurretConstants.kTurretZero.in(Radians)))));
     Logger.recordOutput(String.format("Superstructure/%sShooter", logKey), mechanismShooter);
     Logger.recordOutput(String.format("Superstructure/%sClimb", logKey), mechanismClimb);
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/SuperstructureVisualizerMS", (end - start) * 1000);
+    }
   }
 }

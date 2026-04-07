@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -132,12 +133,18 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double start = Timer.getFPGATimestamp();
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs(logKeyProcessInputs[i], inputs[i]);
     }
-    double afterIO = Timer.getFPGATimestamp();
+    double afterIO = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      afterIO = Timer.getFPGATimestamp();
+    }
 
     // Clear reusable collections
     allTagPoses.clear();
@@ -282,9 +289,11 @@ public class Vision extends SubsystemBase {
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
     Logger.recordOutput("Vision/Summary/TagStdevMultipliers", tagStdevMultipliersArray);
 
-    double end = Timer.getFPGATimestamp();
-    Logger.recordOutput("Timing/VisionInputUpdateMS", (afterIO - start) * 1000);
-    Logger.recordOutput("Timing/VisionTimeMathMS", (end - afterIO) * 1000);
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/Vision/InputUpdateMS", (afterIO - start) * 1000);
+      Logger.recordOutput("Timing/Vision/SubsystemCodeMS", (end - afterIO) * 1000);
+    }
   }
 
   @FunctionalInterface

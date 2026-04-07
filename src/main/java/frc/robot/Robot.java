@@ -11,7 +11,9 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.command.CachedTrigger;
+import frc.robot.lib.subsystem.angular.AngularSubsystem;
 import frc.robot.lib.subsystem.angular.SignalIOManager;
+import frc.robot.lib.subsystem.linear.LinearSubsystem;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -98,6 +100,10 @@ public class Robot extends LoggedRobot {
     SignalIOManager.update();
     CachedTrigger.refreshAll();
     CommandScheduler.getInstance().run();
+    if (Constants.kEnableLoopTimingLogs) {
+      AngularSubsystem.recordAndResetTiming();
+      LinearSubsystem.recordAndResetTiming();
+    }
     robotContainer.periodic();
   }
 

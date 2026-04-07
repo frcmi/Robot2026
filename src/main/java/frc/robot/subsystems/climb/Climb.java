@@ -9,8 +9,10 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.climb.ClimberConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -43,11 +45,21 @@ public class Climb extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
+
     // This method will be called once per scheduler run
     measuredState.setClimber(climber.getLength());
 
     Logger.recordOutput("Climb/TargetState", targetState);
     Logger.recordOutput("Climb/MeasuredState", measuredState);
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/ClimbMS", (end - start) * 1000);
+    }
   }
 
   public Command waitUntilAtGoal() {

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.constants.transfer.KickerConstants;
 import frc.robot.constants.transfer.TransferConstants;
 import frc.robot.lib.subsystem.VirtualSubsystem;
@@ -55,6 +56,11 @@ public class Transfer extends VirtualSubsystem {
 
   @Override
   public void periodic() {
+    double start = 0.0;
+    if (Constants.kEnableLoopTimingLogs) {
+      start = Timer.getFPGATimestamp();
+    }
+
     // This method will be called once per scheduler run
     measuredState.setTransfer(targetStateAimed().getTransfer());
     measuredState.setKicker(targetStateAimed().getKicker());
@@ -65,6 +71,11 @@ public class Transfer extends VirtualSubsystem {
     Logger.recordOutput("Transfer/ShouldTransfer", targetState == TransferState.kTransferring);
 
     updateJamDetection();
+
+    if (Constants.kEnableLoopTimingLogs) {
+      double end = Timer.getFPGATimestamp();
+      Logger.recordOutput("Timing/TransferMS", (end - start) * 1000);
+    }
   }
 
   private TransferState targetStateAimed() {

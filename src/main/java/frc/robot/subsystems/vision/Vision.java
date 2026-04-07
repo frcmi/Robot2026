@@ -201,16 +201,14 @@ public class Vision extends SubsystemBase {
       }
 
       // Log camera metadata
-      if (!tagPoses.isEmpty()) {
-        Logger.recordOutput(
-            logKeyTagPoses[cameraIndex], tagPoses.toArray(new Pose3d[tagPoses.size()]));
-        Logger.recordOutput(
-            logKeyRobotPosesAccepted[cameraIndex],
-            robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
-        Logger.recordOutput(
-            logKeyRobotPosesRejected[cameraIndex],
-            robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
-      }
+      Logger.recordOutput(
+          logKeyTagPoses[cameraIndex], tagPoses.toArray(new Pose3d[tagPoses.size()]));
+      Logger.recordOutput(
+          logKeyRobotPosesAccepted[cameraIndex],
+          robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+      Logger.recordOutput(
+          logKeyRobotPosesRejected[cameraIndex],
+          robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
 
       allTagPoses.addAll(tagPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);

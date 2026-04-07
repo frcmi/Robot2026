@@ -109,6 +109,27 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
+  private boolean isPoseObservationRejected(int cameraIndex, VisionIO.PoseObservation observation) {
+    boolean rejectPose =
+        observation.tagCount() == 0 // Must have at least one tag
+            || (observation.ambiguity() > maxAmbiguity.getAsDouble()) // Cannot be high ambiguity
+            || Math.abs(observation.pose().getZ())
+                > maxZError.getAsDouble() // Must have realistic Z coordinate
+
+            // Must be within the field boundaries
+            || observation.pose().getX() < 0.0
+            || observation.pose().getX() > aprilTagLayout.getFieldLength()
+            || observation.pose().getY() < 0.0
+            || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+
+    // If not aimed and turret camera, ignore
+    if (cameraIndex == 4 && !aimed.getAsBoolean()) { // TODO: Don't hardcode camera index
+      rejectPose = true;
+    }
+
+    return rejectPose;
+  }
+
   @Override
   public void periodic() {
     double start = Timer.getFPGATimestamp();
@@ -128,17 +149,27 @@ public class Vision extends SubsystemBase {
     double lowestTagStdevMultiplierOverall = Double.POSITIVE_INFINITY;
     boolean hasMinTagMultiplierRawOverall = false;
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      boolean cameraHasAcceptedPoseObservation = false;
+      for (var observation : inputs[cameraIndex].poseObservations) {
+        if (!isPoseObservationRejected(cameraIndex, observation)) {
+          cameraHasAcceptedPoseObservation = true;
+          break;
+        }
+      }
+
       double lowestTagStdevMultiplierForCamera = Double.POSITIVE_INFINITY;
-      for (int tagId : inputs[cameraIndex].tagIds) {
-        double tagStdevMultiplierCandidate = getTagStdevMultiplier(tagId);
-        if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierForCamera) {
-          lowestTagStdevMultiplierForCamera = tagStdevMultiplierCandidate;
-        }
-        if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierOverall) {
-          lowestTagStdevMultiplierOverall = tagStdevMultiplierCandidate;
-        }
-        if (tagStdevMultiplierCandidate == 1.0) {
-          hasMinTagMultiplierRawOverall = true;
+      if (cameraHasAcceptedPoseObservation) {
+        for (int tagId : inputs[cameraIndex].tagIds) {
+          double tagStdevMultiplierCandidate = getTagStdevMultiplier(tagId);
+          if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierForCamera) {
+            lowestTagStdevMultiplierForCamera = tagStdevMultiplierCandidate;
+          }
+          if (tagStdevMultiplierCandidate < lowestTagStdevMultiplierOverall) {
+            lowestTagStdevMultiplierOverall = tagStdevMultiplierCandidate;
+          }
+          if (tagStdevMultiplierCandidate == 1.0) {
+            hasMinTagMultiplierRawOverall = true;
+          }
         }
       }
       tagStdevMultipliersArray[cameraIndex] = lowestTagStdevMultiplierForCamera;
@@ -180,23 +211,7 @@ public class Vision extends SubsystemBase {
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
-        boolean rejectPose =
-            observation.tagCount() == 0 // Must have at least one tag
-                || (observation.ambiguity()
-                    > maxAmbiguity.getAsDouble()) // Cannot be high ambiguity
-                || Math.abs(observation.pose().getZ())
-                    > maxZError.getAsDouble() // Must have realistic Z coordinate
-
-                // Must be within the field boundaries
-                || observation.pose().getX() < 0.0
-                || observation.pose().getX() > aprilTagLayout.getFieldLength()
-                || observation.pose().getY() < 0.0
-                || observation.pose().getY() > aprilTagLayout.getFieldWidth();
-
-        // If not aimed and turret camera, ignore
-        if (cameraIndex == 4 && !aimed.getAsBoolean()) { // TODO: Don't hardcode camera index
-          rejectPose = true;
-        }
+        boolean rejectPose = isPoseObservationRejected(cameraIndex, observation);
 
         // Add pose to log
         if (rejectPose) {

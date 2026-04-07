@@ -457,6 +457,6 @@
    {"name":"IntakeStop", "from":{"target":5, "targetTimestamp":4.46077, "offset":{"exp":"-0.1 s", "val":-0.1}}, "event":null},
    {"name":"IntakeBumpLift", "from":{"target":5, "targetTimestamp":4.46077, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"IntakeBumpDrop", "from":{"target":6, "targetTimestamp":6.30645, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"ShootStart", "from":{"target":7, "targetTimestamp":6.76391, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"ShootStart", "from":{"target":6, "targetTimestamp":6.30645, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"ShootStop", "from":{"target":8, "targetTimestamp":9.5899, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

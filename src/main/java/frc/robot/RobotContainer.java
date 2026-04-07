@@ -174,14 +174,15 @@ public class RobotContainer {
           vision =
               new Vision(
                   drive::addVisionMeasurement,
-                  shooter::isAimed,
+                  shooter::isTurretAimed,
                   new VisionIOLimelight(camera0Name, drive::getRotation),
                   new VisionIOLimelight(camera1Name, drive::getRotation),
                   new VisionIOLimelight(camera2Name, drive::getRotation),
                   new VisionIOLimelight(camera3Name, drive::getRotation),
                   turretCamera);
         } else {
-          vision = new Vision(drive::addVisionMeasurement, shooter::isAimed, new VisionIO() {});
+          vision =
+              new Vision(drive::addVisionMeasurement, shooter::isTurretAimed, new VisionIO() {});
         }
 
         if (Constants.intakeHardwareExists) {
@@ -257,7 +258,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                shooter::isAimed,
+                shooter::isTurretAimed,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose),
                 new VisionIOPhotonVisionSim(camera2Name, robotToCamera2, drive::getPose),
@@ -315,7 +316,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                shooter::isAimed,
+                shooter::isTurretAimed,
                 new VisionIO() {}); // , new VisionIO() {});
         transfer = new Transfer(shooter.aimed);
         intake = new Intake(drive::getPose, transfer::isAttemptingShooting, isManuallyOscillating);

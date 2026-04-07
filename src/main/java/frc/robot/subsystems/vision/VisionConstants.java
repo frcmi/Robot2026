@@ -44,7 +44,7 @@ public class VisionConstants {
 
   // Basic filtering thresholds
   public static LoggedTunableNumber maxAmbiguity =
-      new LoggedTunableNumber("Vision/MaxAmbiguity", 0.2);
+      new LoggedTunableNumber("Vision/MaxAmbiguity", 0.3);
   public static LoggedTunableNumber maxZError = new LoggedTunableNumber("Vision/MaxZError", 0.75);
 
   // Standard deviation baselines, for 1 meter distance and 1 tag

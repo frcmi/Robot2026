@@ -21,6 +21,9 @@ public class LoggedInterpolatingTable {
   private final String key;
   private boolean hasDefault = false;
   private TreeMap<Double, Double> defaultTable = new TreeMap<>();
+  // Cached copy of the dashboard table, rebuilt once per loop in periodic().
+  // Avoids allocating a new TreeMap on every get()/getMinKey()/getMaxKey() call.
+  private TreeMap<Double, Double> cachedDashboardTable = null;
   private LoggedNetworkNumber entryCountNumber;
   private Map<Integer, LoggedNetworkNumber> inputNumbers = new HashMap<>();
   private Map<Integer, LoggedNetworkNumber> outputNumbers = new HashMap<>();
@@ -92,7 +95,7 @@ public class LoggedInterpolatingTable {
       return 0.0;
     }
 
-    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = activeTable();
 
     if (table.isEmpty()) {
       return 0.0;
@@ -131,14 +134,21 @@ public class LoggedInterpolatingTable {
   }
 
   /**
-   * Periodic callback that ensures values are continuously read and logged to AdvantageScope.
-   * Called automatically via the static updater - no need to call manually.
+   * Periodic callback that rebuilds the cached dashboard table once per loop. All read methods
+   * (get, getMinKey, getMaxKey) use this cache so they do not allocate a new TreeMap on every call.
    */
   private void periodic() {
     if (Constants.kTuningMode && hasDefault) {
-      // Trigger a read to ensure all values are logged
-      getTableFromDashboard();
+      cachedDashboardTable = getTableFromDashboard();
     }
+  }
+
+  /** Returns the active table: cached dashboard copy in tuning mode, defaults otherwise. */
+  private TreeMap<Double, Double> activeTable() {
+    if (Constants.kTuningMode && cachedDashboardTable != null) {
+      return cachedDashboardTable;
+    }
+    return defaultTable;
   }
 
   /**
@@ -246,7 +256,7 @@ public class LoggedInterpolatingTable {
    * @return Nx2 array where each row is [input, output]
    */
   public double[][] getTable() {
-    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = activeTable();
 
     double[][] result = new double[table.size()][2];
     int index = 0;
@@ -267,7 +277,7 @@ public class LoggedInterpolatingTable {
     if (!hasDefault) {
       return 0.0;
     }
-    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = activeTable();
     if (table.isEmpty()) {
       return 0.0;
     }
@@ -283,7 +293,7 @@ public class LoggedInterpolatingTable {
     if (!hasDefault) {
       return 0.0;
     }
-    TreeMap<Double, Double> table = Constants.kTuningMode ? getTableFromDashboard() : defaultTable;
+    TreeMap<Double, Double> table = activeTable();
     if (table.isEmpty()) {
       return 0.0;
     }
@@ -299,6 +309,6 @@ public class LoggedInterpolatingTable {
     if (!hasDefault) {
       return 0;
     }
-    return Constants.kTuningMode ? (int) entryCountNumber.get() : defaultTable.size();
+    return activeTable().size();
   }
 }

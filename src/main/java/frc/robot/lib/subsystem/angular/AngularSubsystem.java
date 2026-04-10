@@ -14,12 +14,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.lib.LoggedTunableNumber;
-import frc.robot.lib.subsystem.DeviceConnectedStatus;
 import frc.robot.lib.subsystem.RegisteredSubsystem;
-import java.util.Arrays;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -170,16 +166,24 @@ public class AngularSubsystem extends RegisteredSubsystem {
 
     Logger.recordOutput(String.format("AngularSubsystems/%s/AtAngle", logKey), isAtAngle);
 
-    if (!Arrays.stream(inputs.deviceConnectedStatuses)
-        .allMatch(DeviceConnectedStatus::isConnected)) {
-      Stream<String> disconnectedDevicesIds =
-          Arrays.stream(inputs.deviceConnectedStatuses)
-              .filter(d -> !d.isConnected())
-              .map(d -> String.valueOf(d.getId()));
+    boolean allConnected = true;
+    for (var status : inputs.deviceConnectedStatuses) {
+      if (!status.isConnected()) {
+        allConnected = false;
+        break;
+      }
+    }
+    if (!allConnected) {
+      StringBuilder disconnectedIds = new StringBuilder();
+      for (var status : inputs.deviceConnectedStatuses) {
+        if (!status.isConnected()) {
+          if (disconnectedIds.length() > 0) disconnectedIds.append(", ");
+          disconnectedIds.append(status.getId());
+        }
+      }
       motorDisconectedAlert.setText(
           String.format(
-              "Motors: %s; on bus: %s disconnected!",
-              disconnectedDevicesIds.collect(Collectors.joining(", ")), config.getBus().getName()));
+              "Motors: %s; on bus: %s disconnected!", disconnectedIds, config.getBus().getName()));
       motorDisconectedAlert.set(true);
     } else {
       motorDisconectedAlert.set(false);
@@ -322,7 +326,9 @@ public class AngularSubsystem extends RegisteredSubsystem {
   }
 
   public boolean areAllDevicesConnected() {
-    return Arrays.stream(inputs.deviceConnectedStatuses)
-        .allMatch(DeviceConnectedStatus::isConnected);
+    for (var status : inputs.deviceConnectedStatuses) {
+      if (!status.isConnected()) return false;
+    }
+    return true;
   }
 }

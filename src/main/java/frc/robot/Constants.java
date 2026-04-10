@@ -39,9 +39,14 @@ public final class Constants {
   public static boolean visionHardwareExists = true;
   public static boolean ledHardwareExists = true;
 
-  // For interplut & tunable double
-  public static boolean kTuningMode = true;
+  // Set true during tuning sessions to allow dashboard-driven PID/table edits.
+  // MUST be false at competition: every LoggedTunableNumber.get() and
+  // LoggedInterpolatingTable.get() is a NetworkTables read, and getTableFromDashboard()
+  // allocates a new TreeMap on every call — causing GC spikes inside the aiming loop.
+  public static boolean kTuningMode = false;
 
-  // Timing instrumentation gate. Keep false in normal operation to avoid loop-time overhead.
-  public static final boolean kEnableLoopTimingLogs = true;
+  // Enable per-subsystem loop-time logging. Useful for diagnosing spikes; keep false
+  // in normal operation to avoid the overhead of ~20 extra Timer.getFPGATimestamp()
+  // calls per loop.
+  public static boolean kEnableLoopTimingLogs = false;
 }

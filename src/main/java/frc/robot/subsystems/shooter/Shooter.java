@@ -11,7 +11,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.either;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -370,9 +369,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
           && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return turretAimed
-          && hoodErr < maxHoodErr * 1.8
-          && shooterDistInRange;
+      return turretAimed && hoodErr < maxHoodErr * 1.8 && shooterDistInRange;
     }
   }
 

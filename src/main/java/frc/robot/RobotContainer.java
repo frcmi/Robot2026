@@ -490,10 +490,6 @@ public class RobotContainer {
         .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE).repeatedly())
         .onFalse(climb.resetClimb());
 
-    // Intake controls
-    operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
-    operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
-
     /* INTAKE CONTROLS
     - Driver left trigger: Intake
     - Driver left bumper: Reverse intake

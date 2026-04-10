@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftBump1"
+            "pathName": "RightBump1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftBump2Hairy"
+            "pathName": "RightBump2Diva"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Left Auto",
+  "folder": "Right Auto",
   "choreoAuto": true
 }

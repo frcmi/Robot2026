@@ -372,12 +372,6 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
       // In neutral zone, more lenient since just tryna get into the alliance zone
       return turretAimed
           && hoodErr < maxHoodErr * 1.8
-          && ((flywheelErr
-                  < FlywheelConstants.kSubsystemConfigReal
-                          .getVelocityTolerance()
-                          .in(RotationsPerSecond)
-                      * 1.8)
-              || disabled)
           && shooterDistInRange;
     }
   }

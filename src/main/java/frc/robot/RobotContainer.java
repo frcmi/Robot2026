@@ -433,7 +433,10 @@ public class RobotContainer {
     - Operator button B: Lock down hood
     - Operator button A: Reset turret
      */
-    operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
+    operatorController
+        .rightTrigger
+        .and(driverController.rightTrigger.negate())
+        .whileTrue(transfer.set(TransferState.kTransferring));
     if (sim) {
       simController.buttonB.whileTrue(transfer.set(TransferState.kTransferring));
     }
@@ -489,10 +492,7 @@ public class RobotContainer {
 
     // Intake controls
     operatorController.rightTrigger.whileTrue(transfer.set(TransferState.kTransferring));
-    operatorController
-        .rightBumper
-        .onTrue(transfer.set(TransferState.kReverse))
-        .onFalse(transfer.set(TransferState.kIdle));
+    operatorController.rightBumper.whileTrue(transfer.set(TransferState.kReverse));
 
     /* INTAKE CONTROLS
     - Driver left trigger: Intake

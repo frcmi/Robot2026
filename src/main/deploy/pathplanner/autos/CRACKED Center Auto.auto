@@ -7,13 +7,32 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center"
+            "pathName": "CenterAuto1"
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Shoot"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterAuto2"
           }
         }
       ]
@@ -21,5 +40,5 @@
   },
   "resetOdom": true,
   "folder": "Center Auto",
-  "choreoAuto": false
+  "choreoAuto": true
 }

@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center Goon"
+            "pathName": "LeftBump1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftBump2Diva"
           }
         },
         {
@@ -20,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Center Auto",
-  "choreoAuto": false
+  "folder": "Left Auto",
+  "choreoAuto": true
 }

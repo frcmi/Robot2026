@@ -11,9 +11,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.either;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -315,7 +313,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
         });
   }
 
-  private boolean getNearTrenchFromHub(Translation2d hubPosition, Pose2d currentPose) {
+  private boolean getNearTrenchFromHub(Translation2d hubPosition, Translation2d currentPose) {
     // Check X
     boolean nearX =
         Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
@@ -328,15 +326,14 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
   // Trench code
   private boolean isNearTrench() {
     ChassisSpeeds velDelta = robotVel.get().times(HoodConstants.HOOD_LOWER_TIME.in(Seconds));
-    Pose2d currentPose = this.robotPose.get();
-    Pose2d futurePose =
-        currentPose.plus(
-            new Transform2d(
-                velDelta.vxMetersPerSecond, velDelta.vyMetersPerSecond, new Rotation2d()));
-    return getNearTrenchFromHub(FieldConstants.kHubPositionBlue, currentPose)
-        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, currentPose)
-        || getNearTrenchFromHub(FieldConstants.kHubPositionBlue, futurePose)
-        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, futurePose);
+    Translation2d currentTranslation = this.robotPose.get().getTranslation();
+    Translation2d futureDelta =
+        new Translation2d(velDelta.vxMetersPerSecond, velDelta.vyMetersPerSecond);
+    Translation2d futureTranslation = currentTranslation.plus(futureDelta);
+    return getNearTrenchFromHub(FieldConstants.kHubPositionBlue, currentTranslation)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, currentTranslation)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionBlue, futureTranslation)
+        || getNearTrenchFromHub(FieldConstants.kHubPositionRed, futureTranslation);
   }
 
   private boolean isInAllianceZone() {
@@ -372,15 +369,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
           && shooterDistInRange;
     } else {
       // In neutral zone, more lenient since just tryna get into the alliance zone
-      return turretAimed
-          && hoodErr < maxHoodErr * 1.8
-          && ((flywheelErr
-                  < FlywheelConstants.kSubsystemConfigReal
-                          .getVelocityTolerance()
-                          .in(RotationsPerSecond)
-                      * 1.8)
-              || disabled)
-          && shooterDistInRange;
+      return turretAimed && hoodErr < maxHoodErr * 1.8 && shooterDistInRange;
     }
   }
 

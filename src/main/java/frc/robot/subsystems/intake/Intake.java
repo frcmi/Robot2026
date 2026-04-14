@@ -45,7 +45,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final Timer oscillationTimer = new Timer();
 
   private final LoggedTunableNumber oscillationPeriod =
-      new LoggedTunableNumber("Intake/OscillationPeriodS", 1.2);
+      new LoggedTunableNumber("Intake/OscillationPeriodS", 0.6);
   private final LoggedTunableNumber oscillationDutyCycle =
       new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.7);
   private final LoggedTunableNumber oscillationInitialDelay =

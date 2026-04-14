@@ -63,11 +63,11 @@ public class TurretConstants {
           .bus(kCanivoreBus)
           .positionTolerance(Degrees.of(10.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(10.0)
+          .kP(7.0)
           .kI(0.0)
-          .kD(0.4)
-          .kS(0.4)
-          .kV(TurretConstants.kV)
+          .kD(0.3)
+          .kS(0.2)
+          .kV(2 * TurretConstants.kV)
           .cruiseVelocity(RotationsPerSecond.of(5)) // 420rpm
           .acceleration(RotationsPerSecondPerSecond.of(15.0))
           .build();

@@ -50,7 +50,7 @@ public class TurretConstants {
 
   public static final double kTurretGearRatio = 75.0 / 21.0 * 48.0 / 11.0;
   public static final double kV =
-      kTurretGearRatio / DCMotor.getKrakenX44(1).KvRadPerSecPerVolt * 1.5;
+      kTurretGearRatio / DCMotor.getKrakenX44(1).KvRadPerSecPerVolt * 3;
 
   public static final Voltage OVERRIDE_VOLTAGE = Volts.of(1.5);
 
@@ -63,11 +63,11 @@ public class TurretConstants {
           .bus(kCanivoreBus)
           .positionTolerance(Degrees.of(10.0))
           .velocityTolerance(RotationsPerSecond.of(1.0)) // Robot can be spinning while we shoot
-          .kP(7.0)
+          .kP(10.0)
           .kI(0.0)
-          .kD(0.3)
+          .kD(0.4)
           .kS(0.2)
-          .kV(2 * TurretConstants.kV)
+          .kV(TurretConstants.kV)
           .cruiseVelocity(RotationsPerSecond.of(5)) // 420rpm
           .acceleration(RotationsPerSecondPerSecond.of(15.0))
           .build();

@@ -271,5 +271,7 @@
  },
  "events":[
    {"name":"IntakeStart", "from":{"target":2, "targetTimestamp":1.45562, "offset":{"exp":"-0.5 s", "val":-0.5}}, "event":null},
-   {"name":"IntakeStop", "from":{"target":3, "targetTimestamp":3.22761, "offset":{"exp":"0.5 s", "val":0.5}}, "event":null}]
+   {"name":"IntakeStop", "from":{"target":3, "targetTimestamp":3.22761, "offset":{"exp":"0.5 s", "val":0.5}}, "event":null},
+   {"name":"IntakeInitLift", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"IntakeInitDrop", "from":{"target":1, "targetTimestamp":0.54834, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

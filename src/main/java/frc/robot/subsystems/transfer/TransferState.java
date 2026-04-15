@@ -67,9 +67,9 @@ public class TransferState implements StructSerializable {
   public static final TransferState kIdle =
       new TransferState(Volts.of(-0.5), RotationsPerSecond.of(0.0), "kIdle");
   public static final TransferState kTransferring =
-      new TransferState(Volts.of(4.5), RotationsPerSecond.of(20.0), "kTransferring");
+      new TransferState(Volts.of(-4.5), RotationsPerSecond.of(20.0), "kTransferring");
   public static final TransferState kReverse =
-      new TransferState(Volts.of(-4.5), RotationsPerSecond.of(-20.0), "kReverse");
+      new TransferState(Volts.of(4.5), RotationsPerSecond.of(-20.0), "kReverse");
 
   @SuppressWarnings("unused")
   public static final Struct<TransferState> struct =

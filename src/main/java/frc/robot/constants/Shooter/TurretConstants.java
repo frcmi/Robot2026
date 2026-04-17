@@ -49,8 +49,7 @@ public class TurretConstants {
   // intake direction
 
   public static final double kTurretGearRatio = 75.0 / 21.0 * 48.0 / 11.0;
-  public static final double kV =
-      kTurretGearRatio / DCMotor.getKrakenX44(1).KvRadPerSecPerVolt * 3;
+  public static final double kV = kTurretGearRatio / DCMotor.getKrakenX44(1).KvRadPerSecPerVolt * 3;
 
   public static final Voltage OVERRIDE_VOLTAGE = Volts.of(1.5);
 

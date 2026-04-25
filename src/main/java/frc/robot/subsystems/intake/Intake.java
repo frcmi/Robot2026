@@ -37,7 +37,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final AngularSubsystem pivot;
   private final Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
-  private final Trigger nearBump = new CachedTrigger(this::isNearBump).debounce(0.05);
+  private final Trigger nearBump = new CachedTrigger(this ::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
   private final BooleanSupplier manualOscillate;
   private final BooleanSupplier isAutonomous;
@@ -45,7 +45,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final Timer oscillationTimer = new Timer();
 
   private final LoggedTunableNumber oscillationPeriod =
-      new LoggedTunableNumber("Intake/OscillationPeriodS", 0.5);
+      new LoggedTunableNumber("Intake/OscillationPeriodS", 0.6);
   private final LoggedTunableNumber oscillationDutyCycle =
       new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.25);
   private final LoggedTunableNumber oscillationInitialDelay =

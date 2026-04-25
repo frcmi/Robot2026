@@ -431,5 +431,5 @@
    {"name":"ShootStart", "from":{"target":6, "targetTimestamp":5.17116, "offset":{"exp":"0.2 s", "val":0.2}}, "event":null},
    {"name":"ShootStop", "from":{"target":8, "targetTimestamp":9.68996, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"IntakeInitLift", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"IntakeInitDrop", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.3 s", "val":0.3}}, "event":null}]
+   {"name":"IntakeInitDrop", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0.6 s", "val":0.6}}, "event":null}]
 }

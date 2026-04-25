@@ -60,7 +60,7 @@ public class PivotConstants {
           .rotorRotationsPerSensorRotation(5.0 * 4.0) // The reductions on the intake
           .outputAnglePerOutputRotation(Rotations.of(1.0))
           .inverted(InvertedValue.Clockwise_Positive)
-          .supplyCurrentLimit(Amps.of(40.0))
+          .supplyCurrentLimit(Amps.of(60.0))
           .statorCurrentLimit(Amps.of(120.0))
           .neutralMode(NeutralModeValue.Brake)
           .kP(kSubsystemConfigReal.getKP())

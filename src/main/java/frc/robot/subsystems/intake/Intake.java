@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
@@ -44,12 +45,16 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
   private final Timer oscillationTimer = new Timer();
 
-  private final LoggedTunableNumber oscillationPeriod =
-      new LoggedTunableNumber("Intake/OscillationPeriodS", 0.6);
-  private final LoggedTunableNumber oscillationDutyCycle =
-      new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.25);
-  private final LoggedTunableNumber oscillationInitialDelay =
-      new LoggedTunableNumber("Intake/OscillationInitialDelay", 0.5);
+  private final LoggedTunableNumber shakeAngleDegrees =
+      new LoggedTunableNumber("Intake/ShakeAngleDegrees", 25.0);
+  private final LoggedTunableNumber shakeUpTimeSec =
+      new LoggedTunableNumber("Intake/ShakeUpTimeSec", 0.4);
+  private final LoggedTunableNumber shakeDownTimeSec =
+      new LoggedTunableNumber("Intake/ShakeDownTimeSec", 0.4);
+  private final LoggedTunableNumber foldVelocityDegreesPerSecond =
+      new LoggedTunableNumber("Intake/FoldVelocityDegreesPerSecond", 10.0);
+  private final LoggedTunableNumber foldMaxAngleDegrees =
+      new LoggedTunableNumber("Intake/FoldMaxAngleDegrees", 80.0);
 
   @Getter private IntakeState targetState = IntakeState.kDown;
   @Getter private IntakeState measuredState;
@@ -102,16 +107,19 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
         prevOscillating = true;
       }
 
-      // Oscillate
-      double timeNow = oscillationTimer.get();
-      double per = oscillationPeriod.get();
-      double initialDelay = oscillationInitialDelay.get();
-      double duty = oscillationDutyCycle.get();
-      boolean intakeUp =
-          timeNow < initialDelay ? false : (timeNow - initialDelay) % per < per * duty;
-      return new IntakeState(
-          intakeUp ? IntakeState.kTransferring.getPivot() : IntakeState.kDown.getPivot(),
-          IntakeState.kTransferring.getRollers());
+      double t = oscillationTimer.get();
+      double t1 = shakeUpTimeSec.get();
+      double t2 = t1 + shakeDownTimeSec.get();
+      double pivotAngle;
+      if (t < t1) {
+        pivotAngle = shakeAngleDegrees.get();
+      } else if (t < t2) {
+        pivotAngle = 0.0;
+      } else {
+        pivotAngle =
+            Math.min(foldVelocityDegreesPerSecond.get() * (t - t2), foldMaxAngleDegrees.get());
+      }
+      return new IntakeState(Degrees.of(pivotAngle), IntakeState.kTransferring.getRollers());
     } else {
       prevOscillating = false;
     }

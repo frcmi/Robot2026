@@ -428,7 +428,7 @@
   "splits":[0]
  },
  "events":[
-   {"name":"IntakeStart", "from":{"target":2, "targetTimestamp":1.32739, "offset":{"exp":"-0.3 s", "val":-0.3}}, "event":null},
+   {"name":"IntakeStart", "from":{"target":2, "targetTimestamp":1.32739, "offset":{"exp":"-0.4 s", "val":-0.4}}, "event":null},
    {"name":"IntakeStop", "from":{"target":5, "targetTimestamp":4.00769, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":null},
    {"name":"IntakeBumpLift", "from":{"target":5, "targetTimestamp":4.00769, "offset":{"exp":"-0.2 s", "val":-0.2}}, "event":null},
    {"name":"IntakeBumpDrop", "from":{"target":7, "targetTimestamp":5.51794, "offset":{"exp":"0 s", "val":0.0}}, "event":null},

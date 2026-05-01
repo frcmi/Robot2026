@@ -483,14 +483,15 @@ public class RobotContainer {
         shooter.turretPower(
             () -> TurretConstants.OVERRIDE_VOLTAGE.times(-operatorController.getRightStickX())));
     operatorController.dPadUp.onTrue(shooter.toggleDisabled());
-    operatorController
+    /*operatorController
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE).repeatedly())
         .onFalse(shooter.zeroHood());
     operatorController
         .dPadDown
         .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE).repeatedly())
-        .onFalse(climb.resetClimb());
+        .onFalse(climb.resetClimb());*/
+    operatorController.dPadDown.whileTrue(superstructure.intakeDefend());
 
     /* INTAKE CONTROLS
     - Driver left trigger: Intake

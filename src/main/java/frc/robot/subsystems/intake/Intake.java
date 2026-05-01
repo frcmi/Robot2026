@@ -12,12 +12,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.constants.RobotConstants;
+import frc.robot.constants.intake.DefenderConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FieldConstants;
@@ -51,6 +53,9 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final LoggedTunableNumber oscillationInitialDelay =
       new LoggedTunableNumber("Intake/OscillationInitialDelay", 0.5);
 
+  private final Servo defender;
+  private boolean defending = false;
+
   @Getter private IntakeState targetState = IntakeState.kDown;
   @Getter private IntakeState measuredState;
 
@@ -80,6 +85,12 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     this.manualOscillate = manualOscillate;
     this.isAutonomous =
         isAutonomous; // Unused, but may be useful at some point so just leaving it in
+
+    // Defender code
+    this.defender = new Servo(DefenderConstants.DEFENDER_PORT);
+    new Trigger(() -> defending)
+        .whileTrue(Commands.runOnce(() -> defender.set(DefenderConstants.defenderClosed.get())))
+        .whileFalse(Commands.runOnce(() -> defender.set(DefenderConstants.defenderClosed.get())));
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
@@ -130,6 +141,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);
+    Logger.recordOutput("Intake/Defending", defending);
 
     if (Constants.kEnableLoopTimingLogs) {
       double end = Timer.getFPGATimestamp();
@@ -151,6 +163,10 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
   public Command openLoopPivot(Voltage volts) {
     return this.pivot.openLoop(() -> volts);
+  }
+
+  public void setDefending(boolean newVal) {
+    this.defending = newVal;
   }
 
   private boolean isNearBump() {

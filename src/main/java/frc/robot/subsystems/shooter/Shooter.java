@@ -317,10 +317,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     // Check X
     boolean nearX =
         Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
-    boolean nearY =
+    /*boolean nearY =
         currentPose.getY() < FieldConstants.trenchWidthY
-            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
-    return nearX && nearY;
+            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);*/
+    return nearX;// && nearY;
   }
 
   // Trench code

@@ -90,7 +90,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     this.defender = new Servo(DefenderConstants.DEFENDER_PORT);
     new Trigger(() -> defending)
         .whileTrue(Commands.runOnce(() -> defender.set(DefenderConstants.defenderClosed.get())))
-        .whileFalse(Commands.runOnce(() -> defender.set(DefenderConstants.defenderClosed.get())));
+        .whileFalse(Commands.runOnce(() -> defender.set(DefenderConstants.defenderOpen.get())));
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));

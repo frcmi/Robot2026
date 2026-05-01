@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.constants.RobotConstants;
-import frc.robot.constants.intake.DefenderConstants;
 import frc.robot.constants.intake.PivotConstants;
 import frc.robot.constants.intake.RollerConstants;
 import frc.robot.constants.shooter.FieldConstants;
@@ -87,10 +86,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
         isAutonomous; // Unused, but may be useful at some point so just leaving it in
 
     // Defender code
-    this.defender = new Servo(DefenderConstants.DEFENDER_PORT);
-    new Trigger(() -> defending)
-        .whileTrue(Commands.runOnce(() -> defender.set(DefenderConstants.defenderClosed.get())))
-        .whileFalse(Commands.runOnce(() -> defender.set(DefenderConstants.defenderOpen.get())));
+    this.defender = new Servo(PivotConstants.DEFENDER_PORT);
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
@@ -139,9 +135,16 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 
+    if (defending) {
+      defender.set(PivotConstants.defenderOpen.getAsDouble());
+    } else {
+      defender.set(PivotConstants.defenderClosed.getAsDouble());
+    }
+
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);
     Logger.recordOutput("Intake/Defending", defending);
+    Logger.recordOutput("Intake/DefenderVal", defender.get());
 
     if (Constants.kEnableLoopTimingLogs) {
       double end = Timer.getFPGATimestamp();

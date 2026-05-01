@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.subsystem.angular.AngularIOSimConfig;
 import frc.robot.lib.subsystem.angular.AngularIOTalonFXConfig;
 import frc.robot.lib.subsystem.angular.AngularSubsystemConfig;
@@ -122,4 +123,12 @@ public class PivotConstants {
               Optional.of(kRealAngleFromSubsystemAngleZeroSupplier))
           .armLengthSupplier(Optional.of(() -> PivotLength))
           .build();
+
+  public static final int DEFENDER_PORT = 2;
+  public static LoggedTunableNumber defenderClosed =
+      new LoggedTunableNumber("Defender/DefenderClosed", 0.28);
+  public static LoggedTunableNumber defenderOpen =
+      new LoggedTunableNumber("Defender/DefenderOpen", 0.82);
+public static LoggedTunableNumber defenderWaitTime =
+      new LoggedTunableNumber("Defender/DefenderWait", 0.15);
 }

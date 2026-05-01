@@ -8,7 +8,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.DriveConstants;
@@ -138,8 +140,10 @@ public class RobotSuperstructure {
 
   // Defending
   public Command intakeDefend() {
-    return new SequentialCommandGroup(
-            Commands.runOnce(() -> intake.setDefending(true)), intake.set(IntakeState.kDefending))
+    return new ParallelCommandGroup(
+            intake.set(IntakeState.kDefending),
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), Commands.runOnce(() -> intake.setDefending(true))))
         .finallyDo(() -> intake.setDefending(false));
   }
 }

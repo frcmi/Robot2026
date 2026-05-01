@@ -462,12 +462,12 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 shooter.setFlywheelOffset(
-                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(1.0)))));
+                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(0.5)))));
     operatorController.buttonX.onTrue(
         Commands.runOnce(
             () ->
                 shooter.setFlywheelOffset(
-                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(-1.0)))));
+                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(-0.5)))));
 
     /* DEBUG/FAILSAFE CONTROLS:
      - Operator A: Toggle turret manual override

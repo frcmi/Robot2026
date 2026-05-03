@@ -61,7 +61,7 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
 
   // for crossing shooting in init, if true hood will not lower when near trench
   @Getter @Setter private boolean hoodUnlocked = true;
-  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(0.0);
+  @Getter @Setter private AngularVelocity flywheelOffset = RotationsPerSecond.of(1.5);
 
   // For detecting whether aimed or not
   double targetDist = 0.0;
@@ -317,10 +317,10 @@ public class Shooter extends VirtualSubsystem implements AllianceUpdatedObserver
     // Check X
     boolean nearX =
         Math.abs(currentPose.getX() - hubPosition.getX()) < (FieldConstants.trenchWidthX / 2.0);
-    boolean nearY =
-        currentPose.getY() < FieldConstants.trenchWidthY
-            || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);
-    return nearX && nearY;
+    /*boolean nearY =
+    currentPose.getY() < FieldConstants.trenchWidthY
+        || currentPose.getY() > (FieldConstants.fieldWidthY - FieldConstants.trenchWidthY);*/
+    return nearX; // && nearY;
   }
 
   // Trench code

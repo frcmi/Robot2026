@@ -194,7 +194,7 @@ public class RobotContainer {
                   new AngularSubsystem(
                       new AngularIOTalonFX(KickerConstants.kTalonFXConfig),
                       KickerConstants.kSubsystemConfigReal),
-                  shooter.aimed);
+                  shooter.aimed.or(operatorController.leftTrigger));
           intake =
               new Intake(
                   new AngularSubsystem(
@@ -318,7 +318,7 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 shooter::isTurretAimed,
                 new VisionIO() {}); // , new VisionIO() {});
-        transfer = new Transfer(shooter.aimed);
+        transfer = new Transfer(shooter.aimed.or(operatorController.leftTrigger));
         intake = new Intake(drive::getPose, transfer::isAttemptingShooting, isManuallyOscillating);
         climb = new Climb();
         led = new LED();
@@ -429,14 +429,16 @@ public class RobotContainer {
 
     /* SHOOTER CONTROLS
     - Operator right trigger (driver in sim): Shoot, NOTE: this rumbles the controller when not aimed
+    - Operator left trigger: Shoot, ignore all overrides
     - Operator right bumper: Reverse transfer (why is this useful?)
     - Operator button B: Lock down hood
     - Operator button A: Reset turret
      */
     operatorController
         .rightTrigger
-        .and(driverController.rightTrigger.negate())
+        .and(driverController.rightTrigger.and(shooter.inAllianceZone).negate())
         .whileTrue(transfer.set(TransferState.kTransferring));
+    operatorController.leftTrigger.whileTrue(transfer.set(TransferState.kTransferring));
     if (sim) {
       simController.buttonB.whileTrue(transfer.set(TransferState.kTransferring));
     }
@@ -460,12 +462,12 @@ public class RobotContainer {
         Commands.runOnce(
             () ->
                 shooter.setFlywheelOffset(
-                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(1.0)))));
+                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(0.5)))));
     operatorController.buttonX.onTrue(
         Commands.runOnce(
             () ->
                 shooter.setFlywheelOffset(
-                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(-1.0)))));
+                    shooter.getFlywheelOffset().plus(RotationsPerSecond.of(-0.5)))));
 
     /* DEBUG/FAILSAFE CONTROLS:
      - Operator A: Toggle turret manual override
@@ -485,10 +487,11 @@ public class RobotContainer {
         .dPadLeft
         .whileTrue(shooter.overrideHood(HoodConstants.MANUAL_OVERRIDE).repeatedly())
         .onFalse(shooter.zeroHood());
-    operatorController
-        .dPadDown
-        .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE).repeatedly())
-        .onFalse(climb.resetClimb());
+    /*operatorController
+    .dPadDown
+    .whileTrue(climb.overrideClimb(ClimberConstants.MANUAL_OVERRIDE).repeatedly())
+    .onFalse(climb.resetClimb());*/
+    operatorController.dPadDown.whileTrue(superstructure.intakeDefend());
 
     /* INTAKE CONTROLS
     - Driver left trigger: Intake

@@ -64,7 +64,9 @@ public class Robot extends LoggedRobot {
           realLogPath = "/home/lvuser/logs";
         }
         Logger.addDataReceiver(new WPILOGWriter(realLogPath));
-        Logger.addDataReceiver(new NT4Publisher());
+        if (Constants.kTuningMode) {
+          Logger.addDataReceiver(new NT4Publisher());
+        }
         break;
 
       case SIM:

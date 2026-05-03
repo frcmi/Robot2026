@@ -40,7 +40,7 @@ public final class Constants {
   public static boolean ledHardwareExists = true;
 
   // For interplut & tunable double
-  public static boolean kTuningMode = true;
+  public static boolean kTuningMode = false;
 
   // Timing instrumentation gate. Keep false in normal operation to avoid loop-time overhead.
   public static final boolean kEnableLoopTimingLogs = true;

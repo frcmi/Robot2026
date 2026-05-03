@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,7 +38,7 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final AngularSubsystem pivot;
   private final Supplier<Pose2d> robotPose;
   private Alliance alliance = Alliance.Red;
-  private final Trigger nearBump = new CachedTrigger(this ::isNearBump).debounce(0.05);
+  private final Trigger nearBump = new CachedTrigger(this::isNearBump).debounce(0.05);
   private final BooleanSupplier shooting;
   private final BooleanSupplier manualOscillate;
   private final BooleanSupplier isAutonomous;
@@ -45,11 +46,14 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
   private final Timer oscillationTimer = new Timer();
 
   private final LoggedTunableNumber oscillationPeriod =
-      new LoggedTunableNumber("Intake/OscillationPeriodS", 0.6);
+      new LoggedTunableNumber("Intake/OscillationPeriodS", 1.1);
   private final LoggedTunableNumber oscillationDutyCycle =
-      new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.25);
+      new LoggedTunableNumber("Intake/OscillationDutyCycle", 0.7);
   private final LoggedTunableNumber oscillationInitialDelay =
       new LoggedTunableNumber("Intake/OscillationInitialDelay", 0.5);
+
+  private final Servo defender;
+  private boolean defending = false;
 
   @Getter private IntakeState targetState = IntakeState.kDown;
   @Getter private IntakeState measuredState;
@@ -80,6 +84,9 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     this.manualOscillate = manualOscillate;
     this.isAutonomous =
         isAutonomous; // Unused, but may be useful at some point so just leaving it in
+
+    // Defender code
+    this.defender = new Servo(PivotConstants.DEFENDER_PORT);
 
     pivot.setDefaultCommand(pivot.holdAtGoal(() -> gatedTarget().getPivot()));
     rollers.setDefaultCommand(rollers.openLoop(() -> gatedTarget().getRollers()));
@@ -128,8 +135,16 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
     measuredState.setPivot(pivot.getAngle());
     measuredState.setRollers(targetState.getRollers());
 
+    if (defending) {
+      defender.set(PivotConstants.defenderOpen.getAsDouble());
+    } else {
+      defender.set(PivotConstants.defenderClosed.getAsDouble());
+    }
+
     Logger.recordOutput("Intake/TargetState", targetState);
     Logger.recordOutput("Intake/MeasuredState", measuredState);
+    Logger.recordOutput("Intake/Defending", defending);
+    Logger.recordOutput("Intake/DefenderVal", defender.get());
 
     if (Constants.kEnableLoopTimingLogs) {
       double end = Timer.getFPGATimestamp();
@@ -151,6 +166,10 @@ public class Intake extends VirtualSubsystem implements AllianceUpdatedObserver 
 
   public Command openLoopPivot(Voltage volts) {
     return this.pivot.openLoop(() -> volts);
+  }
+
+  public void setDefending(boolean newVal) {
+    this.defending = newVal;
   }
 
   private boolean isNearBump() {

@@ -38,7 +38,7 @@ public class TurretConstants {
   public static final Translation3d TurretCameraOffset =
       new Translation3d(Inches.of(7.005).in(Meters), 0, Inches.of(18.010477).in(Meters));
   public static final Rotation3d TurretCameraRotation =
-      new Rotation3d(0, Math.toRadians(150), Math.toRadians(180));
+      new Rotation3d(0, Math.toRadians(144), Math.toRadians(180)); // 32 deg pitch
 
   public static final Angle kTurretPhysicalMinAngle = Degrees.of(-235);
   public static final Angle kTurretPhysicalMaxAngle =
@@ -65,7 +65,7 @@ public class TurretConstants {
           .kP(10.0)
           .kI(0.0)
           .kD(0.4)
-          .kS(0.2)
+          .kS(0.62)
           .kV(TurretConstants.kV)
           .cruiseVelocity(RotationsPerSecond.of(5)) // 420rpm
           .acceleration(RotationsPerSecondPerSecond.of(15.0))

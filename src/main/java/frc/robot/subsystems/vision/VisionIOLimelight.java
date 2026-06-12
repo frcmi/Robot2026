@@ -37,6 +37,10 @@ public class VisionIOLimelight implements VisionIO {
 
   private final String name;
 
+  // Pre-allocated collections reused each updateInputs() call to avoid per-loop GC pressure
+  private final Set<Integer> tagIds = new HashSet<>();
+  private final List<PoseObservation> poseObservations = new ArrayList<>();
+
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -73,8 +77,8 @@ public class VisionIOLimelight implements VisionIO {
         new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Read new pose observations from NetworkTables
-    Set<Integer> tagIds = new HashSet<>();
-    List<PoseObservation> poseObservations = new ArrayList<>();
+    tagIds.clear();
+    poseObservations.clear();
     for (var rawSample : megatag1Subscriber.readQueue()) {
       if (rawSample.value.length == 0) continue;
       for (int i = 11; i < rawSample.value.length; i += 7) {

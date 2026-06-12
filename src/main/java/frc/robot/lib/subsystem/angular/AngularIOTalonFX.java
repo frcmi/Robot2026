@@ -129,17 +129,12 @@ public class AngularIOTalonFX implements AngularIO {
         referenceVelocity);
     SignalIOManager.addSignals(busName, motorTemperatures);
 
-    // Update logging frequency
+    // Control signals: 50 Hz — used in the feedback loop each cycle
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
-        position,
-        velocity,
-        acceleration,
-        appliedVolts,
-        supplyCurrent,
-        statorCurrent,
-        referencePosition,
-        referenceVelocity);
+        50.0, position, velocity, appliedVolts, supplyCurrent, statorCurrent);
+    // Logging-only signals: 20 Hz — not on the control path, reducing RIO CAN bus load
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        20.0, acceleration, referencePosition, referenceVelocity);
 
     // Update status frame rate
     master

@@ -129,6 +129,6 @@ public class PivotConstants {
       new LoggedTunableNumber("Defender/DefenderClosed", 0.28);
   public static LoggedTunableNumber defenderOpen =
       new LoggedTunableNumber("Defender/DefenderOpen", 0.82);
-public static LoggedTunableNumber defenderWaitTime =
+  public static LoggedTunableNumber defenderWaitTime =
       new LoggedTunableNumber("Defender/DefenderWait", 0.15);
 }
